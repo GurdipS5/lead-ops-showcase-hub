@@ -9,6 +9,7 @@ import Skills from '@/components/Skills';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import LighthouseWidget from '@/components/LighthouseWidget';
+import GitHubWidget from '@/components/GitHubWidget';
 
 const Index = () => {
   return (
@@ -20,6 +21,7 @@ const Index = () => {
         <Experience />
         <Projects />
         <Skills />
+        <GitHubWidget />
         <Contact />
         <LighthouseWidget />
         <Footer />
