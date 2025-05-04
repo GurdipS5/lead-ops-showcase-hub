@@ -51,7 +51,8 @@ const Skills = () => {
     { name: "NDepend", isLucide: true, icon: "database" },
     { name: "Visual Studio", isLucide: true, icon: "computer" },
     { name: "Windows Server", isLucide: true, icon: "server" },
-    { name: "Cilium", isLucide: true, icon: "shield" },
+    // Updated Cilium logo to use the provided image
+    { name: "Cilium", icon: "/lovable-uploads/5be38420-0bb7-4527-8cf9-b32fda1df103.png" },
     // Updated Istio logo using the provided SVG image
     { name: "Istio", icon: "/lovable-uploads/5e91d7b0-070e-46f5-9eca-ec89175e7427.png" },
     // VMware logo with improved background handling
@@ -135,7 +136,6 @@ const Skills = () => {
                         {tool.icon === "database" && <Database className="w-16 h-16 mb-3" />}
                         {tool.icon === "computer" && <Computer className="w-16 h-16 mb-3" />}
                         {tool.icon === "server" && <Server className="w-16 h-16 mb-3" />}
-                        {tool.icon === "shield" && <Shield className="w-16 h-16 mb-3" />}
                         {tool.icon === "layers" && <Layers className="w-16 h-16 mb-3" />}
                       </>
                     ) : (
@@ -148,14 +148,16 @@ const Skills = () => {
                           mixBlendMode: tool.name === "Pulumi" ? "screen" : 
                                         tool.name === "OPNsense" ? "multiply" : 
                                         tool.name === "VMware" ? "screen" :
-                                        tool.name === "Istio" ? "normal" : "normal",
+                                        tool.name === "Istio" ? "normal" : 
+                                        tool.name === "Cilium" ? "normal" : "normal",
                           filter: tool.name === "OPNsense" ? "brightness(1.2)" : 
                                   tool.name === "VMware" ? "brightness(1.1) contrast(1.1)" :
                                   "none",
                           opacity: tool.name === "OPNsense" ? 0.9 : 1,
                           backdropFilter: tool.name === "VMware" ? "blur(0px)" : undefined,
                           background: tool.name === "VMware" ? "transparent" : 
-                                      tool.name === "Istio" ? "transparent" : undefined
+                                      tool.name === "Istio" ? "transparent" :
+                                      tool.name === "Cilium" ? "transparent" : undefined
                         }}
                       />
                     )}
