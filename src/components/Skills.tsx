@@ -1,10 +1,9 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Database, Computer, Server, Shield, Layers, HardDrive } from "lucide-react";
+import { Database, Computer, Server, Shield, Layers } from "lucide-react";
 
 const Skills = () => {
   // Technical skills data
@@ -49,14 +48,15 @@ const Skills = () => {
     { name: "Sentry", icon: "https://www.vectorlogo.zone/logos/sentryio/sentryio-icon.svg" },
     { name: "Sonarqube", icon: "https://www.svgrepo.com/show/354365/sonarqube.svg" },
     { name: "JetBrains", icon: "https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" },
-    // Adding the requested tools with Lucide icons
+    // Adding the requested tools with Lucide icons for some and images for others
     { name: "NDepend", isLucide: true, icon: "database" },
     { name: "Visual Studio", isLucide: true, icon: "computer" },
     { name: "Windows Server", isLucide: true, icon: "server" },
     { name: "Cilium", isLucide: true, icon: "shield" },
     { name: "Istio", isLucide: true, icon: "layers" },
-    { name: "VMware", isLucide: true, icon: "hard-drive" },
-    // Replace with the new OPNsense logo
+    // Replace the Lucide icon with the actual VMware logo
+    { name: "VMware", icon: "/lovable-uploads/c9c6d218-0234-469a-be35-ba9e760b6653.png" },
+    // Keep the existing OPNsense logo
     { name: "OPNsense", icon: "/lovable-uploads/d49f1107-d7a3-4ac2-a862-1744e1aa3bc0.png" }
   ];
   
@@ -137,7 +137,6 @@ const Skills = () => {
                         {tool.icon === "server" && <Server className="w-16 h-16 mb-3" />}
                         {tool.icon === "shield" && <Shield className="w-16 h-16 mb-3" />}
                         {tool.icon === "layers" && <Layers className="w-16 h-16 mb-3" />}
-                        {tool.icon === "hard-drive" && <HardDrive className="w-16 h-16 mb-3" />}
                       </>
                     ) : (
                       <img 
@@ -146,9 +145,13 @@ const Skills = () => {
                         className="w-16 h-16 mb-3 object-contain"
                         style={{ 
                           backgroundColor: tool.name === "Pulumi" ? "transparent" : undefined,
-                          mixBlendMode: tool.name === "Pulumi" ? "screen" : tool.name === "OPNsense" ? "multiply" : "normal",
-                          filter: tool.name === "OPNsense" ? "brightness(1.2)" : "none",
-                          opacity: tool.name === "OPNsense" ? 0.9 : 1
+                          mixBlendMode: tool.name === "Pulumi" ? "screen" : 
+                                        tool.name === "OPNsense" ? "multiply" : 
+                                        tool.name === "VMware" ? "screen" : "normal",
+                          filter: tool.name === "OPNsense" ? "brightness(1.2)" : 
+                                  tool.name === "VMware" ? "brightness(0.95) contrast(0.9)" : "none",
+                          opacity: tool.name === "OPNsense" ? 0.9 : 
+                                   tool.name === "VMware" ? 0.85 : 1
                         }}
                       />
                     )}
