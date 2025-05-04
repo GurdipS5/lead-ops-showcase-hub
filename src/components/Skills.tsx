@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -51,14 +50,10 @@ const Skills = () => {
     { name: "JetBrains", icon: "https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" },
     { name: "NDepend", isLucide: true, icon: "database" },
     { name: "Visual Studio", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/visualstudio/visualstudio-plain.svg" },
-    { name: "Windows Server", isLucide: true, icon: "server" },
-    // Updated Cilium logo to use the provided image
+    { name: "Windows Server", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows8/windows8-original.svg" },
     { name: "Cilium", icon: "/lovable-uploads/5be38420-0bb7-4527-8cf9-b32fda1df103.png" },
-    // Updated Istio logo using the provided SVG image
     { name: "Istio", icon: "/lovable-uploads/5e91d7b0-070e-46f5-9eca-ec89175e7427.png" },
-    // VMware logo with improved background handling
     { name: "VMware", icon: "/lovable-uploads/c9c6d218-0234-469a-be35-ba9e760b6653.png" },
-    // Keep the existing OPNsense logo
     { name: "OPNsense", icon: "/lovable-uploads/d49f1107-d7a3-4ac2-a862-1744e1aa3bc0.png" }
   ];
   
@@ -147,6 +142,7 @@ const Skills = () => {
                         style={{ 
                           backgroundColor: tool.name === "Pulumi" ? "transparent" : undefined,
                           mixBlendMode: tool.name === "Pulumi" ? "screen" : 
+                                        tool.name === "Pulumi" ? "screen" : 
                                         tool.name === "OPNsense" ? "multiply" : 
                                         tool.name === "VMware" ? "screen" :
                                         tool.name === "Istio" ? "normal" : 
