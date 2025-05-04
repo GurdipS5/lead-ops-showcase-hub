@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -54,7 +55,7 @@ const Skills = () => {
     { name: "Windows Server", isLucide: true, icon: "server" },
     { name: "Cilium", isLucide: true, icon: "shield" },
     { name: "Istio", isLucide: true, icon: "layers" },
-    // Replace the Lucide icon with the actual VMware logo
+    // VMware logo with improved background handling
     { name: "VMware", icon: "/lovable-uploads/c9c6d218-0234-469a-be35-ba9e760b6653.png" },
     // Keep the existing OPNsense logo
     { name: "OPNsense", icon: "/lovable-uploads/d49f1107-d7a3-4ac2-a862-1744e1aa3bc0.png" }
@@ -149,9 +150,11 @@ const Skills = () => {
                                         tool.name === "OPNsense" ? "multiply" : 
                                         tool.name === "VMware" ? "screen" : "normal",
                           filter: tool.name === "OPNsense" ? "brightness(1.2)" : 
-                                  tool.name === "VMware" ? "brightness(0.95) contrast(0.9)" : "none",
+                                  tool.name === "VMware" ? "brightness(1.1) contrast(1.1)" : "none",
                           opacity: tool.name === "OPNsense" ? 0.9 : 
-                                   tool.name === "VMware" ? 0.85 : 1
+                                   tool.name === "VMware" ? 1 : 1,
+                          backdropFilter: tool.name === "VMware" ? "blur(0px)" : undefined,
+                          background: tool.name === "VMware" ? "transparent" : undefined
                         }}
                       />
                     )}
