@@ -16,6 +16,16 @@ const Navbar = () => {
     { name: "Contact", href: "#contact" },
   ];
 
+  const handleResumeClick = () => {
+    // Create a link to download the resume PDF
+    const link = document.createElement('a');
+    link.href = '/resume.pdf'; // The path to your resume PDF
+    link.download = 'Gurdip_Sira_Resume.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <header className="w-full z-50 bg-[#0a0f1f] py-5 fixed">
       <div className="container flex items-center justify-between">
@@ -42,7 +52,10 @@ const Navbar = () => {
             </a>
           ))}
           <ThemeToggle />
-          <Button className="font-mono text-sm bg-[#33c3f0] hover:bg-[#33c3f0]/90 text-white">
+          <Button 
+            className="font-mono text-sm bg-[#33c3f0] hover:bg-[#33c3f0]/90 text-white"
+            onClick={handleResumeClick}
+          >
             Resume
           </Button>
         </nav>
@@ -72,7 +85,10 @@ const Navbar = () => {
               {link.name}
             </a>
           ))}
-          <Button className="font-mono text-sm bg-[#33c3f0] hover:bg-[#33c3f0]/90 text-white w-full">
+          <Button 
+            className="font-mono text-sm bg-[#33c3f0] hover:bg-[#33c3f0]/90 text-white w-full"
+            onClick={handleResumeClick}
+          >
             Resume
           </Button>
         </nav>
