@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Skills = () => {
   const technicalSkills = [
@@ -74,28 +75,30 @@ const Skills = () => {
             <h3 className="text-xl font-bold mb-4 mt-10">Certifications</h3>
             <Card>
               <CardContent className="p-6">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50%]">Certification</TableHead>
-                      <TableHead>Issuer</TableHead>
-                      <TableHead className="text-right">Year</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {certifications.map((cert) => (
-                      <TableRow key={cert.name}>
-                        <TableCell className="font-medium">{cert.name}</TableCell>
-                        <TableCell>{cert.issuer}</TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="outline" className="bg-devops-dark text-white text-sm font-medium">
-                            {cert.year}
-                          </Badge>
-                        </TableCell>
+                <ScrollArea className="h-[320px]">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[50%] sticky top-0 bg-background z-10">Certification</TableHead>
+                        <TableHead className="sticky top-0 bg-background z-10">Issuer</TableHead>
+                        <TableHead className="text-right sticky top-0 bg-background z-10">Year</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {certifications.map((cert) => (
+                        <TableRow key={cert.name}>
+                          <TableCell className="font-medium">{cert.name}</TableCell>
+                          <TableCell>{cert.issuer}</TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant="outline" className="bg-devops-dark text-white text-sm font-medium">
+                              {cert.year}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>
