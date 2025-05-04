@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +43,7 @@ const Skills = () => {
     { name: "PostgreSQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
     { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
     { name: "C#", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg" },
-    { name: "Snyk", icon: "https://www.vectorlogo.zone/logos/snyk/snyk-icon.svg" },
+    { name: "Snyk", icon: "https://www.svgrepo.com/show/378926/snyk.svg" },
     { name: "Hashicorp Vault", icon: "https://www.vectorlogo.zone/logos/vaultproject/vaultproject-icon.svg" },
     { name: "Sentry", icon: "https://www.vectorlogo.zone/logos/sentryio/sentryio-icon.svg" },
     { name: "Sonarqube", icon: "https://www.svgrepo.com/show/354365/sonarqube.svg" },
@@ -151,10 +150,11 @@ const Skills = () => {
                                         tool.name === "VMware" ? "screen" :
                                         tool.name === "Istio" ? "normal" : 
                                         tool.name === "Cilium" ? "normal" : 
-                                        tool.name === "Visual Studio" ? "normal" : "normal",
+                                        tool.name === "Visual Studio" ? "normal" :
+                                        tool.name === "Snyk" ? "normal" : "normal",
                           filter: tool.name === "OPNsense" ? "brightness(1.2)" : 
                                   tool.name === "VMware" ? "brightness(1.1) contrast(1.1)" :
-                                  "none",
+                                  tool.name === "Snyk" ? "brightness(1.1)" : "none",
                           opacity: tool.name === "OPNsense" ? 0.9 : 1,
                           backdropFilter: tool.name === "VMware" ? "blur(0px)" : undefined,
                           background: tool.name === "VMware" ? "transparent" : 
