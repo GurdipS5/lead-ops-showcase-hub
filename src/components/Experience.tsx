@@ -5,8 +5,21 @@ const Experience = () => {
   const experiences = [
     {
       position: "DevOps Lead",
+      company: "Virgin Money",
+      period: "October 2022 - Present",
+      description:
+        "Leading cloud migration initiatives, infrastructure optimization, and DevOps transformation across the organization. Responsible for implementing modern CI/CD practices, Kubernetes orchestration, and fostering a culture of innovation through Research and Development.",
+      achievements: [
+        "Led a seamless migration of 50+ applications to AWS/Azure, resulting in a 30% reduction in infrastructure costs and improved scalability",
+        "Successfully designed, deployed, and maintained highly available Kubernetes clusters supporting over 100 microservices",
+        "Developed common Terraform modules, reducing code duplication and increasing developer productivity",
+        "Built a Research and Development function focused on AI, Machine Learning and Data Engineering in Azure"
+      ]
+    },
+    {
+      position: "DevOps Lead",
       company: "TechSolutions Inc.",
-      period: "2021 - Present",
+      period: "2021 - 2022",
       description:
         "Leading a team of 8 engineers to implement and maintain CI/CD pipelines, cloud infrastructure, and monitoring solutions across the organization. Reduced deployment time by 70% and increased system reliability by implementing automated testing and monitoring.",
       achievements: [
@@ -37,18 +50,6 @@ const Experience = () => {
         "Orchestrated migration from on-premise to AWS cloud infrastructure",
         "Implemented Docker containers for local development environments",
         "Created automated backup and recovery procedures, reducing data loss risk"
-      ]
-    },
-    {
-      position: "IT Operations Specialist",
-      company: "Data Systems Ltd.",
-      period: "2013 - 2015",
-      description:
-        "Provided support for internal systems and infrastructure. Participated in initial DevOps transformation projects.",
-      achievements: [
-        "Automated routine server maintenance tasks using Bash and Python scripts",
-        "Set up monitoring and alerting using Nagios and ELK stack",
-        "Collaborated on the first company-wide CI/CD implementation"
       ]
     }
   ];
