@@ -10,15 +10,11 @@ const About = () => {
         <div className="grid lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2 space-y-6">
             <p className="text-lg">
-              I'm a seasoned <span className="highlight-text">DevOps Leader</span> with a passion for building scalable infrastructure and optimizing development workflows. With extensive experience in cloud architecture, containerization, and continuous integration/delivery, I specialize in transforming traditional IT operations into streamlined, automated processes.
+              Ever since I wrote my first line of code in high school, I've been captivated by the power of technology to transform ideas into reality. My journey into the world of <span className="highlight-text">DevOps</span> began with a fascination for how infrastructure and development can seamlessly work together to deliver robust, scalable, and efficient solutions. Over the past decade, I have dedicated myself to mastering the art of DevOps, spearheading initiatives that have revolutionized deployment pipelines, enhanced system reliability, and optimized workflows.
             </p>
             
             <p>
-              Throughout my career, I've led teams that implemented efficient DevOps practices across various industries, resulting in faster deployment cycles, improved system reliability, and enhanced collaboration between development and operations teams.
-            </p>
-            
-            <p>
-              My approach combines technical expertise with a deep understanding of business needs, ensuring that infrastructure decisions support both engineering excellence and organizational goals.
+              From automating complex CI/CD processes to implementing comprehensive monitoring solutions, my career is a testament to my passion for continuous improvement and innovation. As a DevOps lead, I have successfully led cross-functional teams, driven cloud migration projects, and ensured the stability and performance of mission-critical applications. Join me as I share the milestones, projects, and experiences that define my professional journey and showcase my commitment to excellence in the ever-evolving field of DevOps.
             </p>
             
             <div className="grid sm:grid-cols-2 gap-4 mt-8">
