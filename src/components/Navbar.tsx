@@ -20,7 +20,7 @@ const Navbar = () => {
     // Create a link to download the resume PDF
     const link = document.createElement('a');
     link.href = '/resume.pdf'; // The path to your resume PDF
-    link.download = 'Gurdip_Sira_Resume.pdf';
+    link.setAttribute('download', 'Gurdip_Sira_Resume.pdf');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
