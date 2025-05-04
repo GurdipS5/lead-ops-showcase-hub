@@ -17,16 +17,16 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="w-full z-50 bg-background py-5">
+    <header className="w-full z-50 bg-[#0a0f1f] py-5 fixed">
       <div className="container flex items-center justify-between">
         <div className="flex items-center">
           <a
             href="#"
-            className="text-xl font-pixel font-bold text-foreground flex items-center gap-1"
+            className="text-xl font-bold text-white flex items-center gap-1"
           >
-            <span className="text-accent">&lt;</span>
-            Gurdip<span className="text-accent">Sira</span>
-            <span className="text-accent">/&gt;</span>
+            <span className="text-[#33c3f0]">&lt;</span>
+            Gurdip<span className="text-[#33c3f0]">Sira</span>
+            <span className="text-[#33c3f0]">/&gt;</span>
           </a>
         </div>
 
@@ -36,13 +36,13 @@ const Navbar = () => {
             <a
               key={link.name}
               href={link.href}
-              className="font-mono text-sm text-gray-600 dark:text-gray-300 hover:text-accent dark:hover:text-accent transition-colors duration-200"
+              className="font-mono text-sm text-gray-300 hover:text-[#33c3f0] transition-colors duration-200"
             >
               {link.name}
             </a>
           ))}
           <ThemeToggle />
-          <Button className="font-mono text-sm bg-accent hover:bg-accent/90">
+          <Button className="font-mono text-sm bg-[#33c3f0] hover:bg-[#33c3f0]/90 text-white">
             Resume
           </Button>
         </nav>
@@ -52,7 +52,7 @@ const Navbar = () => {
           <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-foreground"
+            className="text-white"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -61,18 +61,18 @@ const Navbar = () => {
 
       {/* Mobile navigation */}
       {mobileMenuOpen && (
-        <nav className="md:hidden absolute top-full left-0 right-0 bg-background shadow-md py-4 px-6 flex flex-col gap-4 z-50">
+        <nav className="md:hidden absolute top-full left-0 right-0 bg-[#0a0f1f] shadow-md py-4 px-6 flex flex-col gap-4 z-50">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="font-mono text-sm text-gray-600 dark:text-gray-300 hover:text-accent dark:hover:text-accent py-2 transition-colors duration-200"
+              className="font-mono text-sm text-gray-300 hover:text-[#33c3f0] py-2 transition-colors duration-200"
               onClick={() => setMobileMenuOpen(false)}
             >
               {link.name}
             </a>
           ))}
-          <Button className="font-mono text-sm bg-accent hover:bg-accent/90 w-full">
+          <Button className="font-mono text-sm bg-[#33c3f0] hover:bg-[#33c3f0]/90 text-white w-full">
             Resume
           </Button>
         </nav>
