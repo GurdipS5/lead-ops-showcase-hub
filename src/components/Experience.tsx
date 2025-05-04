@@ -18,7 +18,7 @@ const Experience = () => {
     },
     {
       position: "DevOps Lead",
-      company: "TechSolutions Inc.",
+      company: "Sea/Live",
       period: "2021 - 2022",
       description:
         "Led DevOps initiatives focusing on security, compliance, and infrastructure automation. Enhanced CI/CD pipelines and implemented security best practices across the organization's Kubernetes infrastructure.",
