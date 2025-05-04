@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -129,14 +130,14 @@ const Navbar = () => {
             <a
               key={link.name}
               href={link.href}
-              className="font-mono text-sm text-gray-300 hover:text-[#33c3f0] transition-colors duration-200"
+              className="font-sans text-sm text-gray-300 hover:text-[#33c3f0] transition-colors duration-200 tracking-wide font-medium"
             >
               {link.name}
             </a>
           ))}
           <ThemeToggle />
           <Button 
-            className="font-mono text-sm bg-[#33c3f0] hover:bg-[#33c3f0]/90 text-white"
+            className="font-sans text-sm bg-[#33c3f0] hover:bg-[#33c3f0]/90 text-white"
             onClick={handleResumeClick}
           >
             Resume
@@ -162,14 +163,14 @@ const Navbar = () => {
             <a
               key={link.name}
               href={link.href}
-              className="font-mono text-sm text-gray-300 hover:text-[#33c3f0] py-2 transition-colors duration-200"
+              className="font-sans text-sm text-gray-300 hover:text-[#33c3f0] py-2 transition-colors duration-200 tracking-wide font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               {link.name}
             </a>
           ))}
           <Button 
-            className="font-mono text-sm bg-[#33c3f0] hover:bg-[#33c3f0]/90 text-white w-full"
+            className="font-sans text-sm bg-[#33c3f0] hover:bg-[#33c3f0]/90 text-white w-full"
             onClick={handleResumeClick}
           >
             Resume
