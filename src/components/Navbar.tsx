@@ -6,24 +6,7 @@ import { cn } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
   const navLinks = [
     { name: "Home", href: "#hero" },
@@ -35,14 +18,7 @@ const Navbar = () => {
   ];
 
   return (
-    <header
-      className={cn(
-        "w-full z-50 transition-all duration-300",
-        isScrolled
-          ? "bg-black/90 dark:bg-devops-darkbg/90 shadow-sm backdrop-blur-sm py-3"
-          : "bg-black py-5"
-      )}
-    >
+    <header className="w-full z-50 bg-black py-5">
       <div className="container flex items-center justify-between">
         <div className="flex items-center">
           <a
@@ -67,7 +43,7 @@ const Navbar = () => {
             </a>
           ))}
           <ThemeToggle />
-          <Button className="bg-accent hover:bg-accent/90 dark:bg-devops-darkaccent dark:hover:bg-devops-darkaccent/90">
+          <Button className="bg-accent hover:bg-accent/90">
             Resume
           </Button>
         </nav>
@@ -86,7 +62,7 @@ const Navbar = () => {
 
       {/* Mobile navigation */}
       {mobileMenuOpen && (
-        <nav className="md:hidden absolute top-full left-0 right-0 bg-black dark:bg-devops-darkbg shadow-md py-4 px-6 flex flex-col gap-4">
+        <nav className="md:hidden absolute top-full left-0 right-0 bg-black shadow-md py-4 px-6 flex flex-col gap-4 z-50">
           {navLinks.map((link) => (
             <a
               key={link.name}
@@ -97,7 +73,7 @@ const Navbar = () => {
               {link.name}
             </a>
           ))}
-          <Button className="bg-accent hover:bg-accent/90 dark:bg-devops-darkaccent dark:hover:bg-devops-darkaccent/90 w-full">
+          <Button className="bg-accent hover:bg-accent/90 w-full">
             Resume
           </Button>
         </nav>

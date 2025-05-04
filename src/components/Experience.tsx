@@ -54,7 +54,7 @@ const Experience = () => {
   ];
 
   return (
-    <section id="experience" className="py-20 bg-devops-light">
+    <section id="experience" className="py-20 bg-black">
       <div className="container">
         <h2 className="section-heading">Professional Experience</h2>
         
@@ -66,29 +66,29 @@ const Experience = () => {
             {experiences.map((exp, index) => (
               <div key={exp.position + exp.company} className="relative">
                 {/* Timeline dot */}
-                <div className="absolute left-0 md:left-1/2 w-4 h-4 bg-devops-accent rounded-full transform -translate-y-1/2 md:-translate-x-1/2 border-4 border-white"></div>
+                <div className="absolute left-0 md:left-1/2 w-4 h-4 bg-devops-accent rounded-full transform -translate-y-1/2 md:-translate-x-1/2 border-4 border-black"></div>
                 
                 <div className={`md:w-1/2 ${index % 2 === 0 ? 'md:pr-12 ml-6 md:ml-0' : 'md:pl-12 ml-6 md:ml-auto'}`}>
-                  <Card className="overflow-hidden animate-fade-in">
+                  <Card className="overflow-hidden animate-fade-in bg-devops-darkcard border-gray-700">
                     <div className="h-2 bg-devops-accent"></div>
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start flex-wrap mb-4">
                         <div>
-                          <h3 className="font-bold text-xl">{exp.position}</h3>
-                          <p className="text-devops-medium">{exp.company}</p>
+                          <h3 className="font-bold text-xl text-white">{exp.position}</h3>
+                          <p className="text-gray-300">{exp.company}</p>
                         </div>
-                        <span className="bg-devops-dark/10 text-devops-dark px-3 py-1 rounded-full text-sm font-medium">
+                        <span className="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm font-medium">
                           {exp.period}
                         </span>
                       </div>
                       
-                      <p className="mb-4">{exp.description}</p>
+                      <p className="mb-4 text-gray-300">{exp.description}</p>
                       
                       <div>
-                        <h4 className="font-medium mb-2 text-sm uppercase tracking-wider text-devops-medium">
+                        <h4 className="font-medium mb-2 text-sm uppercase tracking-wider text-gray-400">
                           Key Achievements
                         </h4>
-                        <ul className="space-y-2">
+                        <ul className="space-y-2 text-gray-300">
                           {exp.achievements.map((achievement, i) => (
                             <li key={i} className="flex items-start gap-2">
                               <span className="text-devops-accent font-bold">→</span>
