@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="mb-6 md:mb-0">
             <a href="#hero" className="text-xl font-bold flex items-center">
               <span className="text-accent dark:text-devops-darkaccent">&lt;</span>
-              Gurdip<span className="text-accent dark:text-devops-darkaccent">Sira</span>
+              Gurdip <span className="text-accent dark:text-devops-darkaccent">Sira</span>
               <span className="text-accent dark:text-devops-darkaccent">/&gt;</span>
             </a>
             <p className="text-gray-400 mt-2 max-w-md">
