@@ -20,8 +20,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['Inter', 'sans-serif'],
-				mono: ['JetBrains Mono', 'monospace'],
+				sans: ['Montserrat', 'sans-serif'],
+				mono: ['"Fira Code"', 'monospace'],
 				pixel: ['"Press Start 2P"', 'cursive'],
 				// Additional nerd font option
 				nerd: ['"Fira Code"', 'monospace'],
