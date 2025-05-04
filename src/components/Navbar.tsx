@@ -36,13 +36,13 @@ const Navbar = () => {
             <a
               key={link.name}
               href={link.href}
-              className="font-mono text-sm text-gray-600 dark:text-gray-300 hover:text-accent dark:hover:text-accent transition-colors duration-200"
+              className="font-sans text-sm text-gray-600 dark:text-gray-300 hover:text-accent dark:hover:text-accent transition-colors duration-200"
             >
               {link.name}
             </a>
           ))}
           <ThemeToggle />
-          <Button className="font-mono text-sm bg-accent hover:bg-accent/90">
+          <Button className="font-sans text-sm bg-accent hover:bg-accent/90">
             Resume
           </Button>
         </nav>
@@ -66,13 +66,13 @@ const Navbar = () => {
             <a
               key={link.name}
               href={link.href}
-              className="font-mono text-sm text-gray-600 dark:text-gray-300 hover:text-accent dark:hover:text-accent py-2 transition-colors duration-200"
+              className="font-sans text-sm text-gray-600 dark:text-gray-300 hover:text-accent dark:hover:text-accent py-2 transition-colors duration-200"
               onClick={() => setMobileMenuOpen(false)}
             >
               {link.name}
             </a>
           ))}
-          <Button className="font-mono text-sm bg-accent hover:bg-accent/90 w-full">
+          <Button className="font-sans text-sm bg-accent hover:bg-accent/90 w-full">
             Resume
           </Button>
         </nav>
