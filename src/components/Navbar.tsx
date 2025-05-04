@@ -22,7 +22,7 @@ const Navbar = () => {
         <div className="flex items-center">
           <a
             href="#"
-            className="text-xl font-pixel text-foreground flex items-center gap-1"
+            className="text-xl font-sans text-foreground flex items-center gap-1"
           >
             <span className="text-accent">&lt;</span>
             Gurdip<span className="text-accent">Sira</span>
