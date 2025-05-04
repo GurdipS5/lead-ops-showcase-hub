@@ -2,6 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const Skills = () => {
   const technicalSkills = [
@@ -73,19 +74,28 @@ const Skills = () => {
             <h3 className="text-xl font-bold mb-4 mt-10">Certifications</h3>
             <Card>
               <CardContent className="p-6">
-                <ul className="divide-y">
-                  {certifications.map((cert) => (
-                    <li key={cert.name} className="py-4 first:pt-0 last:pb-0">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">{cert.name}</p>
-                          <p className="text-sm text-devops-medium">{cert.issuer}</p>
-                        </div>
-                        <Badge className="bg-devops-dark">{cert.year}</Badge>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50%]">Certification</TableHead>
+                      <TableHead>Issuer</TableHead>
+                      <TableHead className="text-right">Year</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {certifications.map((cert) => (
+                      <TableRow key={cert.name}>
+                        <TableCell className="font-medium">{cert.name}</TableCell>
+                        <TableCell>{cert.issuer}</TableCell>
+                        <TableCell className="text-right">
+                          <Badge variant="outline" className="bg-devops-dark text-white text-sm font-medium">
+                            {cert.year}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </div>
