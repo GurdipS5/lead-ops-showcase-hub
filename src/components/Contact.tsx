@@ -191,12 +191,6 @@ const Contact = () => {
                 </p>
               </CardContent>
             </Card>
-            
-            <div className="p-4 bg-devops-accent/10 rounded-lg border border-devops-accent/20">
-              <p className="text-center italic text-devops-dark">
-                "The best way to predict the future is to implement it."
-              </p>
-            </div>
           </div>
         </div>
       </div>
