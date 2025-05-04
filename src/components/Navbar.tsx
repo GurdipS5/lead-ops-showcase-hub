@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "./ThemeToggle";
+import jsPDF from "jspdf";
+import { toPng } from "html-to-image";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -16,14 +18,45 @@ const Navbar = () => {
     { name: "Contact", href: "#contact" },
   ];
 
-  const handleResumeClick = () => {
-    // Create a link to download the resume PDF
-    const link = document.createElement('a');
-    link.href = '/resume.pdf'; // The path to your resume PDF
-    link.setAttribute('download', 'Gurdip_Sira_Resume.pdf');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleResumeClick = async () => {
+    try {
+      // Create a new PDF document
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+      
+      // Handle About section
+      const aboutSection = document.getElementById("about");
+      if (aboutSection) {
+        // Convert about section to image
+        const aboutImage = await toPng(aboutSection, { quality: 0.95 });
+        
+        // Add about section to PDF
+        pdf.text("ABOUT ME", 20, 20);
+        pdf.addImage(aboutImage, "PNG", 10, 25, 190, 0);
+        
+        // Add page break after about section
+        pdf.addPage();
+      }
+      
+      // Handle Experience section
+      const experienceSection = document.getElementById("experience");
+      if (experienceSection) {
+        // Convert experience section to image
+        const expImage = await toPng(experienceSection, { quality: 0.95 });
+        
+        // Add experience section to PDF
+        pdf.text("PROFESSIONAL EXPERIENCE", 20, 20);
+        pdf.addImage(expImage, "PNG", 10, 25, 190, 0);
+      }
+      
+      // Save the PDF with a name
+      pdf.save("Gurdip_Sira_Resume.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
   };
 
   return (
