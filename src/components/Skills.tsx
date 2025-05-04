@@ -28,7 +28,7 @@ const Skills = () => {
     { name: "Terraform", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/terraform/terraform-original.svg" },
     { name: "Ansible", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ansible/ansible-original.svg" },
     { name: "TeamCity", icon: "https://upload.wikimedia.org/wikipedia/commons/8/8e/TeamCity_Icon.png" },
-    { name: "Octopus Deploy", icon: "https://avatars.githubusercontent.com/u/1567268?s=200&v=4" },
+    { name: "Octopus Deploy", icon: "/lovable-uploads/9301a4de-0ee2-445e-8c59-d1478e87c014.png" },
     { name: "GitHub", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" },
     { name: "Prometheus", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prometheus/prometheus-original.svg" },
     { name: "Grafana", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/grafana/grafana-original.svg" },
