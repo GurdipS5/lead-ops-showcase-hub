@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -53,8 +52,8 @@ const Skills = () => {
     { name: "Visual Studio", isLucide: true, icon: "computer" },
     { name: "Windows Server", isLucide: true, icon: "server" },
     { name: "Cilium", isLucide: true, icon: "shield" },
-    // Updated Istio logo using the provided image
-    { name: "Istio", icon: "/lovable-uploads/4d23c4e1-c88d-4324-97cf-1fb4bef65cd8.png" },
+    // Updated Istio logo using the provided SVG image
+    { name: "Istio", icon: "/lovable-uploads/5e91d7b0-070e-46f5-9eca-ec89175e7427.png" },
     // VMware logo with improved background handling
     { name: "VMware", icon: "/lovable-uploads/c9c6d218-0234-469a-be35-ba9e760b6653.png" },
     // Keep the existing OPNsense logo
@@ -149,15 +148,12 @@ const Skills = () => {
                           mixBlendMode: tool.name === "Pulumi" ? "screen" : 
                                         tool.name === "OPNsense" ? "multiply" : 
                                         tool.name === "VMware" ? "screen" :
-                                        tool.name === "Istio" ? "screen" : "normal",
+                                        tool.name === "Istio" ? "normal" : "normal",
                           filter: tool.name === "OPNsense" ? "brightness(1.2)" : 
                                   tool.name === "VMware" ? "brightness(1.1) contrast(1.1)" :
-                                  tool.name === "Istio" ? "brightness(1.05) contrast(1.05)" : "none",
-                          opacity: tool.name === "OPNsense" ? 0.9 : 
-                                   tool.name === "VMware" ? 1 :
-                                   tool.name === "Istio" ? 1 : 1,
-                          backdropFilter: tool.name === "VMware" ? "blur(0px)" : 
-                                          tool.name === "Istio" ? "blur(0px)" : undefined,
+                                  "none",
+                          opacity: tool.name === "OPNsense" ? 0.9 : 1,
+                          backdropFilter: tool.name === "VMware" ? "blur(0px)" : undefined,
                           background: tool.name === "VMware" ? "transparent" : 
                                       tool.name === "Istio" ? "transparent" : undefined
                         }}
