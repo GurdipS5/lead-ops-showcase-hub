@@ -103,7 +103,7 @@ const About = () => {
                 
                 <div className="mt-6 pt-6 border-t">
                   <h3 className="font-bold mb-2">Current Role</h3>
-                  <p className="text-devops-medium">Lead DevOps Engineer at TechSolutions Inc.</p>
+                  <p className="text-devops-medium">DevOps Lead at Virgin Money</p>
                 </div>
               </CardContent>
             </Card>

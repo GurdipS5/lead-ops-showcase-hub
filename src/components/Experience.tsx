@@ -21,11 +21,14 @@ const Experience = () => {
       company: "TechSolutions Inc.",
       period: "2021 - 2022",
       description:
-        "Leading a team of 8 engineers to implement and maintain CI/CD pipelines, cloud infrastructure, and monitoring solutions across the organization. Reduced deployment time by 70% and increased system reliability by implementing automated testing and monitoring.",
+        "Led DevOps initiatives focusing on security, compliance, and infrastructure automation. Enhanced CI/CD pipelines and implemented security best practices across the organization's Kubernetes infrastructure.",
       achievements: [
-        "Migrated legacy infrastructure to Kubernetes, improving scaling capabilities and reducing costs by 35%",
-        "Implemented GitOps workflow with ArgoCD, enhancing deployment visibility and reliability",
-        "Designed multi-region disaster recovery strategy with 99.99% uptime achievement"
+        "Integrated Veracode into Azure DevOps CICD pipelines, improving security posture, compliance and ability to win new customers",
+        "Integrated Kubernetes with best-in-class security tooling (e.g., Istio, Calico) to enforce network policies and secure inter-service communication",
+        "Championed an AppSec program with developers to implement secure development practices, resulting in less CI failures",
+        "Created Terraform modules for an Akamai CDN/DDOS deployment to protect against bot attacks",
+        "Deployed comprehensive monitoring using Prometheus and Grafana, reducing system downtime by 40% through proactive incident management",
+        "Implemented robust CI/CD pipeline using Azure DevOps, reducing deployment frequency from monthly to daily"
       ]
     },
     {
@@ -35,12 +38,9 @@ const Experience = () => {
       description:
         "Led DevOps initiatives focusing on security, compliance, and infrastructure automation. Enhanced CI/CD pipelines and implemented security best practices across the organization's Kubernetes infrastructure.",
       achievements: [
-        "Integrated Veracode into Azure DevOps CICD pipelines, improving security posture, compliance and ability to win new customers",
-        "Integrated Kubernetes with best-in-class security tooling (e.g., Istio, Calico) to enforce network policies and secure inter-service communication",
-        "Championed an AppSec program with developers to implement secure development practices, resulting in less CI failures",
-        "Created Terraform modules for an Akamai CDN/DDOS deployment to protect against bot attacks",
-        "Deployed comprehensive monitoring using Prometheus and Grafana, reducing system downtime by 40% through proactive incident management",
-        "Implemented robust CI/CD pipeline using Azure DevOps, reducing deployment frequency from monthly to daily"
+        "Migrated legacy infrastructure to Kubernetes, improving scaling capabilities and reducing costs by 35%",
+        "Implemented GitOps workflow with ArgoCD, enhancing deployment visibility and reliability",
+        "Designed multi-region disaster recovery strategy with 99.99% uptime achievement"
       ]
     },
     {
