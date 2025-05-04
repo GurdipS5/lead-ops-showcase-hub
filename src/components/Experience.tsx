@@ -30,14 +30,17 @@ const Experience = () => {
     },
     {
       position: "Senior DevOps Engineer",
-      company: "CloudScale Systems",
+      company: "Sea/Live",
       period: "2018 - 2021",
       description:
-        "Designed and implemented cloud-native infrastructure for high-traffic applications using AWS and Terraform. Led the containerization initiative and established monitoring and alerting standards.",
+        "Led DevOps initiatives focusing on security, compliance, and infrastructure automation. Enhanced CI/CD pipelines and implemented security best practices across the organization's Kubernetes infrastructure.",
       achievements: [
-        "Built fully automated CI/CD pipelines using GitHub Actions and AWS CodePipeline",
-        "Implemented infrastructure as code using Terraform across 5 product lines",
-        "Reduced mean time to recovery (MTTR) from 3 hours to 20 minutes"
+        "Integrated Veracode into Azure DevOps CICD pipelines, improving security posture, compliance and ability to win new customers",
+        "Integrated Kubernetes with best-in-class security tooling (e.g., Istio, Calico) to enforce network policies and secure inter-service communication",
+        "Championed an AppSec program with developers to implement secure development practices, resulting in less CI failures",
+        "Created Terraform modules for an Akamai CDN/DDOS deployment to protect against bot attacks",
+        "Deployed comprehensive monitoring using Prometheus and Grafana, reducing system downtime by 40% through proactive incident management",
+        "Implemented robust CI/CD pipeline using Azure DevOps, reducing deployment frequency from monthly to daily"
       ]
     },
     {
