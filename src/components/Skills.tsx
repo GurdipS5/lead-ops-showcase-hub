@@ -147,6 +147,28 @@ const Skills = () => {
                     </div>
                   </div>
                 </div>
+
+                <div className="mt-10">
+                  <h3 className="text-xl font-bold mb-4">GitHub Activity</h3>
+                  <div className="bg-gray-900 p-4 rounded-lg border border-gray-700 overflow-hidden">
+                    <iframe 
+                      src="https://github-readme-stats.vercel.app/api?username=gurdiprowo&show_icons=true&theme=dark&hide_border=true&bg_color=111827" 
+                      width="100%" 
+                      height="200" 
+                      frameBorder="0"
+                      title="GitHub Stats"
+                      className="rounded-lg"
+                    ></iframe>
+                    <iframe 
+                      src="https://github-readme-streak-stats.herokuapp.com/?user=gurdiprowo&theme=dark&background=111827&hide_border=true" 
+                      width="100%" 
+                      height="200" 
+                      frameBorder="0"
+                      title="GitHub Streak"
+                      className="rounded-lg mt-4"
+                    ></iframe>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>

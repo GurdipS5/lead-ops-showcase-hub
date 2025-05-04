@@ -37,10 +37,10 @@ const Navbar = () => {
   return (
     <header
       className={cn(
-        "fixed top-0 w-full z-50 transition-all duration-300",
+        "w-full z-50 transition-all duration-300",
         isScrolled
-          ? "bg-white/90 dark:bg-devops-darkbg/90 shadow-sm backdrop-blur-sm py-3"
-          : "bg-transparent py-5"
+          ? "bg-black/90 dark:bg-devops-darkbg/90 shadow-sm backdrop-blur-sm py-3"
+          : "bg-black py-5"
       )}
     >
       <div className="container flex items-center justify-between">
@@ -86,7 +86,7 @@ const Navbar = () => {
 
       {/* Mobile navigation */}
       {mobileMenuOpen && (
-        <nav className="md:hidden absolute top-full left-0 right-0 bg-white dark:bg-devops-darkbg shadow-md py-4 px-6 flex flex-col gap-4">
+        <nav className="md:hidden absolute top-full left-0 right-0 bg-black dark:bg-devops-darkbg shadow-md py-4 px-6 flex flex-col gap-4">
           {navLinks.map((link) => (
             <a
               key={link.name}
