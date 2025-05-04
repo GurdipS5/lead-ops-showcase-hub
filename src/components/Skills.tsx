@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Skills = () => {
+  // This is already a JavaScript object array that can be easily modified or loaded from an API
   const technicalSkills = [
     { name: "Kubernetes", level: 95 },
     { name: "AWS / Cloud Platforms", level: 90 },
@@ -17,6 +18,7 @@ const Skills = () => {
     { name: "Linux Administration", level: 90 }
   ];
   
+  // This is a JavaScript object array for tools and technologies
   const toolsAndTechnologies = [
     { name: "Kubernetes", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" },
     { name: "Docker", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-plain.svg" },
@@ -40,6 +42,7 @@ const Skills = () => {
     { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" }
   ];
   
+  // This is a JavaScript object array for certifications
   const certifications = [
     { name: "AWS Certified DevOps Engineer - Professional", issuer: "Amazon Web Services", year: "2022" },
     { name: "CKA: Certified Kubernetes Administrator", issuer: "Cloud Native Computing Foundation", year: "2021" },
@@ -49,14 +52,14 @@ const Skills = () => {
   ];
   
   return (
-    <section id="skills" className="py-20 bg-devops-light">
+    <section id="skills" className="py-20 bg-black text-white">
       <div className="container">
         <h2 className="section-heading">Skills & Expertise</h2>
         
         <div className="grid md:grid-cols-2 gap-10">
           <div>
             <h3 className="text-xl font-bold mb-4">Technical Proficiency</h3>
-            <Card>
+            <Card className="bg-black border border-gray-700">
               <CardContent className="p-6">
                 <div className="space-y-6">
                   {technicalSkills.map((skill) => (
@@ -73,24 +76,24 @@ const Skills = () => {
             </Card>
             
             <h3 className="text-xl font-bold mb-4 mt-10">Certifications</h3>
-            <Card>
+            <Card className="bg-black border border-gray-700">
               <CardContent className="p-6">
                 <ScrollArea className="h-[320px]">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50%] sticky top-0 bg-background z-10">Certification</TableHead>
-                        <TableHead className="sticky top-0 bg-background z-10">Issuer</TableHead>
-                        <TableHead className="text-right sticky top-0 bg-background z-10">Year</TableHead>
+                      <TableRow className="border-gray-700">
+                        <TableHead className="w-[50%] sticky top-0 bg-black z-10 text-white">Certification</TableHead>
+                        <TableHead className="sticky top-0 bg-black z-10 text-white">Issuer</TableHead>
+                        <TableHead className="text-right sticky top-0 bg-black z-10 text-white">Year</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {certifications.map((cert) => (
-                        <TableRow key={cert.name}>
-                          <TableCell className="font-medium">{cert.name}</TableCell>
-                          <TableCell>{cert.issuer}</TableCell>
+                        <TableRow key={cert.name} className="border-gray-700">
+                          <TableCell className="font-medium text-white">{cert.name}</TableCell>
+                          <TableCell className="text-gray-300">{cert.issuer}</TableCell>
                           <TableCell className="text-right">
-                            <Badge variant="outline" className="bg-devops-dark text-white text-sm font-medium">
+                            <Badge variant="outline" className="bg-devops-dark text-white text-sm font-medium border-gray-600">
                               {cert.year}
                             </Badge>
                           </TableCell>
@@ -105,20 +108,20 @@ const Skills = () => {
           
           <div>
             <h3 className="text-xl font-bold mb-4">Tools & Technologies</h3>
-            <Card className="h-full">
+            <Card className="h-full bg-black border border-gray-700">
               <CardContent className="p-6">
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {toolsAndTechnologies.map((tool) => (
                     <div 
                       key={tool.name} 
-                      className="flex flex-col items-center justify-center p-4 bg-white rounded-lg border border-border hover:shadow-md transition-shadow"
+                      className="flex flex-col items-center justify-center p-4 bg-gray-900 rounded-lg border border-gray-700 hover:shadow-md transition-shadow"
                     >
                       <img 
                         src={tool.icon} 
                         alt={tool.name} 
                         className="w-12 h-12 mb-2"
                       />
-                      <span className="text-xs font-medium text-center">{tool.name}</span>
+                      <span className="text-xs font-medium text-center text-gray-300">{tool.name}</span>
                     </div>
                   ))}
                 </div>
@@ -126,21 +129,21 @@ const Skills = () => {
                 <div className="mt-10">
                   <h3 className="text-xl font-bold mb-4">Core Competencies</h3>
                   <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="bg-white p-4 rounded-lg border border-border">
+                    <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
                       <h4 className="font-medium mb-2">Cloud Architecture</h4>
-                      <p className="text-sm text-devops-medium">Designing scalable and resilient cloud solutions across major providers.</p>
+                      <p className="text-sm text-gray-400">Designing scalable and resilient cloud solutions across major providers.</p>
                     </div>
-                    <div className="bg-white p-4 rounded-lg border border-border">
+                    <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
                       <h4 className="font-medium mb-2">CI/CD Pipeline Design</h4>
-                      <p className="text-sm text-devops-medium">Building efficient and reliable continuous delivery workflows.</p>
+                      <p className="text-sm text-gray-400">Building efficient and reliable continuous delivery workflows.</p>
                     </div>
-                    <div className="bg-white p-4 rounded-lg border border-border">
+                    <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
                       <h4 className="font-medium mb-2">Infrastructure as Code</h4>
-                      <p className="text-sm text-devops-medium">Automating infrastructure deployment with Terraform and CloudFormation.</p>
+                      <p className="text-sm text-gray-400">Automating infrastructure deployment with Terraform and CloudFormation.</p>
                     </div>
-                    <div className="bg-white p-4 rounded-lg border border-border">
+                    <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
                       <h4 className="font-medium mb-2">Container Orchestration</h4>
-                      <p className="text-sm text-devops-medium">Managing complex Kubernetes environments with best practices.</p>
+                      <p className="text-sm text-gray-400">Managing complex Kubernetes environments with best practices.</p>
                     </div>
                   </div>
                 </div>
