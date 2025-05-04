@@ -118,7 +118,10 @@ const Skills = () => {
                       src={tool.icon} 
                       alt={tool.name} 
                       className="w-16 h-16 mb-3 object-contain"
-                      style={{ backgroundColor: tool.name === "Pulumi" ? "transparent" : undefined }}
+                      style={{ 
+                        backgroundColor: tool.name === "Pulumi" ? "transparent" : undefined,
+                        mixBlendMode: tool.name === "Pulumi" ? "screen" : "normal"
+                      }}
                     />
                     <span className="text-sm font-medium text-center text-gray-300">{tool.name}</span>
                   </div>
