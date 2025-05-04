@@ -47,7 +47,7 @@ const Navbar = () => {
         <div className="flex items-center">
           <a
             href="#"
-            className="text-xl font-bold text-devops-dark dark:text-white flex items-center gap-1"
+            className="text-xl font-bold text-white flex items-center gap-1"
           >
             <span className="text-accent">&lt;</span>
             Gurdip<span className="text-accent">Sira</span>
@@ -61,7 +61,7 @@ const Navbar = () => {
             <a
               key={link.name}
               href={link.href}
-              className="text-devops-medium dark:text-gray-300 hover:text-devops-dark dark:hover:text-white transition-colors duration-200"
+              className="text-gray-300 hover:text-white transition-colors duration-200"
             >
               {link.name}
             </a>
@@ -77,7 +77,7 @@ const Navbar = () => {
           <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-devops-dark dark:text-white"
+            className="text-white"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -91,7 +91,7 @@ const Navbar = () => {
             <a
               key={link.name}
               href={link.href}
-              className="text-devops-medium dark:text-gray-300 hover:text-devops-dark dark:hover:text-white py-2 transition-colors duration-200"
+              className="text-gray-300 hover:text-white py-2 transition-colors duration-200"
               onClick={() => setMobileMenuOpen(false)}
             >
               {link.name}
