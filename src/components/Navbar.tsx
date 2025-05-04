@@ -18,12 +18,12 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="w-full z-50 bg-black py-5">
+    <header className="w-full z-50 bg-background py-5">
       <div className="container flex items-center justify-between">
         <div className="flex items-center">
           <a
             href="#"
-            className="text-xl font-bold text-white flex items-center gap-1"
+            className="text-xl font-pixel text-foreground flex items-center gap-1"
           >
             <span className="text-accent">&lt;</span>
             Gurdip<span className="text-accent">Sira</span>
@@ -37,13 +37,13 @@ const Navbar = () => {
             <a
               key={link.name}
               href={link.href}
-              className="text-gray-300 hover:text-white transition-colors duration-200"
+              className="font-nerd text-sm text-gray-600 dark:text-gray-300 hover:text-accent dark:hover:text-accent transition-colors duration-200"
             >
               {link.name}
             </a>
           ))}
           <ThemeToggle />
-          <Button className="bg-accent hover:bg-accent/90">
+          <Button className="font-nerd text-sm bg-accent hover:bg-accent/90">
             Resume
           </Button>
         </nav>
@@ -53,7 +53,7 @@ const Navbar = () => {
           <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-white"
+            className="text-foreground"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -62,18 +62,18 @@ const Navbar = () => {
 
       {/* Mobile navigation */}
       {mobileMenuOpen && (
-        <nav className="md:hidden absolute top-full left-0 right-0 bg-black shadow-md py-4 px-6 flex flex-col gap-4 z-50">
+        <nav className="md:hidden absolute top-full left-0 right-0 bg-background shadow-md py-4 px-6 flex flex-col gap-4 z-50">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-gray-300 hover:text-white py-2 transition-colors duration-200"
+              className="font-nerd text-sm text-gray-600 dark:text-gray-300 hover:text-accent dark:hover:text-accent py-2 transition-colors duration-200"
               onClick={() => setMobileMenuOpen(false)}
             >
               {link.name}
             </a>
           ))}
-          <Button className="bg-accent hover:bg-accent/90 w-full">
+          <Button className="font-nerd text-sm bg-accent hover:bg-accent/90 w-full">
             Resume
           </Button>
         </nav>

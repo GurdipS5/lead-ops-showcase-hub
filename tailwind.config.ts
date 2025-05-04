@@ -19,6 +19,13 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
+				mono: ['JetBrains Mono', 'monospace'],
+				pixel: ['"Press Start 2P"', 'cursive'],
+				// Additional nerd font option
+				nerd: ['"Fira Code"', 'monospace'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -73,10 +80,6 @@ export default {
 					darkcard: '#1E293B', // Dark card background
 					darkaccent: '#0EA5E9', // Bright blue accent for dark mode
 				}
-			},
-			fontFamily: {
-				sans: ['Inter', 'sans-serif'],
-				mono: ['JetBrains Mono', 'monospace'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
