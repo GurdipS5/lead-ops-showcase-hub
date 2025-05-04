@@ -41,8 +41,8 @@ const LighthouseWidget = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <Card className="w-64 bg-[#101630] border border-[#1e293b] shadow-lg">
+    <div className="w-full max-w-screen-lg mx-auto px-4 py-8">
+      <Card className="w-full md:w-96 mx-auto bg-[#101630] border border-[#1e293b] shadow-lg">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">

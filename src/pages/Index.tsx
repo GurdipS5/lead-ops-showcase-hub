@@ -21,9 +21,9 @@ const Index = () => {
         <Projects />
         <Skills />
         <Contact />
+        <LighthouseWidget />
         <Footer />
       </main>
-      <LighthouseWidget />
     </div>
   );
 };
