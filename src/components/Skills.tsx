@@ -49,12 +49,12 @@ const Skills = () => {
     { name: "Sentry", icon: "https://www.vectorlogo.zone/logos/sentryio/sentryio-icon.svg" },
     { name: "Sonarqube", icon: "https://www.svgrepo.com/show/354365/sonarqube.svg" },
     { name: "JetBrains", icon: "https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" },
-    // Adding the requested tools with Lucide icons for some and images for others
     { name: "NDepend", isLucide: true, icon: "database" },
     { name: "Visual Studio", isLucide: true, icon: "computer" },
     { name: "Windows Server", isLucide: true, icon: "server" },
     { name: "Cilium", isLucide: true, icon: "shield" },
-    { name: "Istio", isLucide: true, icon: "layers" },
+    // Updated Istio logo using the provided image
+    { name: "Istio", icon: "/lovable-uploads/4d23c4e1-c88d-4324-97cf-1fb4bef65cd8.png" },
     // VMware logo with improved background handling
     { name: "VMware", icon: "/lovable-uploads/c9c6d218-0234-469a-be35-ba9e760b6653.png" },
     // Keep the existing OPNsense logo
@@ -148,13 +148,18 @@ const Skills = () => {
                           backgroundColor: tool.name === "Pulumi" ? "transparent" : undefined,
                           mixBlendMode: tool.name === "Pulumi" ? "screen" : 
                                         tool.name === "OPNsense" ? "multiply" : 
-                                        tool.name === "VMware" ? "screen" : "normal",
+                                        tool.name === "VMware" ? "screen" :
+                                        tool.name === "Istio" ? "screen" : "normal",
                           filter: tool.name === "OPNsense" ? "brightness(1.2)" : 
-                                  tool.name === "VMware" ? "brightness(1.1) contrast(1.1)" : "none",
+                                  tool.name === "VMware" ? "brightness(1.1) contrast(1.1)" :
+                                  tool.name === "Istio" ? "brightness(1.05) contrast(1.05)" : "none",
                           opacity: tool.name === "OPNsense" ? 0.9 : 
-                                   tool.name === "VMware" ? 1 : 1,
-                          backdropFilter: tool.name === "VMware" ? "blur(0px)" : undefined,
-                          background: tool.name === "VMware" ? "transparent" : undefined
+                                   tool.name === "VMware" ? 1 :
+                                   tool.name === "Istio" ? 1 : 1,
+                          backdropFilter: tool.name === "VMware" ? "blur(0px)" : 
+                                          tool.name === "Istio" ? "blur(0px)" : undefined,
+                          background: tool.name === "VMware" ? "transparent" : 
+                                      tool.name === "Istio" ? "transparent" : undefined
                         }}
                       />
                     )}
