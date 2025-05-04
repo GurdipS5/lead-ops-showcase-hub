@@ -51,26 +51,26 @@ const Contact = () => {
     {
       icon: Mail,
       label: "Email",
-      value: "john.doe@example.com",
-      href: "mailto:john.doe@example.com",
+      value: "gurdip.sira@example.com",
+      href: "mailto:gurdip.sira@example.com",
     },
     {
       icon: Globe,
       label: "Website",
-      value: "johndoe.dev",
-      href: "https://johndoe.dev",
+      value: "gurdipsira.dev",
+      href: "https://gurdipsira.dev",
     },
     {
       icon: Linkedin,
       label: "LinkedIn",
-      value: "linkedin.com/in/johndoe",
-      href: "https://linkedin.com/in/johndoe",
+      value: "linkedin.com/in/gurdipsira",
+      href: "https://linkedin.com/in/gurdipsira",
     },
     {
       icon: Github,
       label: "GitHub",
-      value: "github.com/johndoe",
-      href: "https://github.com/johndoe",
+      value: "github.com/gurdipsira",
+      href: "https://github.com/gurdipsira",
     },
   ];
 
