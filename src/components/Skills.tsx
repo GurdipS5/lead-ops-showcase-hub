@@ -1,6 +1,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 
 const Skills = () => {
   const technicalSkills = [
@@ -15,9 +16,26 @@ const Skills = () => {
   ];
   
   const toolsAndTechnologies = [
-    "Kubernetes", "Docker", "AWS", "GCP", "Azure", "Terraform", "Ansible", 
-    "Jenkins", "GitHub Actions", "ArgoCD", "Helm", "Prometheus", "Grafana", 
-    "ELK Stack", "Istio", "Vault", "Python", "Bash", "Git", "Linux"
+    { name: "Kubernetes", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" },
+    { name: "Docker", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-plain.svg" },
+    { name: "AWS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original.svg" },
+    { name: "GCP", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg" },
+    { name: "Azure", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azure/azure-original.svg" },
+    { name: "Terraform", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/terraform/terraform-original.svg" },
+    { name: "Ansible", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ansible/ansible-original.svg" },
+    { name: "Jenkins", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jenkins/jenkins-original.svg" },
+    { name: "GitHub", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" },
+    { name: "Prometheus", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prometheus/prometheus-original.svg" },
+    { name: "Grafana", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/grafana/grafana-original.svg" },
+    { name: "Python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
+    { name: "Bash", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bash/bash-original.svg" },
+    { name: "Git", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" },
+    { name: "Linux", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" },
+    { name: "Nginx", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg" },
+    { name: "Redis", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" },
+    { name: "MongoDB", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" },
+    { name: "PostgreSQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
+    { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" }
   ];
   
   const certifications = [
@@ -45,7 +63,7 @@ const Skills = () => {
                         <span className="font-medium">{skill.name}</span>
                         <span className="text-sm text-devops-medium">{skill.level}%</span>
                       </div>
-                      <Progress value={skill.level} className="h-2" indicatorClassName="bg-devops-accent" />
+                      <Progress value={skill.level} className="h-2" />
                     </div>
                   ))}
                 </div>
@@ -76,14 +94,19 @@ const Skills = () => {
             <h3 className="text-xl font-bold mb-4">Tools & Technologies</h3>
             <Card className="h-full">
               <CardContent className="p-6">
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {toolsAndTechnologies.map((tool) => (
-                    <span 
-                      key={tool} 
-                      className="bg-white px-4 py-2 rounded-full text-sm border border-devops-accent/20 hover:border-devops-accent/50 transition-colors"
+                    <div 
+                      key={tool.name} 
+                      className="flex flex-col items-center justify-center p-4 bg-white rounded-lg border border-border hover:shadow-md transition-shadow"
                     >
-                      {tool}
-                    </span>
+                      <img 
+                        src={tool.icon} 
+                        alt={tool.name} 
+                        className="w-12 h-12 mb-2"
+                      />
+                      <span className="text-xs font-medium text-center">{tool.name}</span>
+                    </div>
                   ))}
                 </div>
                 
@@ -117,7 +140,7 @@ const Skills = () => {
   );
 };
 
-// Missing component that needs to be defined
+// Badge component definition
 const Badge = ({ children, className = "" }) => {
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-devops-accent text-white ${className}`}>
