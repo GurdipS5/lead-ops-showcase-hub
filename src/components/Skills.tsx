@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Database, Computer, Server, Shield, Layers, HardDrive, Settings } from "lucide-react";
+import { Database, Computer, Server, Shield, Layers, HardDrive } from "lucide-react";
 
 const Skills = () => {
   // Technical skills data
@@ -56,7 +56,8 @@ const Skills = () => {
     { name: "Cilium", isLucide: true, icon: "shield" },
     { name: "Istio", isLucide: true, icon: "layers" },
     { name: "VMware", isLucide: true, icon: "hard-drive" },
-    { name: "OPNSense", isLucide: true, icon: "settings" }
+    // Replace the generic Settings icon with the actual OPNsense logo 
+    { name: "OPNsense", icon: "/lovable-uploads/17e02949-f3a0-40ef-beff-4d9e30752a50.png", customStyle: true }
   ];
   
   // Certifications data
@@ -137,7 +138,6 @@ const Skills = () => {
                         {tool.icon === "shield" && <Shield className="w-16 h-16 mb-3" />}
                         {tool.icon === "layers" && <Layers className="w-16 h-16 mb-3" />}
                         {tool.icon === "hard-drive" && <HardDrive className="w-16 h-16 mb-3" />}
-                        {tool.icon === "settings" && <Settings className="w-16 h-16 mb-3" />}
                       </>
                     ) : (
                       <img 
@@ -146,7 +146,9 @@ const Skills = () => {
                         className="w-16 h-16 mb-3 object-contain"
                         style={{ 
                           backgroundColor: tool.name === "Pulumi" ? "transparent" : undefined,
-                          mixBlendMode: tool.name === "Pulumi" ? "screen" : "normal"
+                          mixBlendMode: tool.name === "Pulumi" ? "screen" : tool.customStyle ? "multiply" : "normal",
+                          filter: tool.name === "OPNsense" ? "contrast(0.9) brightness(1.2)" : "none", 
+                          opacity: tool.name === "OPNsense" ? 0.85 : 1
                         }}
                       />
                     )}
