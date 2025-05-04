@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "./ThemeToggle";
-import jsPDF from "jspdf";
-import { toPng } from "html-to-image";
+import { jsPDF } from "jspdf";
+import { toast } from "@/components/ui/use-toast";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -27,35 +27,88 @@ const Navbar = () => {
         format: "a4",
       });
       
-      // Handle About section
+      // Get content from about section
       const aboutSection = document.getElementById("about");
-      if (aboutSection) {
-        // Convert about section to image
-        const aboutImage = await toPng(aboutSection, { quality: 0.95 });
-        
-        // Add about section to PDF
-        pdf.text("ABOUT ME", 20, 20);
-        pdf.addImage(aboutImage, "PNG", 10, 25, 190, 0);
-        
-        // Add page break after about section
-        pdf.addPage();
+      const experienceSection = document.getElementById("experience");
+      
+      if (!aboutSection || !experienceSection) {
+        toast({
+          title: "Error generating resume",
+          description: "Could not find required sections",
+          variant: "destructive",
+        });
+        return;
       }
       
-      // Handle Experience section
-      const experienceSection = document.getElementById("experience");
-      if (experienceSection) {
-        // Convert experience section to image
-        const expImage = await toPng(experienceSection, { quality: 0.95 });
-        
-        // Add experience section to PDF
-        pdf.text("PROFESSIONAL EXPERIENCE", 20, 20);
-        pdf.addImage(expImage, "PNG", 10, 25, 190, 0);
-      }
+      // Add header
+      pdf.setFontSize(22);
+      pdf.setTextColor(51, 195, 240); // #33c3f0
+      pdf.text("Gurdip Sira - Resume", 105, 20, { align: "center" });
+      
+      // About section
+      pdf.setFontSize(16);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text("About", 20, 40);
+      
+      // Extract and add about text
+      const aboutText = aboutSection.textContent?.replace(/\s+/g, ' ').trim() || 
+        "DevOps Engineer with experience in CI/CD, containerization, and cloud infrastructure.";
+      pdf.setFontSize(12);
+      pdf.setTextColor(60, 60, 60);
+      
+      const splitAbout = pdf.splitTextToSize(aboutText, 170);
+      pdf.text(splitAbout, 20, 50);
+      
+      // Experience section
+      pdf.setFontSize(16);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text("Experience", 20, 90);
+      
+      // Extract experience details
+      const experienceItems = experienceSection.querySelectorAll("h3, h4, p");
+      let yPosition = 100;
+      
+      experienceItems.forEach((item) => {
+        const text = item.textContent?.trim() || "";
+        if (text) {
+          if (item.tagName === "H3") {
+            pdf.setFontSize(14);
+            pdf.setTextColor(0, 0, 0);
+            yPosition += 10;
+          } else if (item.tagName === "H4") {
+            pdf.setFontSize(12);
+            pdf.setTextColor(80, 80, 80);
+          } else {
+            pdf.setFontSize(10);
+            pdf.setTextColor(60, 60, 60);
+          }
+          
+          const splitText = pdf.splitTextToSize(text, 170);
+          pdf.text(splitText, 20, yPosition);
+          yPosition += splitText.length * 5 + 2;
+          
+          // Add new page if needed
+          if (yPosition > 270) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+        }
+      });
       
       // Save the PDF with a name
       pdf.save("Gurdip_Sira_Resume.pdf");
+      
+      toast({
+        title: "Resume downloaded",
+        description: "Your resume has been successfully generated and downloaded.",
+      });
     } catch (error) {
       console.error("Error generating PDF:", error);
+      toast({
+        title: "Error generating resume",
+        description: "There was a problem creating your resume PDF.",
+        variant: "destructive",
+      });
     }
   };
 
