@@ -56,8 +56,8 @@ const Skills = () => {
     { name: "Cilium", isLucide: true, icon: "shield" },
     { name: "Istio", isLucide: true, icon: "layers" },
     { name: "VMware", isLucide: true, icon: "hard-drive" },
-    // Replace the generic Settings icon with the actual OPNsense logo 
-    { name: "OPNsense", icon: "/lovable-uploads/17e02949-f3a0-40ef-beff-4d9e30752a50.png", customStyle: true }
+    // Replace with the new OPNsense logo
+    { name: "OPNsense", icon: "/lovable-uploads/d49f1107-d7a3-4ac2-a862-1744e1aa3bc0.png" }
   ];
   
   // Certifications data
@@ -146,9 +146,9 @@ const Skills = () => {
                         className="w-16 h-16 mb-3 object-contain"
                         style={{ 
                           backgroundColor: tool.name === "Pulumi" ? "transparent" : undefined,
-                          mixBlendMode: tool.name === "Pulumi" ? "screen" : tool.customStyle ? "multiply" : "normal",
-                          filter: tool.name === "OPNsense" ? "contrast(0.9) brightness(1.2)" : "none", 
-                          opacity: tool.name === "OPNsense" ? 0.85 : 1
+                          mixBlendMode: tool.name === "Pulumi" ? "screen" : tool.name === "OPNsense" ? "multiply" : "normal",
+                          filter: tool.name === "OPNsense" ? "brightness(1.2)" : "none",
+                          opacity: tool.name === "OPNsense" ? 0.9 : 1
                         }}
                       />
                     )}
