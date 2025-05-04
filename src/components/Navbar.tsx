@@ -120,8 +120,8 @@ const Navbar = () => {
             href="#"
             className="text-xl font-arial font-bold text-white flex items-center gap-1"
           >
-            <span className="text-[#33c3f0] font-sans">&lt;</span>
-            <span className="font-sans">Gurdip</span><span className="text-[#33c3f0] font-sans">Sira</span>
+      <span className="text-[#33c3f0] font-sans">&lt;</span>
+            <span className="font-sans">Gurdip </span><span className="text-[#33c3f0] font-sans">Sira</span>
             <span className="text-[#33c3f0] font-sans">/&gt;</span>
           </a>
         </div>
