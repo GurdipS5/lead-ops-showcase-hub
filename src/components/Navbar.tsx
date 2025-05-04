@@ -22,7 +22,7 @@ const Navbar = () => {
         <div className="flex items-center">
           <a
             href="#"
-            className="text-xl font-pixel text-white flex items-center gap-1"
+            className="text-xl font-bold text-white flex items-center gap-1"
           >
             <span className="text-[#33c3f0]">&lt;</span>
             Gurdip<span className="text-[#33c3f0]">Sira</span>
