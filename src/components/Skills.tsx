@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +46,7 @@ const Skills = () => {
     { name: "Snyk", icon: "https://www.vectorlogo.zone/logos/snyk/snyk-icon.svg" },
     { name: "Hashicorp Vault", icon: "https://www.vectorlogo.zone/logos/vaultproject/vaultproject-icon.svg" },
     { name: "Sentry", icon: "https://www.vectorlogo.zone/logos/sentryio/sentryio-icon.svg" },
-    { name: "Kosli", icon: "https://kosli.com/assets/images/logo.svg" },
+    { name: "Sonarqube", icon: "https://www.svgrepo.com/show/354365/sonarqube.svg" },
     { name: "JetBrains", icon: "https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" }
   ];
   
