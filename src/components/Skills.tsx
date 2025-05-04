@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +50,7 @@ const Skills = () => {
     { name: "Sonarqube", icon: "https://www.svgrepo.com/show/354365/sonarqube.svg" },
     { name: "JetBrains", icon: "https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" },
     { name: "NDepend", isLucide: true, icon: "database" },
-    { name: "Visual Studio", isLucide: true, icon: "computer" },
+    { name: "Visual Studio", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/visualstudio/visualstudio-plain.svg" },
     { name: "Windows Server", isLucide: true, icon: "server" },
     // Updated Cilium logo to use the provided image
     { name: "Cilium", icon: "/lovable-uploads/5be38420-0bb7-4527-8cf9-b32fda1df103.png" },
@@ -149,7 +150,8 @@ const Skills = () => {
                                         tool.name === "OPNsense" ? "multiply" : 
                                         tool.name === "VMware" ? "screen" :
                                         tool.name === "Istio" ? "normal" : 
-                                        tool.name === "Cilium" ? "normal" : "normal",
+                                        tool.name === "Cilium" ? "normal" : 
+                                        tool.name === "Visual Studio" ? "normal" : "normal",
                           filter: tool.name === "OPNsense" ? "brightness(1.2)" : 
                                   tool.name === "VMware" ? "brightness(1.1) contrast(1.1)" :
                                   "none",
