@@ -21,7 +21,7 @@ const Footer = () => {
           
           <div className="flex gap-4">
             <a
-              href="https://github.com/johndoe"
+              href="https://github.com/gurdipsira"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-gray-800 hover:bg-gray-700 p-3 rounded-full transition-colors"
@@ -29,7 +29,7 @@ const Footer = () => {
               <Github className="h-5 w-5" />
             </a>
             <a
-              href="https://linkedin.com/in/johndoe"
+              href="https://linkedin.com/in/gurdipsira"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-gray-800 hover:bg-gray-700 p-3 rounded-full transition-colors"
@@ -37,7 +37,7 @@ const Footer = () => {
               <Linkedin className="h-5 w-5" />
             </a>
             <a
-              href="mailto:john.doe@example.com"
+              href="mailto:gurdip.sira@example.com"
               className="bg-gray-800 hover:bg-gray-700 p-3 rounded-full transition-colors"
             >
               <Mail className="h-5 w-5" />
