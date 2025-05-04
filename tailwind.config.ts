@@ -23,6 +23,7 @@ export default {
 				sans: ['Montserrat', 'sans-serif'],
 				mono: ['"Fira Code"', 'monospace'],
 				pixel: ['"Press Start 2P"', 'cursive'],
+				arial: ['Arial', 'Helvetica', 'sans-serif'],
 				// Additional nerd font option
 				nerd: ['"Fira Code"', 'monospace'],
 			},
