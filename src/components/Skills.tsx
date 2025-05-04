@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -111,15 +110,15 @@ const Skills = () => {
           <div>
             <h3 className="text-xl font-bold mb-6">Tools & Technologies</h3>
             <div className="bg-[#101630] border border-[#1e293b] rounded-lg p-6">
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-6">
                 {toolsAndTechnologies.map((tool) => (
-                  <div key={tool.name} className="flex flex-col items-center justify-center p-3 bg-[#192040] rounded-lg">
+                  <div key={tool.name} className="flex flex-col items-center justify-center p-4 bg-[#192040] rounded-lg">
                     <img 
                       src={tool.icon} 
                       alt={tool.name} 
-                      className="w-12 h-12 mb-2"
+                      className="w-16 h-16 mb-3 object-contain"
                     />
-                    <span className="text-xs font-medium text-center text-gray-300">{tool.name}</span>
+                    <span className="text-sm font-medium text-center text-gray-300">{tool.name}</span>
                   </div>
                 ))}
               </div>
