@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +26,7 @@ const Skills = () => {
     { name: "Azure DevOps", icon: "/lovable-uploads/1d71d24c-8b55-42bf-a665-06ce70d62546.png" },
     { name: "Azure", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azure/azure-original.svg" },
     { name: "Terraform", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/terraform/terraform-original.svg" },
-    { name: "Pulumi", icon: "https://www.pulumi.com/images/logo/logo-on-white.svg" },
+    { name: "Pulumi", icon: "/lovable-uploads/556fafac-7920-47a7-aeb3-8731b763541f.png" },
     { name: "Ansible", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ansible/ansible-original.svg" },
     { name: "TeamCity", icon: "https://upload.wikimedia.org/wikipedia/commons/8/8e/TeamCity_Icon.png" },
     { name: "Octopus Deploy", icon: "/lovable-uploads/a68f9f2a-05b4-43f5-92ab-9922a3336c0b.png" },
