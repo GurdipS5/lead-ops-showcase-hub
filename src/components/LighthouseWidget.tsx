@@ -1,7 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, Gauge } from 'lucide-react';
+import { TrendingUp, Gauge, ExternalLink } from 'lucide-react';
+import { Button } from './ui/button';
 
 interface PerformanceMetric {
   name: string;
@@ -15,6 +16,9 @@ const LighthouseWidget = () => {
     { name: 'Best Practices', score: 100 },
     { name: 'SEO', score: 100 }
   ]);
+
+  // This URL would typically point to a real Lighthouse report
+  const lighthouseReportUrl = "https://pagespeed.web.dev/";
 
   useEffect(() => {
     // This would typically fetch real Lighthouse data from an API
@@ -64,8 +68,16 @@ const LighthouseWidget = () => {
             ))}
           </div>
           
-          <div className="mt-4 pt-3 border-t border-[#1e293b] text-center">
+          <div className="mt-4 pt-3 border-t border-[#1e293b] flex flex-col items-center">
             <p className="text-[10px] text-gray-400">Last updated 04 May 2025</p>
+            <a 
+              href={lighthouseReportUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 flex items-center gap-1 text-xs text-accent hover:text-accent/80 transition-colors"
+            >
+              View full report <ExternalLink size={12} />
+            </a>
           </div>
         </CardContent>
       </Card>
