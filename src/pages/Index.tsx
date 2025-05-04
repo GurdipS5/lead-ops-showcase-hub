@@ -8,6 +8,7 @@ import Projects from '@/components/Projects';
 import Skills from '@/components/Skills';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
+import LighthouseWidget from '@/components/LighthouseWidget';
 
 const Index = () => {
   return (
@@ -22,6 +23,7 @@ const Index = () => {
         <Contact />
         <Footer />
       </main>
+      <LighthouseWidget />
     </div>
   );
 };
