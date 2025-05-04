@@ -44,8 +44,8 @@ const Hero = () => {
           <div className="bg-devops-darkcard p-6 rounded-xl shadow-lg z-10 relative">
             <div className="rounded-lg overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80"
-                alt="DevOps Visualization"
+                src="https://images.unsplash.com/photo-1577495508326-19a1b3cf65b7?auto=format&fit=crop&q=80"
+                alt="Nissan GTR R35"
                 className="w-full h-auto object-cover"
               />
             </div>
