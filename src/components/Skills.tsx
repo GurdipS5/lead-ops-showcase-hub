@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Database, Computer, Server, Shield, Layers, HardDrive, Settings } from "lucide-react";
 
 const Skills = () => {
   // Technical skills data
@@ -47,7 +48,15 @@ const Skills = () => {
     { name: "Hashicorp Vault", icon: "https://www.vectorlogo.zone/logos/vaultproject/vaultproject-icon.svg" },
     { name: "Sentry", icon: "https://www.vectorlogo.zone/logos/sentryio/sentryio-icon.svg" },
     { name: "Sonarqube", icon: "https://www.svgrepo.com/show/354365/sonarqube.svg" },
-    { name: "JetBrains", icon: "https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" }
+    { name: "JetBrains", icon: "https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" },
+    // Adding the requested tools with Lucide icons
+    { name: "NDepend", isLucide: true, icon: "database" },
+    { name: "Visual Studio", isLucide: true, icon: "computer" },
+    { name: "Windows Server", isLucide: true, icon: "server" },
+    { name: "Cilium", isLucide: true, icon: "shield" },
+    { name: "Istio", isLucide: true, icon: "layers" },
+    { name: "VMware", isLucide: true, icon: "hard-drive" },
+    { name: "OPNSense", isLucide: true, icon: "settings" }
   ];
   
   // Certifications data
@@ -120,15 +129,27 @@ const Skills = () => {
               <div className="grid grid-cols-3 md:grid-cols-4 gap-6">
                 {toolsAndTechnologies.map((tool) => (
                   <div key={tool.name} className="flex flex-col items-center justify-center p-4 bg-[#192040] rounded-lg">
-                    <img 
-                      src={tool.icon} 
-                      alt={tool.name} 
-                      className="w-16 h-16 mb-3 object-contain"
-                      style={{ 
-                        backgroundColor: tool.name === "Pulumi" ? "transparent" : undefined,
-                        mixBlendMode: tool.name === "Pulumi" ? "screen" : "normal"
-                      }}
-                    />
+                    {tool.isLucide ? (
+                      <>
+                        {tool.icon === "database" && <Database className="w-16 h-16 mb-3" />}
+                        {tool.icon === "computer" && <Computer className="w-16 h-16 mb-3" />}
+                        {tool.icon === "server" && <Server className="w-16 h-16 mb-3" />}
+                        {tool.icon === "shield" && <Shield className="w-16 h-16 mb-3" />}
+                        {tool.icon === "layers" && <Layers className="w-16 h-16 mb-3" />}
+                        {tool.icon === "hard-drive" && <HardDrive className="w-16 h-16 mb-3" />}
+                        {tool.icon === "settings" && <Settings className="w-16 h-16 mb-3" />}
+                      </>
+                    ) : (
+                      <img 
+                        src={tool.icon} 
+                        alt={tool.name} 
+                        className="w-16 h-16 mb-3 object-contain"
+                        style={{ 
+                          backgroundColor: tool.name === "Pulumi" ? "transparent" : undefined,
+                          mixBlendMode: tool.name === "Pulumi" ? "screen" : "normal"
+                        }}
+                      />
+                    )}
                     <span className="text-sm font-medium text-center text-gray-300">{tool.name}</span>
                   </div>
                 ))}
