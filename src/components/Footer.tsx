@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="mb-6 md:mb-0">
             <a href="#hero" className="text-xl font-bold flex items-center">
       <span className="text-[#33c3f0] font-sans">&lt;</span>
-            <span className="font-sans">Gurdip</span><span className="text-[#33c3f0] font-sans">Sira</span>
+            <span className="font-sans">Gurdip </span><span className="text-[#33c3f0] font-sans">Sira</span>
             <span className="text-[#33c3f0] font-sans">/&gt;</span>
             </a>
             <p className="text-gray-400 mt-2 max-w-md">
