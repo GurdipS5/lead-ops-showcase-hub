@@ -10,9 +10,9 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div className="mb-6 md:mb-0">
             <a href="#hero" className="text-xl font-bold flex items-center">
-              <span className="text-devops-accent">&lt;</span>
-              DevOps<span className="text-devops-accent">Lead</span>
-              <span className="text-devops-accent">/&gt;</span>
+              <span className="text-accent dark:text-devops-darkaccent">&lt;</span>
+              Gurdip<span className="text-accent dark:text-devops-darkaccent">Sira</span>
+              <span className="text-accent dark:text-devops-darkaccent">/&gt;</span>
             </a>
             <p className="text-devops-medium mt-2 max-w-md">
               Bridging the gap between development and operations with streamlined infrastructure and automated workflows.
@@ -48,7 +48,7 @@ const Footer = () => {
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <p className="text-sm text-devops-medium">
-              © {currentYear} John Doe. All rights reserved.
+              © {currentYear} Gurdip Sira. All rights reserved.
             </p>
           </div>
           

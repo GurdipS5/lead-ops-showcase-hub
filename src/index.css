@@ -44,6 +44,45 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 20% 98%;
+
+    --card: 222 47% 14%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 210 20% 98%;
+    --primary-foreground: 215 32% 10%;
+
+    --secondary: 215 25% 27%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 210 20% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 210 20% 98%;
+
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 210 20% 98%;
+    --sidebar-primary-foreground: 215 32% 10%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 217 33% 20%;
+    --sidebar-ring: 210 20% 98%;
+  }
 }
 
 @layer base {
@@ -57,18 +96,26 @@
   }
   
   .section-heading {
-    @apply text-3xl font-bold text-devops-dark mb-6 relative;
+    @apply text-3xl font-bold text-foreground mb-6 relative;
   }
   
   .section-heading::after {
     content: "";
-    @apply block absolute w-16 h-1 bg-devops-accent mt-2;
+    @apply block absolute w-16 h-1 bg-accent mt-2;
+  }
+
+  .dark .bg-devops-light {
+    @apply bg-devops-darkbg;
+  }
+
+  .dark .bg-white {
+    @apply bg-devops-darkcard;
   }
 }
 
 @layer utilities {
   .highlight-text {
-    @apply text-devops-accent font-medium;
+    @apply text-accent font-medium;
   }
   
   .animate-delay-100 {
@@ -89,5 +136,9 @@
   
   .animate-delay-500 {
     animation-delay: 500ms;
+  }
+
+  .glass-effect {
+    @apply backdrop-blur-sm bg-white/70 dark:bg-black/50;
   }
 }

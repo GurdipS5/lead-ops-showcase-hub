@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -38,7 +39,7 @@ const Navbar = () => {
       className={cn(
         "fixed top-0 w-full z-50 transition-all duration-300",
         isScrolled
-          ? "bg-white/90 shadow-sm backdrop-blur-sm py-3"
+          ? "bg-white/90 dark:bg-devops-darkbg/90 shadow-sm backdrop-blur-sm py-3"
           : "bg-transparent py-5"
       )}
     >
@@ -46,11 +47,11 @@ const Navbar = () => {
         <div className="flex items-center">
           <a
             href="#"
-            className="text-xl font-bold text-devops-dark flex items-center gap-1"
+            className="text-xl font-bold text-devops-dark dark:text-white flex items-center gap-1"
           >
-            <span className="text-devops-accent">&lt;</span>
-            DevOps<span className="text-devops-accent">Lead</span>
-            <span className="text-devops-accent">/&gt;</span>
+            <span className="text-accent">&lt;</span>
+            Gurdip<span className="text-accent">Sira</span>
+            <span className="text-accent">/&gt;</span>
           </a>
         </div>
 
@@ -60,39 +61,43 @@ const Navbar = () => {
             <a
               key={link.name}
               href={link.href}
-              className="text-devops-medium hover:text-devops-dark transition-colors duration-200"
+              className="text-devops-medium dark:text-gray-300 hover:text-devops-dark dark:hover:text-white transition-colors duration-200"
             >
               {link.name}
             </a>
           ))}
-          <Button className="bg-devops-accent hover:bg-devops-accent/90">
+          <ThemeToggle />
+          <Button className="bg-accent hover:bg-accent/90 dark:bg-devops-darkaccent dark:hover:bg-devops-darkaccent/90">
             Resume
           </Button>
         </nav>
 
         {/* Mobile menu button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden text-devops-dark"
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="text-devops-dark dark:text-white"
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile navigation */}
       {mobileMenuOpen && (
-        <nav className="md:hidden absolute top-full left-0 right-0 bg-white shadow-md py-4 px-6 flex flex-col gap-4">
+        <nav className="md:hidden absolute top-full left-0 right-0 bg-white dark:bg-devops-darkbg shadow-md py-4 px-6 flex flex-col gap-4">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-devops-medium hover:text-devops-dark py-2 transition-colors duration-200"
+              className="text-devops-medium dark:text-gray-300 hover:text-devops-dark dark:hover:text-white py-2 transition-colors duration-200"
               onClick={() => setMobileMenuOpen(false)}
             >
               {link.name}
             </a>
           ))}
-          <Button className="bg-devops-accent hover:bg-devops-accent/90 w-full">
+          <Button className="bg-accent hover:bg-accent/90 dark:bg-devops-darkaccent dark:hover:bg-devops-darkaccent/90 w-full">
             Resume
           </Button>
         </nav>

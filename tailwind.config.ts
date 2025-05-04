@@ -68,6 +68,10 @@ export default {
 					medium: '#64748B',   // Steel blue
 					light: '#F1F5F9',    // Light gray
 					accent: '#06B6D4',   // Vibrant cyan
+					// Dark theme specific colors
+					darkbg: '#0F1629',   // Dark background
+					darkcard: '#1E293B', // Dark card background
+					darkaccent: '#0EA5E9', // Bright blue accent for dark mode
 				}
 			},
 			fontFamily: {
