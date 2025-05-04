@@ -20,7 +20,7 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['Montserrat', 'sans-serif'],
+				sans: ['Arial', 'Helvetica', 'sans-serif'],
 				mono: ['"Fira Code"', 'monospace'],
 				pixel: ['"Press Start 2P"', 'cursive'],
 				arial: ['Arial', 'Helvetica', 'sans-serif'],
