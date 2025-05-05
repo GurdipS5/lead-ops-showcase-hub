@@ -43,18 +43,6 @@ const Experience = () => {
         "Implemented GitOps workflow with ArgoCD, enhancing deployment visibility and reliability",
         "Designed multi-region disaster recovery strategy with 99.99% uptime achievement"
       ]
-    },
-    {
-      position: "Systems Engineer",
-      company: "InnoTech Solutions",
-      period: "2015 - 2018",
-      description:
-        "Managed and maintained on-premise and cloud infrastructure. Collaborated with developers to streamline deployment processes and implement monitoring solutions.",
-      achievements: [
-        "Orchestrated migration from on-premise to AWS cloud infrastructure",
-        "Implemented Docker containers for local development environments",
-        "Created automated backup and recovery procedures, reducing data loss risk"
-      ]
     }
   ];
 
