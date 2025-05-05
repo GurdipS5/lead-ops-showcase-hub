@@ -33,12 +33,13 @@ const Experience = () => {
     },
     {
       position: "Senior DevOps Engineer",
-      company: "Sea/Live",
+      company: "Reed Digital",
       period: "2018 - 2021",
       description:
         "Led DevOps initiatives focusing on security, compliance, and infrastructure automation. Enhanced CI/CD pipelines and implemented security best practices across the organization's Kubernetes infrastructure.",
       achievements: [
-        "Migrated legacy infrastructure to Kubernetes, improving scaling capabilities and reducing costs by 35%",
+        "Achieved significant cost savings by analyzing and optimizing AWS usage, resulting in 20% reduction in monthly expenses. This involved educating developers, and using native tooling such as AWS Cloud Explorer.",
+        "Deployed Kong, as an API Gateway for our Kubernetes microservices. This helped improve reliability and developer productivity, by offloading",
         "Implemented GitOps workflow with ArgoCD, enhancing deployment visibility and reliability",
         "Designed multi-region disaster recovery strategy with 99.99% uptime achievement"
       ]
