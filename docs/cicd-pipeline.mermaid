@@ -1,0 +1,27 @@
+graph TD
+    Start([Start]) --> NpmInstall[NPM Install]
+    NpmInstall --> Compile[Compile]
+    Compile --> QualityChecks{Parallel Quality Checks}
+
+    QualityChecks --> GitGuardian[GitGuardian Scan]
+    QualityChecks --> CycloneDX[CycloneDX SBOM]
+    QualityChecks --> SnykScan[Snyk Security Scan]
+
+    GitGuardian --> JoinQuality{Join}
+    CycloneDX --> JoinQuality
+    SnykScan --> JoinQuality
+
+    JoinQuality --> GenerateChangelog[Generate Changelog]
+    GenerateChangelog --> KosliReport[Kosli Report]
+    KosliReport --> PushToProGet[Push to ProGet]
+    PushToProGet --> OctopusDeploy[Octopus Deploy]
+    OctopusDeploy --> End([End])
+
+%% Styling with improved contrast
+    classDef process fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000
+    classDef decision fill:#e6f3ff,stroke:#000000,stroke-width:2px,color:#000000
+    classDef start fill:#e6ffe6,stroke:#000000,stroke-width:2px,color:#000000
+
+    class Start,End start
+    class QualityChecks,JoinQuality decision
+    class NpmInstall,Compile,GitGuardian,CycloneDX,SnykScan,GenerateChangelog,KosliReport,PushToProGet,OctopusDeploy process

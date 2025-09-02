@@ -1,9 +1,7 @@
-
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, Gauge, ExternalLink, Loader2 } from 'lucide-react';
-import { Button } from './ui/button';
-import { useToast } from './ui/use-toast';
+import React, { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { TrendingUp, Gauge, ExternalLink, Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface PerformanceMetric {
   name: string;
@@ -20,63 +18,54 @@ const LighthouseWidget = () => {
     const fetchLighthouseData = async () => {
       try {
         setIsLoading(true);
-        // Using PageSpeed Insights API to get real Lighthouse data
-        // The URL is hardcoded to demo.lovable.dev for demonstration purposes
-        const websiteUrl = encodeURIComponent('https://demo.lovable.dev');
-        const apiKey = 'AIzaSyDHfVIDTYbYD-Ri3N9HxClDwhIGZYCsmgE'; // This is a public API key for demonstration
-        const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${websiteUrl}&strategy=mobile&key=${apiKey}`;
-        
+        const websiteUrl = encodeURIComponent("https://demo.lovable.dev");
+        // Use environment variable for API key
+        const apiKey = import.meta.env.VITE_PAGESPEED_API_KEY;
+        const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${websiteUrl}&strategy=mobile${apiKey ? `&key=${apiKey}` : ""}`;
+
         const response = await fetch(apiUrl);
         const data = await response.json();
-        
+
         if (data.error) {
-          throw new Error(data.error.message || 'Failed to fetch Lighthouse data');
+          throw new Error(data.error.message || "Failed to fetch Lighthouse data");
         }
 
-        // Extract the metrics from the API response
         const categories = data.lighthouseResult.categories;
         const fetchedMetrics: PerformanceMetric[] = [
-          { name: 'Performance', score: Math.round(categories.performance.score * 100) },
-          { name: 'Accessibility', score: Math.round(categories.accessibility.score * 100) },
-          { name: 'Best Practices', score: Math.round(categories['best-practices'].score * 100) },
-          { name: 'SEO', score: Math.round(categories.seo.score * 100) }
+          { name: "Performance", score: Math.round(categories.performance.score * 100) },
+          { name: "Accessibility", score: Math.round(categories.accessibility.score * 100) },
+          { name: "Best Practices", score: Math.round(categories["best-practices"].score * 100) },
+          { name: "SEO", score: Math.round(categories.seo.score * 100) },
         ];
 
         setMetrics(fetchedMetrics);
-        
-        // Set the actual report URL
-        const reportId = data.id;
-        const realReportUrl = `https://pagespeed.web.dev/report?url=${websiteUrl}`;
-        setReportUrl(realReportUrl);
-        
+        setReportUrl(`https://pagespeed.web.dev/report?url=${websiteUrl}`);
         setIsLoading(false);
       } catch (error) {
-        console.error('Failed to fetch Lighthouse data:', error);
+        console.error("Failed to fetch Lighthouse data:", error);
         toast({
           title: "Error fetching Lighthouse data",
           description: "Unable to load performance metrics. Using fallback data.",
-          variant: "destructive"
+          variant: "destructive",
         });
-        
-        // Fallback to default metrics in case of error
         setMetrics([
-          { name: 'Performance', score: 96 },
-          { name: 'Accessibility', score: 98 },
-          { name: 'Best Practices', score: 100 },
-          { name: 'SEO', score: 100 }
+          { name: "Performance", score: 96 },
+          { name: "Accessibility", score: 98 },
+          { name: "Best Practices", score: 100 },
+          { name: "SEO", score: 100 },
         ]);
         setReportUrl("https://pagespeed.web.dev/");
         setIsLoading(false);
       }
     };
-    
+
     fetchLighthouseData();
   }, [toast]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'bg-green-500';
-    if (score >= 75) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (score >= 90) return "bg-green-500";
+    if (score >= 75) return "bg-yellow-500";
+    return "bg-red-500";
   };
 
   return (
@@ -90,7 +79,7 @@ const LighthouseWidget = () => {
             </div>
             <TrendingUp className="text-green-400" size={16} />
           </div>
-          
+
           {isLoading ? (
             <div className="h-32 flex items-center justify-center">
               <Loader2 className="h-8 w-8 text-accent animate-spin" />
@@ -103,17 +92,17 @@ const LighthouseWidget = () => {
                   <span className="text-xs text-gray-300">{metric.name}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium text-white">{metric.score}</span>
-                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: getScoreColor(metric.score) }}></div>
+                    <div className={`h-2 w-2 rounded-full ${getScoreColor(metric.score)}`}></div>
                   </div>
                 </div>
               ))}
             </div>
           )}
-          
+
           <div className="mt-4 pt-3 border-t border-[#1e293b] flex flex-col items-center">
             <p className="text-[10px] text-gray-400">Last updated {new Date().toLocaleDateString()}</p>
             {!isLoading && (
-              <a 
+              <a
                 href={reportUrl}
                 target="_blank"
                 rel="noopener noreferrer"

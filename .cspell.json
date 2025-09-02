@@ -1,0 +1,51 @@
+{
+  "version": "1",
+  "language": "en",
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.git/**",
+    "**/.next/**",
+    "**/.turbo/**",
+    "**/.vite/**"
+  ],
+  "ignoreWords": [
+    "GSSIRA",
+    "Lovable",
+    "Vite",
+    "TypeScript",
+    "React",
+    "Tailwind",
+    "Shadcn",
+    "ESLint",
+    "Prettier",
+    "Husky",
+    "Netlify",
+    "Snyk",
+    "SBOM",
+    "CycloneDX",
+    "Lighthouse",
+    "ts",
+    "tsx",
+    "jsx",
+    "js",
+    "css",
+    "html",
+    "json",
+    "md",
+    "mdx",
+    "yml",
+    "yaml"
+  ],
+  "words": [],
+  "dictionaryDefinitions": [
+    {
+      "name": "custom-words",
+      "path": "./cspell.dic"
+    }
+  ],
+  "dictionaries": [
+    "en",
+    "custom-words"
+  ]
+}

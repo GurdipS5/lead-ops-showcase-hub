@@ -1,0 +1,20 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🚀 Running Nuke build..."
+
+# Run the Nuke build
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    ./build.cmd
+else
+    ./build.sh
+fi
+
+# Check the exit code
+if [ $? -eq 0 ]; then
+    echo "✅ Build successful"
+    exit 0
+else
+    echo "❌ Build failed - commit aborted"
+    exit 1
+fi

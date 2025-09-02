@@ -1,73 +1,99 @@
-# Welcome to your Lovable project
+# Lead Operations Showcase Hub
 
-## Project info
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Build Status](https://teamcity.gssira.com/app/rest/builds/buildType:<BuildTypeId>/statusIcon)](https://teamcity.gssira.com)
 
-**URL**: https://lovable.dev/projects/2fa091ef-3aa5-44e8-8bb4-2c717b0f5278
+> **Note**: Replace `<BuildTypeId>` with your actual TeamCity build configuration ID from the URL when viewing your specific build configuration.
+[![Tech Stack](https://img.shields.io/badge/tech%20stack-Vite%20|%20React%20|%20TypeScript%20|%20Tailwind%20CSS-blueviolet)](https://lovable.dev)
 
-## How can I edit this code?
+<div align="center">
+  <img src="https://lovable.dev/assets/logo.svg" alt="Lovable Logo" width="100" height="100">
+  <h3>Modern Lead Operations Dashboard</h3>
+</div>
 
-There are several ways of editing your application.
+## 🚀 Project Overview
 
-**Use Lovable**
+This project is a modern, feature-rich lead operations dashboard built with cutting-edge web technologies. It's designed to provide a seamless experience for managing and analyzing lead operations data.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2fa091ef-3aa5-44e8-8bb4-2c717b0f5278) and start prompting.
+## 🛠️ Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Framework**: Vite
+- **Language**: TypeScript
+- **UI Framework**: React
+- **UI Components**: shadcn-ui
+- **Styling**: Tailwind CSS
 
-**Use your preferred IDE**
+## 📋 Project Info
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Lovable Project URL**: [https://lovable.dev/projects/2fa091ef-3aa5-44e8-8bb4-2c717b0f5278](https://lovable.dev/projects/2fa091ef-3aa5-44e8-8bb4-2c717b0f5278)
+- **Built with Lovable**: A modern AI-powered development platform
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🚀 Getting Started
 
-Follow these steps:
+### Prerequisites
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+- Node.js & npm (Recommended installation via [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+
+### Development Setup
+
+```bash
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 📝 Editing Options
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 1. Using Lovable
 
-**Use GitHub Codespaces**
+- Visit the [Lovable Project](https://lovable.dev/projects/2fa091ef-3aa5-44e8-8bb4-2c717b0f5278)
+- Start prompting to make changes
+- Changes are automatically committed to the repo
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 2. Local Development
 
-## What technologies are used for this project?
+- Clone the repository
+- Use your preferred IDE
+- Changes will be reflected in Lovable
 
-This project is built with:
+### 3. GitHub Direct Edit
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Navigate to the desired file
+- Click the Edit button (pencil icon)
+- Make and commit changes
 
-## How can I deploy this project?
+### 4. GitHub Codespaces
 
-Simply open [Lovable](https://lovable.dev/projects/2fa091ef-3aa5-44e8-8bb4-2c717b0f5278) and click on Share -> Publish.
+- Click the "Code" button
+- Select "Codespaces" tab
+- Create a new codespace
+- Edit and push changes
 
-## Can I connect a custom domain to my Lovable project?
+## 🚀 Deployment
 
-Yes, you can!
+Deploying is simple with Lovable:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. Open your project in Lovable
+2. Click on Share
+3. Select Publish
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 🌐 Custom Domain
+
+Yes, you can connect a custom domain! Follow these steps:
+
+1. Navigate to Project > Settings > Domains
+2. Click "Connect Domain"
+3. Follow the setup guide at [docs.lovable.dev](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+npm install --save-dev prettier

@@ -1,0 +1,30 @@
+{
+  "output": "CHANGELOG.md",
+  "template": "compact",
+  "unreleased": true,
+  "commitLimit": false,
+  "backfillLimit": false,
+  "tagPrefix": "v",
+  "sortCommits": "date",
+  "includeBranch": ["main", "master"],
+  "ignoreCommitPattern": "^(\\[skip ci\\]|chore\\(release\\))",
+  "commitUrl": false,
+  "compareUrl": false,
+  "issueUrl": false,
+  "mergeUrl": false,
+  "breakingPattern": "BREAKING CHANGE:",
+  "typeToEmoji": {
+    "feat": "✨",
+    "fix": "🐛",
+    "perf": "⚡",
+    "refactor": "♻️",
+    "style": "💄",
+    "docs": "📚",
+    "test": "🧪",
+    "build": "🏗️",
+    "ci": "👷",
+    "chore": "🔧",
+    "revert": "⏪",
+    "security": "🔒"
+  }
+}
