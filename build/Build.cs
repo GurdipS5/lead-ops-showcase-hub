@@ -977,7 +977,7 @@ partial class Build : NukeBuild
                     var version = PackageVersion;
                     var outputDir = RootDirectory / "artifacts" / "publish" / "packages"; // output of the artifact (zip)
                     var contentDir = RootDirectory / "dist"; // output of the build
-                    var nuspecPath = RootDirectory / $"{packageId}.nuspec";
+                    var nuspecPath = RootDirectory / "artifacts" / "publish" / "packages" / $"{packageId}.nuspec";
 
                     Log.Information(
                         "Starting NuGet package creation for {PackageId} version {Version}",
