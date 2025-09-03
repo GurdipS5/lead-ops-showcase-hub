@@ -1025,8 +1025,8 @@ partial class Build : NukeBuild
                                 {
                                     FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash",
                                     Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                        ? $"/c nuget {nugetCommand}"
-                        : $"-c \"nuget {nugetCommand}\"",
+               ? $"/c dotnet nuget {nugetCommand}"
+               : $"-c \"dotnet nuget {nugetCommand}\"",
                                     UseShellExecute = false,
                                     RedirectStandardOutput = true,
                                     RedirectStandardError = true,
