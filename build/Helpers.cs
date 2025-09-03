@@ -380,6 +380,7 @@ namespace _build
         /// <param name="version"></param>
         public static void UpdateNuspecFile(string NuspecPath, string version)
         {
+           
             if (!File.Exists(NuspecPath))
             {
                 Serilog.Log.Warning($".nuspec file not found at {NuspecPath}");

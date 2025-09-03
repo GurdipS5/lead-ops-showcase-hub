@@ -121,7 +121,7 @@ partial class Build : NukeBuild
     //            == true
     //    );
 
-    public static int Main() => Execute<Build>(x => x.CheckInToGitHub);
+    public static int Main() => Execute<Build>(x => x.PushToProGet);
 
     [GitRepository]
     readonly GitRepository Repository;
@@ -347,19 +347,78 @@ partial class Build : NukeBuild
         _ =>
             _.DependsOn(CSpellCheck)
                 .AssuredAfterFailure()
-                .Executes(() =>
+                .Executes(async () =>
                 {
+                    // Use 'cloud' command in CI/server environments, 'get-version' locally
+                    var nbgvCommand = IsServerBuild ? "cloud --format json" : "get-version --format json";
+
+                    string versionOutput = null;
+
+      
+                    var process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash",
+                            Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                                ? $"/c npx nbgv {nbgvCommand}"
+                                : $"-c \"npx nbgv {nbgvCommand}\"",
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            CreateNoWindow = true,
+                            WorkingDirectory = Environment.CurrentDirectory
+                        }
+                    };
+
                   
-                     var command = IsServerBuild ? "cloud --format json" : "get-version --format json";
-                    var versionOutput = Helpers.RunProcess("nbgv", command);
+
+                    try
+                    {
+                        process.Start();
+
+                        // Read streams asynchronously to avoid deadlocks
+                        var outputTask = process.StandardOutput.ReadToEndAsync();
+                        var errorTask = process.StandardError.ReadToEndAsync();
+
+                        process.WaitForExit();
+
+                        var output = await outputTask;
+                        var error = await errorTask;
+
+                        if (process.ExitCode == 0)
+                        {
+                            versionOutput = output.Trim();
+                            Serilog.Log.Information($"Successfully generated version using nbgv");
+                        }
+                        else
+                        {
+                            Serilog.Log.Error($"NBGV failed with exit code {process.ExitCode}");
+                            if (!string.IsNullOrEmpty(output))
+                            {
+                                Serilog.Log.Error($"NBGV Output: {output}");
+                            }
+                            if (!string.IsNullOrEmpty(error))
+                            {
+                                Serilog.Log.Error($"NBGV Error: {error}");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Serilog.Log.Error($"Failed to run NBGV: {ex.Message}");
+                        Serilog.Log.Error($"Stack Trace: {ex.StackTrace}");
+                    }
+
                     if (string.IsNullOrEmpty(versionOutput))
                     {
                         throw new InvalidOperationException(
-                            $"Failed to generate version using nbgv {command.Split(' ')[0]}"
+                            $"Failed to generate version using npx nbgv. " +
+                            "Make sure Node.js and the nbgv npm package are installed: 'npm install -g nbgv' or 'npm install nbgv'"
                         );
                     }
-                    var versionJson = JsonDocument.Parse(versionOutput);
 
+                    var versionJson = JsonDocument.Parse(versionOutput);
                     // For local builds, use Version (includes patch) instead of SimpleVersion
                     var versionProperty = IsServerBuild ? "SimpleVersion" : "Version";
                     simpleVersion = versionJson
@@ -369,7 +428,6 @@ partial class Build : NukeBuild
                     Serilog.Log.Information($"Generated version: {simpleVersion}");
                     // Store version for use in other targets
                     Environment.SetEnvironmentVariable("GENERATED_VERSION", simpleVersion);
-                
                 });
 
     Target UpdatePackageFiles =>
@@ -391,8 +449,11 @@ partial class Build : NukeBuild
                     // Update package-lock.json
                     Helpers.UpdatePackageLockJson(version, PackageLockJSONPath);
 
+                    Log.Information(NuspecPath);
+
                     // Update .nuspec file
-                    Helpers.UpdateNuspecFile(version, NuspecPath);
+                    Helpers.UpdateNuspecFile(NuspecPath, version
+                        );
                 });
 
     Target UpdateChangelog =>
@@ -401,9 +462,8 @@ partial class Build : NukeBuild
                 .AssuredAfterFailure()
                 .Executes(() =>
                 {
-                    bool b = false;
-
-                    if (b)
+                 
+                    if (IsServerBuild)
                     {
                         var version = Environment.GetEnvironmentVariable("GENERATED_VERSION");
                         if (string.IsNullOrEmpty(version))
@@ -459,7 +519,6 @@ partial class Build : NukeBuild
                         }
                     }
                 });
-
 
     /// <summary>
     /// Generates a CycloneDX SBOM (Software Bill of Materials) file for dependency tracking.
@@ -835,6 +894,7 @@ partial class Build : NukeBuild
         _ =>
             _.Description("Commits and pushes changes back to GitHub repository")
                 .AssuredAfterFailure()
+                .DependsOn(AttestAdditionalTools)
                 .Requires(() => GitHubToken)
                 .Executes(async () =>
                 {
@@ -910,6 +970,7 @@ partial class Build : NukeBuild
     Target CreateNuGetPackage =>
         _ =>
             _.DependsOn(CheckInToGitHub)
+                .AssuredAfterFailure()
                 .Executes(() =>
                 {
                     var packageId = "Portfolio of Gurdip Sira";
@@ -1017,6 +1078,7 @@ partial class Build : NukeBuild
     Target PushToProGet =>
         _ =>
             _.DependsOn(CreateNuGetPackage)
+             .AssuredAfterFailure()
                 .Executes(() =>
                 {
                     Log.Information("📤 Pushing NuGet package to ProGet...");
