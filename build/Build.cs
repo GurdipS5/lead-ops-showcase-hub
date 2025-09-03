@@ -971,7 +971,7 @@ partial class Build : NukeBuild
         _ =>
             _.DependsOn(CheckInToGitHub)
                 .AssuredAfterFailure()
-                .Executes(() =>
+                .Executes(async () =>
                 {
                     var packageId = "Portfolio of Gurdip Sira";
                     var version = PackageVersion;
@@ -1019,13 +1019,58 @@ partial class Build : NukeBuild
                     {
                         if (IsLocalBuild)
                         {
-                            ProcessTasks
-                                .StartProcess(
-                                    toolPath: "nuget",
-                                    arguments: nugetCommand,
-                                    logOutput: true
-                                )
-                                .AssertZeroExitCode();
+                            var process = new Process
+                            {
+                                StartInfo = new ProcessStartInfo
+                                {
+                                    FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash",
+                                    Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                        ? $"/c dotnet nuget {nugetCommand}"
+                        : $"-c \"dotnet nuget {nugetCommand}\"",
+                                    UseShellExecute = false,
+                                    RedirectStandardOutput = true,
+                                    RedirectStandardError = true,
+                                    CreateNoWindow = true,
+                                    WorkingDirectory = Environment.CurrentDirectory
+                                }
+                            };
+
+                            try
+                            {
+                                process.Start();
+
+                                // Read streams asynchronously to avoid deadlocks
+                                var outputTask = process.StandardOutput.ReadToEndAsync();
+                                var errorTask = process.StandardError.ReadToEndAsync();
+
+                                process.WaitForExit();
+
+                                var output = await outputTask;
+                                var error = await errorTask;
+
+                                // Log output
+                                if (!string.IsNullOrEmpty(output))
+                                {
+                                    Serilog.Log.Information($"NuGet Output: {output}");
+                                }
+
+                                if (!string.IsNullOrEmpty(error))
+                                {
+                                    Serilog.Log.Error($"NuGet Error: {error}");
+                                }
+
+                                if (process.ExitCode != 0)
+                                {
+                                    throw new InvalidOperationException($"NuGet command failed with exit code {process.ExitCode}");
+                                }
+
+                                Serilog.Log.Information($"NuGet command completed successfully");
+                            }
+                            catch (Exception ex)
+                            {
+                                Serilog.Log.Error($"Failed to run NuGet command: {ex.Message}");
+                                throw;
+                            }
                         }
                         else if (IsServerBuild)
                         {

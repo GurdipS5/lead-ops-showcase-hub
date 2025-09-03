@@ -2,5 +2,5 @@ projectKey=portfolio
 serverUrl=http://sonarqube.gssira.com:9000
 serverVersion=2025.1.1.104738
 dashboardUrl=http://sonarqube.gssira.com:9000/dashboard?id=portfolio
-ceTaskId=1fb6f3d9-38e2-46d0-891e-e05c4dc62f58
-ceTaskUrl=http://sonarqube.gssira.com:9000/api/ce/task?id=1fb6f3d9-38e2-46d0-891e-e05c4dc62f58
+ceTaskId=5f614ac2-ade3-4f76-a6c7-7675311a791b
+ceTaskUrl=http://sonarqube.gssira.com:9000/api/ce/task?id=5f614ac2-ade3-4f76-a6c7-7675311a791b

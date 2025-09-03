@@ -1,1 +1,1 @@
-{"last_found_secrets": [{"match": "a5f6be9c444951a3af9ab1404f6b518663fa7662f62dc5273e4d7ea13855c502", "name": "Google API Key - commit://05b186e7a6b18be7b76381f8cd97e80ecaa76c76/src/components/LighthouseWidget.tsx"}]}
+{"last_found_secrets": [{"name": "Google API Key - commit://05b186e7a6b18be7b76381f8cd97e80ecaa76c76/src/components/LighthouseWidget.tsx", "match": "a5f6be9c444951a3af9ab1404f6b518663fa7662f62dc5273e4d7ea13855c502"}]}
