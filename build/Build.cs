@@ -973,7 +973,8 @@ partial class Build : NukeBuild
                 .AssuredAfterFailure()
                 .Executes(async () =>
                 {
-                    var packageId = "Portfolio of Gurdip Sira";
+
+                    var packageId = "PortfolioofGurdipSira";
                     var version = PackageVersion;
                     var outputDir = RootDirectory / "artifacts" / "publish" / "packages"; // output of the artifact (zip)
                     var contentDir = RootDirectory / "dist"; // output of the build
@@ -995,7 +996,7 @@ partial class Build : NukeBuild
                           <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
                             <metadata>
                               <id>{packageId}</id>
-                              <version>{version}</version>
+                              <version>{simpleVersion}</version>
                               <title>Portfolio of Gurdip Sira</title>
                               <authors>Gurdip Sira</authors>
                               <owners>Gurdip Sira</owners>
