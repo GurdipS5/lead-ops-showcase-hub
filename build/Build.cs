@@ -1132,7 +1132,7 @@ partial class Build : NukeBuild
                     try
                     {
                   
-                        var packageFile = $"PortfoliofGurdipSira.{simpleVersion}.nupkg";
+                        var packageFile = $"PortfolioofGurdipSira.{simpleVersion}.nupkg";
                         var packagePath = RootDirectory / "artifacts" / "publish" / "packages" / packageFile;
                       
                         if (!File.Exists(packagePath))
