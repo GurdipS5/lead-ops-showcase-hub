@@ -1131,8 +1131,8 @@ partial class Build : NukeBuild
 
                     try
                     {
-                        var packageId = "LeadOps.Showcase.Web";
-                        var packageFile = $"{packageId}.{simpleVersion}.nupkg";
+                  
+                        var packageFile = $"PortfoliofGurdipSira.{simpleVersion}.nupkg";
                         var packagePath = RootDirectory / "artifacts" / "publish" / "packages" / packageFile;
                       
                         if (!File.Exists(packagePath))
