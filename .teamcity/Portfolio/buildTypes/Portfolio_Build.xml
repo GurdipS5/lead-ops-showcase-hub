@@ -28,7 +28,7 @@
       </runner>
     </build-runners>
     <vcs-settings>
-      <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5PortfolioRefsHeadsMain" />
+      <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
     </vcs-settings>
     <requirements>
       <equals id="RQ_2" name="npm" value="true" />
