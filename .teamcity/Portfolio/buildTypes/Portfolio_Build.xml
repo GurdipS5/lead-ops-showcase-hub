@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" uuid="d56d2a4c-118d-4120-a0fe-8ff830a84cf3" xsi:noNamespaceSchemaLocation="https://www.jetbrains.com/teamcity/schemas/2025.3/project-config.xsd">
+  <name>Build</name>
+  <description />
+  <settings>
+    <options>
+      <option name="checkoutDirectory" value="portfolio" />
+      <option name="checkoutMode" value="ON_AGENT" />
+    </options>
+    <parameters>
+      <param name="SectionDirctory" value="%system.teamcity.build.checkoutDir%/src/data/sections" />
+      <param name="env.DOTNET_CLI_HOME" value="/tmp" />
+    </parameters>
+    <build-runners>
+      <runner id="ssd" name="ssd" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="chmod +x ./build.sh &gt; /dev/null 2&gt;&amp;1" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+      <runner id="simpleRunner" name="" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="./build.sh" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <vcs-settings>
+      <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5PortfolioRefsHeadsMain" />
+    </vcs-settings>
+    <requirements>
+      <equals id="RQ_2" name="npm" value="true" />
+    </requirements>
+    <build-triggers>
+      <build-trigger id="TRIGGER_8" type="vcsTrigger">
+        <parameters>
+          <param name="branchFilter" value="+:*" />
+          <param name="enableQueueOptimization" value="true" />
+          <param name="quietPeriodMode" value="DO_NOT_USE" />
+          <param name="triggerRules" value="-:comment=regex:\[skip ci\]" />
+        </parameters>
+      </build-trigger>
+    </build-triggers>
+    <build-extensions>
+      <extension id="perfmon" type="perfmon">
+        <parameters>
+          <param name="teamcity.perfmon.feature.enabled" value="true" />
+        </parameters>
+      </extension>
+    </build-extensions>
+  </settings>
+</build-type>
+
