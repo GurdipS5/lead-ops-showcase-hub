@@ -21,7 +21,7 @@
       </runner>
       <runner id="simpleRunner" name="" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="./build.sh" />
+          <param name="script.content" value="./build.sh %env.HARBOR_ROBOT%" />
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
         </parameters>
