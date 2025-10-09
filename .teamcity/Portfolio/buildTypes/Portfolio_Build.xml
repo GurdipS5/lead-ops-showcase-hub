@@ -34,6 +34,54 @@
           <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
+      <runner id="Get_Version" name="Get Version" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# Determine if this is a TeamCity server build
+$isServerBuild = $env:TEAMCITY_VERSION -ne $null
+
+# Choose NBGV command
+$nbgvCommand = if ($isServerBuild) { "cloud --format json" } else { "get-version --format json" }
+
+# Run NBGV
+Write-Host "Running: npx nbgv $nbgvCommand"
+$processInfo = New-Object System.Diagnostics.ProcessStartInfo
+$processInfo.FileName = "npx"
+$processInfo.Arguments = "nbgv $nbgvCommand"
+$processInfo.RedirectStandardOutput = $true
+$processInfo.RedirectStandardError = $true
+$processInfo.UseShellExecute = $false
+$processInfo.CreateNoWindow = $true
+$processInfo.WorkingDirectory = $pwd
+
+$process = New-Object System.Diagnostics.Process
+$process.StartInfo = $processInfo
+$process.Start() | Out-Null
+
+$output = $process.StandardOutput.ReadToEnd()
+$errorOutput = $process.StandardError.ReadToEnd()
+
+$process.WaitForExit()
+
+if ($process.ExitCode -ne 0) {
+    Write-Error "NBGV failed: $errorOutput"
+    exit $process.ExitCode
+}
+
+# Parse JSON output
+$versionJson = $output | ConvertFrom-Json
+$versionProperty = if ($isServerBuild) { "SimpleVersion" } else { "Version" }
+$simpleVersion = $versionJson.$versionProperty
+
+Write-Host "Generated version: $simpleVersion"
+
+# Set TeamCity environment parameter
+Write-Host "##teamcity[setParameter name='env.GENERATED_VERSION' value='$simpleVersion']"]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
