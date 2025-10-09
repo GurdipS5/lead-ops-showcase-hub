@@ -13,7 +13,6 @@
     <extension id="PROJECT_EXT_4" type="versionedSettings">
       <parameters>
         <param name="buildSettings" value="ALWAYS_USE_CURRENT" />
-        <param name="credentialsStorageType" value="credentialsJSON" />
         <param name="enabled" value="true" />
         <param name="ignoreChangesInDependenciesAndVcsSettings" value="false" />
         <param name="rootId" value="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
@@ -27,7 +26,7 @@
         <param name="endpoint" value="approle" />
         <param name="providerType" value="teamcity-vault" />
         <param name="role-id" value="a6496d27-abac-c005-9eda-6a63dc9d8c9c" />
-        <param name="secure:secret-id" value="credentialsJSON:849d332c-e4bb-4ed1-abfd-55677b25e025" />
+        <param name="secure:secret-id" value="zxxcc194c086058dbeb6c39803505b0c610b499c54d6fdfc63a60427e4a4340bb57682f65dee4829e6e" />
         <param name="url" value="http://vault.gssira.com:8200" />
         <param name="vault-namespace" value="DevOps/Portfolio/" />
       </parameters>

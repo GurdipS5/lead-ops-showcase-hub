@@ -6,7 +6,7 @@
   <param name="authMethod" value="PASSWORD" />
   <param name="branch" value="refs/heads/main" />
   <param name="ignoreKnownHosts" value="true" />
-  <param name="secure:password" value="credentialsJSON:c202f1a5-e758-4ae4-be74-8dbb2fda3483" />
+  <param name="secure:password" value="zxxb204d927baef5d1299d19c42c589dde2f11df7974412aabef079dd0ae03ee3f5d5452b4314b3761b775d03cbe80d301b" />
   <param name="submoduleCheckout" value="CHECKOUT" />
   <param name="teamcity:branchSpec" value="refs/heads/*" />
   <param name="url" value="https://github.com/GurdipS5/lead-ops-showcase-hub" />
