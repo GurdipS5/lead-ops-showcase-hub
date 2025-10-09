@@ -13,7 +13,7 @@
 
 ## 🚀 Project Overview
 
-This project is a modern, feature-rich lead operations dashboard built with cutting-edge web technologies. It's designed to provide a seamless experience for managing and analyzing lead operations data.
+This project is a modern, feature-rich lead operations dashboard built with cutting-edge web technologies. It's designed to provide a seamless experience for managing and analyzing lead operations data. t
 
 ## 🛠️ Tech Stack
 
