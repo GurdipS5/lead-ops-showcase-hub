@@ -149,7 +149,7 @@ function Update-JsonVersion {
         }
     }
     catch {
-        Write-Error "Failed to update $FilePath: $_"
+        Write-Error "Failed to update ${FilePath}: $($_.Exception.Message)"
         return $false
     }
 }
