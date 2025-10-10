@@ -224,7 +224,26 @@ exit 0]]></param>
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code" value="npx cyclonedx-npm" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[$sbomPath = $env:SBOMPath
+
+Write-Host "Generating SBOM..." -ForegroundColor Cyan
+
+# Generate SBOM
+npx cyclonedx-npm --output-file $sbomPath
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "`n✓ SBOM generated successfully at: $sbomPath" -ForegroundColor Green
+    
+    # Display contents
+    Write-Host "`n========================================" -ForegroundColor Cyan
+    Write-Host "SBOM Contents:" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+    Get-Content $sbomPath | Write-Host
+    Write-Host "========================================`n" -ForegroundColor Cyan
+} else {
+    Write-Error "Failed to generate SBOM"
+    exit 1
+}]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
