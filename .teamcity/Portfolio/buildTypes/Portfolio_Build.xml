@@ -39,6 +39,7 @@
           <param name="jetbrains_powershell_bitness" value="x64" />
           <param name="jetbrains_powershell_edition" value="Desktop" />
           <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_minVersion" value="5.1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
           <param name="jetbrains_powershell_script_code"><![CDATA[# Determine if this is a TeamCity server build
 $isServerBuild = $env:TEAMCITY_VERSION -ne $null
