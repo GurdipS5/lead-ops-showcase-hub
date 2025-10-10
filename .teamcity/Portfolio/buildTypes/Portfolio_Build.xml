@@ -219,6 +219,13 @@ exit 0]]></param>
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
+      <runner id="Run_CycloneDX" name="Run CycloneDX" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="cyclonedx-npm --output-file %%" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
