@@ -7,6 +7,9 @@
       <option name="checkoutDirectory" value="portfolio" />
       <option name="checkoutMode" value="ON_AGENT" />
     </options>
+    <disabled-settings>
+      <setting-ref ref="sdsdds" />
+    </disabled-settings>
     <parameters>
       <param name="SectionDirctory" value="%system.teamcity.build.checkoutDir%/src/data/sections" />
       <param name="env.DOTNET_CLI_HOME" value="/tmp" />
