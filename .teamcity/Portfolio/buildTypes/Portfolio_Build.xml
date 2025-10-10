@@ -322,11 +322,13 @@ catch {
           <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
-      <runner id="Execute_GitGuardian" name="Execute GitGuardian" type="simpleRunner">
+      <runner id="Execute_GitGuardian" name="Execute GitGuardian" type="jetbrains_powershell">
         <parameters>
-          <param name="script.content" value="ggshield secret scan commit-range HEAD~1 --format sarif | tee %env.GitGuardianDir%\results.sarif" />
-          <param name="teamcity.step.mode" value="execute_if_failed" />
-          <param name="use.custom.script" value="true" />
+          <param name="jetbrains_powershell_execution" value="STDIN" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code" value="ggshield secret scan commit-range HEAD~1 --format sarif | Tee-Object &quot;$env:GitGuardianDir\results.sarif&quot;" />
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
     </build-runners>
