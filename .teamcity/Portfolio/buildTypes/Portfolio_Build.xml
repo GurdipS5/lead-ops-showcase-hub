@@ -148,7 +148,7 @@ Update-JsonVersion -FilePath "package-lock.json" -Version %build.number%
 
 Write-Host "`nVersion update complete!" -ForegroundColor Green]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
     </build-runners>
