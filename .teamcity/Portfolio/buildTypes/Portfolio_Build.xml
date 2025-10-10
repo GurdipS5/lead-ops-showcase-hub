@@ -145,6 +145,8 @@ function Update-JsonVersion {
     }
 }
 
+Write-Host %build.number%
+
 # Update both files
 Update-JsonVersion -FilePath "package.json" -Version %build.number%
 Update-JsonVersion -FilePath "package-lock.json" -Version %build.number%
