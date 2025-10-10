@@ -44,7 +44,7 @@
 $isServerBuild = $env:TEAMCITY_VERSION -ne $null
 
 # Choose NBGV command
-$nbgvCommand = if ($isServerBuild) { "cloud --format json" } else { "get-version --format json" }
+$nbgvCommand = if ($isServerBuild) { "cloud" } else { "get-version --format json" }
 
 # Run NBGV
 Write-Host "Running: npx nbgv $nbgvCommand"
@@ -69,17 +69,7 @@ $process.WaitForExit()
 if ($process.ExitCode -ne 0) {
     Write-Error "NBGV failed: $errorOutput"
     exit $process.ExitCode
-}
-
-# Parse JSON output
-$versionJson = $output | ConvertFrom-Json
-$versionProperty = if ($isServerBuild) { "SimpleVersion" } else { "Version" }
-$simpleVersion = $versionJson.$versionProperty
-
-Write-Host "Generated version: $simpleVersion"
-
-# Set TeamCity environment parameter
-Write-Host "##teamcity[setParameter name='env.GENERATED_VERSION' value='$simpleVersion']"]]></param>
+}]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
