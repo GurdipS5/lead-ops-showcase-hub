@@ -227,7 +227,7 @@ exit 0]]></param>
           <param name="jetbrains_powershell_script_code"><![CDATA[$output = npx cyclonedx-npm --output-file %SBOMPath% 2>&1
 Write-Host $output]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
     </build-runners>
