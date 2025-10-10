@@ -45,51 +45,60 @@
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[string nbgvCommand = IsServerBuild ? "cloud --format json" : "get-version --format json";
-string versionOutput = null;
-  
-Process process = new Process
-{
-    StartInfo = new ProcessStartInfo
-    {
-        FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash",
-        Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? $"/c npx nbgv {nbgvCommand}"
-            : $"-c \"npx nbgv {nbgvCommand}\"",
-        UseShellExecute = false,
-        RedirectStandardOutput = true,
-        RedirectStandardError = true,
-        CreateNoWindow = true,
-        WorkingDirectory = Environment.CurrentDirectory
-    }
-};
+          <param name="jetbrains_powershell_script_code"><![CDATA[$isServerBuild = ![string]::IsNullOrEmpty($env:TEAMCITY_VERSION)
+$nbgvCommand = if ($isServerBuild) { "cloud --format json" } else { "get-version --format json" }
+$versionOutput = $null
 
-try
-{
-    process.Start();
-    // Read streams asynchronously to avoid deadlocks
-    Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
-    Task<string> errorTask = process.StandardError.ReadToEndAsync();
-    process.WaitForExit();
-    string output = await outputTask;
-    string error = await errorTask;
-    if (process.ExitCode == 0)
-    {
-        versionOutput = output.Trim();
-        Serilog.Log.Information($"Successfully generated version using nbgv");
+$processInfo = New-Object System.Diagnostics.ProcessStartInfo
+$processInfo.FileName = if ($IsWindows -or $env:OS -match "Windows") { "cmd.exe" } else { "/bin/bash" }
+$processInfo.Arguments = if ($IsWindows -or $env:OS -match "Windows") { 
+    "/c npx nbgv $nbgvCommand" 
+} else { 
+    "-c `"npx nbgv $nbgvCommand`"" 
+}
+$processInfo.UseShellExecute = $false
+$processInfo.RedirectStandardOutput = $true
+$processInfo.RedirectStandardError = $true
+$processInfo.CreateNoWindow = $true
+$processInfo.WorkingDirectory = Get-Location
+
+$process = New-Object System.Diagnostics.Process
+$process.StartInfo = $processInfo
+
+try {
+    $process.Start() | Out-Null
+    
+    # Read streams asynchronously to avoid deadlocks
+    $outputTask = $process.StandardOutput.ReadToEndAsync()
+    $errorTask = $process.StandardError.ReadToEndAsync()
+    
+    $process.WaitForExit()
+    
+    $output = $outputTask.Result
+    $error = $errorTask.Result
+    
+    if ($process.ExitCode -eq 0) {
+        $versionOutput = $output.Trim()
+        Write-Host "Successfully generated version using nbgv" -ForegroundColor Green
+        Write-Host $versionOutput
     }
-    else
-    {
-        Serilog.Log.Error($"NBGV failed with exit code {process.ExitCode}");
-        if (!string.IsNullOrEmpty(output))
-        {
-            Serilog.Log.Error($"NBGV Output: {output}");
+    else {
+        Write-Error "NBGV failed with exit code $($process.ExitCode)"
+        if (![string]::IsNullOrEmpty($output)) {
+            Write-Error "NBGV Output: $output"
         }
-        if (!string.IsNullOrEmpty(error))
-        {
-            Serilog.Log.Error($"NBGV Error: {error}");
+        if (![string]::IsNullOrEmpty($error)) {
+            Write-Error "NBGV Error: $error"
         }
+        exit $process.ExitCode
     }
+}
+catch {
+    Write-Error "Exception running nbgv: $_"
+    exit 1
+}
+finally {
+    $process.Dispose()
 }]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
