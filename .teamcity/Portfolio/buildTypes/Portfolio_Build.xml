@@ -322,7 +322,7 @@ catch {
       </runner>
       <runner id="Execute_GitGuardian" name="Execute GitGuardian" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="ggshield secret scan commit-range HEAD~1 --format sarif --output %GitGuardianDir%" />
+          <param name="script.content" value="ggshield secret scan commit-range HEAD~1 --format sarif --output %env.GitGuardianDir%" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
           <param name="use.custom.script" value="true" />
         </parameters>
