@@ -104,7 +104,7 @@ finally {
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
-      <runner id="Set_Version_1" name="Set Version (1)" type="jetbrains_powershell">
+      <runner id="Set_Version_1" name="Set Package/Lock Versions" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
