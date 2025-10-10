@@ -45,59 +45,52 @@
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[var nbgvCommand = IsServerBuild ? "cloud --format json" : "get-version --format json";
-
-    string versionOutput = null;
-
-      
-    var process = new Process
-    {
-        StartInfo = new ProcessStartInfo
-        {
-            FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash",
-            Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? $"/c npx nbgv {nbgvCommand}"
-                : $"-c \"npx nbgv {nbgvCommand}\"",
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            WorkingDirectory = Environment.CurrentDirectory
-        }
-    };
-
+          <param name="jetbrains_powershell_script_code"><![CDATA[string nbgvCommand = IsServerBuild ? "cloud --format json" : "get-version --format json";
+string versionOutput = null;
   
-
-    try
+Process process = new Process
+{
+    StartInfo = new ProcessStartInfo
     {
-        process.Start();
+        FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/bash",
+        Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? $"/c npx nbgv {nbgvCommand}"
+            : $"-c \"npx nbgv {nbgvCommand}\"",
+        UseShellExecute = false,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        CreateNoWindow = true,
+        WorkingDirectory = Environment.CurrentDirectory
+    }
+};
 
-        // Read streams asynchronously to avoid deadlocks
-        var outputTask = process.StandardOutput.ReadToEndAsync();
-        var errorTask = process.StandardError.ReadToEndAsync();
-
-        process.WaitForExit();
-
-        var output = await outputTask;
-        var error = await errorTask;
-
-        if (process.ExitCode == 0)
+try
+{
+    process.Start();
+    // Read streams asynchronously to avoid deadlocks
+    Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+    Task<string> errorTask = process.StandardError.ReadToEndAsync();
+    process.WaitForExit();
+    string output = await outputTask;
+    string error = await errorTask;
+    if (process.ExitCode == 0)
+    {
+        versionOutput = output.Trim();
+        Serilog.Log.Information($"Successfully generated version using nbgv");
+    }
+    else
+    {
+        Serilog.Log.Error($"NBGV failed with exit code {process.ExitCode}");
+        if (!string.IsNullOrEmpty(output))
         {
-            versionOutput = output.Trim();
-            Serilog.Log.Information($"Successfully generated version using nbgv");
+            Serilog.Log.Error($"NBGV Output: {output}");
         }
-        else
+        if (!string.IsNullOrEmpty(error))
         {
-            Serilog.Log.Error($"NBGV failed with exit code {process.ExitCode}");
-            if (!string.IsNullOrEmpty(output))
-            {
-                Serilog.Log.Error($"NBGV Output: {output}");
-            }
-            if (!string.IsNullOrEmpty(error))
-            {
-                Serilog.Log.Error($"NBGV Error: {error}");
-            }
-        }]]></param>
+            Serilog.Log.Error($"NBGV Error: {error}");
+        }
+    }
+}]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
