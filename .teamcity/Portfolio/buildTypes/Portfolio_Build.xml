@@ -248,6 +248,70 @@ if ($LASTEXITCODE -eq 0) {
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
+      <runner id="Checkin_to_GitHub" name="Checkin to GitHub" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# Commit and push changes to GitHub repository
+try {
+    Write-Host "Getting repository information..."
+    
+    # Get repository name from git remote
+    $repoName = (Split-Path -Leaf (git remote get-url origin)).Trim()
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to get repository name. Exit code: $LASTEXITCODE"
+        exit 1
+    }
+    
+    # Extract repository owner from remote URL
+    $remoteUrl = git remote get-url origin
+    if ($remoteUrl -match 'github\.com[:/]([^/]+)/') {
+        $repoOwner = $Matches[1]
+    } else {
+        Write-Error "Could not determine repository owner from remote URL: $remoteUrl"
+        exit 1
+    }
+    
+    Write-Host "Repository: $repoOwner/$repoName"
+    Write-Host "Remote URL: $remoteUrl"
+    
+    # Git add
+    Write-Host "`nStaging changes..."
+    git add -A
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "Git add failed with exit code: $LASTEXITCODE"
+    }
+    
+    # Git commit
+    Write-Host "`nCommitting changes..."
+    git commit --no-verify -m "chore(ci): checking in changed code from local ci"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "Git commit failed with exit code: $LASTEXITCODE (possibly nothing to commit)"
+        Write-Host "Skipping push."
+        exit 0
+    }
+    
+    # Git push with token authentication
+    Write-Host "`nPushing to GitHub..."
+    $pushUrl = "https://$env:GITHUB_TOKEN@github.com/$repoOwner/$repoName"
+    git push $pushUrl
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Git push failed with exit code: $LASTEXITCODE"
+        exit 1
+    }
+    
+    Write-Host "`nSuccessfully pushed changes to GitHub" -ForegroundColor Green
+    exit 0
+}
+catch {
+    Write-Error "Failed to check in to GitHub: $($_.Exception.Message)"
+    exit 1
+}]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
