@@ -13,6 +13,7 @@
     <parameters>
       <param name="SectionDirctory" value="%system.teamcity.build.checkoutDir%/src/data/sections" />
       <param name="env.DOTNET_CLI_HOME" value="/tmp" />
+      <param name="env.GitGuardianDir" value="%teamcity.build.checkoutDir%/artifacts/gitguardian" />
       <param name="env.SBOMPath" value="%teamcity.build.checkoutDir%/artifacts/cyclonedx/sbom.json" />
     </parameters>
     <build-runners>
