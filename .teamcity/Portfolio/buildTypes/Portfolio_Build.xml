@@ -155,8 +155,8 @@ function Update-JsonVersion {
 }
 
 # Update both files
-$packageJsonUpdated = Update-JsonVersion -FilePath "package.json" -Version %build.number%
-$packageLockUpdated = Update-JsonVersion -FilePath "package-lock.json" -Version %build.number%
+$packageJsonUpdated = Update-JsonVersion -FilePath "package.json" -Version $Version
+$packageLockUpdated = Update-JsonVersion -FilePath "package-lock.json" -Version $Version
 
 # Summary
 Write-Host "`n========================================" -ForegroundColor Cyan
