@@ -324,7 +324,7 @@ catch {
       </runner>
       <runner id="Execute_GitGuardian" name="Execute GitGuardian" type="jetbrains_powershell">
         <parameters>
-          <param name="jetbrains_powershell_execution" value="STDIN" />
+          <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
           <param name="jetbrains_powershell_script_code" value="ggshield secret scan commit-range HEAD~1 --format sarif | Tee-Object &quot;$env:GitGuardianDir\results.sarif&quot;" />
           <param name="jetbrains_powershell_script_mode" value="CODE" />
