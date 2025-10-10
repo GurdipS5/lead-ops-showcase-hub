@@ -111,47 +111,7 @@ finally {
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[param(
-    [Parameter(Mandatory=$true)]
-    [string]$Version
-)
-
-Write-Host "Updating package.json and package-lock.json to version $Version"
-
-function Update-JsonVersion {
-    param(
-        [string]$FilePath,
-        [string]$NewVersion
-    )
-    
-    if (-not (Test-Path $FilePath)) {
-        Write-Warning "$FilePath not found, skipping..."
-        return
-    }
-    
-    Write-Host "Updating $FilePath..." -ForegroundColor Cyan
-    
-    $content = Get-Content $FilePath -Raw
-    $pattern = '("version"\s*:\s*)"[^"]*"'
-    $replacement = "`$1`"$NewVersion`""
-    
-    if ($content -match $pattern) {
-        $newContent = $content -replace $pattern, $replacement
-        Set-Content -Path $FilePath -Value $newContent -NoNewline -Encoding UTF8
-        Write-Host "✓ Successfully updated $FilePath" -ForegroundColor Green
-    }
-    else {
-        Write-Warning "Could not find version field in $FilePath"
-    }
-}
-
-Write-Host %build.number%
-
-# Update both files
-Update-JsonVersion -FilePath "package.json" -Version %build.number%
-Update-JsonVersion -FilePath "package-lock.json" -Version %build.number%
-
-Write-Host "`nVersion update complete!" -ForegroundColor Green]]></param>
+          <param name="jetbrains_powershell_script_code" value="Write-Host %build.number%" />
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
