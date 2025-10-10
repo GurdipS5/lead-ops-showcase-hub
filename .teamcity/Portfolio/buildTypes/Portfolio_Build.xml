@@ -335,6 +335,51 @@ ggshield secret scan commit-range HEAD~1 --format sarif | Tee-Object "$env:GitGu
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
+      <runner id="NPM_Pack" name="NPM Pack" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# Define directories
+$contentDir = Join-Path $PSScriptRoot "dist"
+$outputDir = Join-Path $PSScriptRoot "artifacts\output"
+
+# Ensure we're in the root directory
+Set-Location $PSScriptRoot
+
+# Run npm pack
+Write-Host "Running npm pack..."
+
+$process = Start-Process -FilePath "npm" `
+    -ArgumentList "pack" `
+    -WorkingDirectory $PSScriptRoot `
+    -NoNewWindow `
+    -Wait `
+    -PassThru `
+    -RedirectStandardOutput "npm-pack-output.log" `
+    -RedirectStandardError "npm-pack-error.log"
+
+# Display output
+if (Test-Path "npm-pack-output.log") {
+    Get-Content "npm-pack-output.log" | ForEach-Object { Write-Host $_ }
+    Remove-Item "npm-pack-output.log"
+}
+
+# Display errors
+if (Test-Path "npm-pack-error.log") {
+    Get-Content "npm-pack-error.log" | ForEach-Object { Write-Host "ERROR: $_" }
+    Remove-Item "npm-pack-error.log"
+}
+
+# Check exit code
+if ($process.ExitCode -ne 0) {
+    throw "npm pack failed with exit code $($process.ExitCode)"
+}
+
+Write-Host "npm pack completed successfully. Created .tgz package."]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
