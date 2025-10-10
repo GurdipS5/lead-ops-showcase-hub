@@ -11,6 +11,7 @@
       <setting-ref ref="sdsdds" />
     </disabled-settings>
     <parameters>
+      <param name="SBOMPath" value="%teamcity.build.checkoutDir%/artifacts/cyclonedx/sbom.json" />
       <param name="SectionDirctory" value="%system.teamcity.build.checkoutDir%/src/data/sections" />
       <param name="env.DOTNET_CLI_HOME" value="/tmp" />
     </parameters>
