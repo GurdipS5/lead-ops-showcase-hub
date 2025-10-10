@@ -222,7 +222,7 @@ exit 0]]></param>
       </runner>
       <runner id="Run_CycloneDX" name="Run CycloneDX" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="cyclonedx-npm --output-file %%" />
+          <param name="script.content" value="cyclonedx-npm --output-file %SBOMPath%" />
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
         </parameters>
