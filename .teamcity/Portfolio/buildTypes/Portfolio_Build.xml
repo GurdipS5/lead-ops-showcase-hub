@@ -12,6 +12,13 @@
       <param name="env.DOTNET_CLI_HOME" value="/tmp" />
     </parameters>
     <build-runners>
+      <runner id="Set_Version" name="Set Version" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="npx nbgv cloud" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
       <runner id="simpleRunner_1" name="" type="simpleRunner">
         <parameters>
           <param name="script.content" value="npm install" />
@@ -30,13 +37,6 @@
       <runner id="CSpell" name="CSpell" type="simpleRunner">
         <parameters>
           <param name="script.content" value="npx cspell &quot;**/*.{js,ts,md,txt}&quot;" />
-          <param name="teamcity.step.mode" value="default" />
-          <param name="use.custom.script" value="true" />
-        </parameters>
-      </runner>
-      <runner id="Set_Version" name="Set Version" type="simpleRunner">
-        <parameters>
-          <param name="script.content" value="npx nbgv cloud" />
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
         </parameters>
