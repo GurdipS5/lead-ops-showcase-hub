@@ -326,7 +326,11 @@ catch {
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code" value="ggshield secret scan commit-range HEAD~1 --format sarif | Tee-Object &quot;$env:GitGuardianDir\results.sarif&quot;" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[if (-not (Test-Path %env.GitGuardianDir%)) {
+    New-Item -ItemType Directory -Path %env.GitGuardianDir% | Out-Null
+}
+
+ggshield secret scan commit-range HEAD~1 --format sarif | Tee-Object "$env:GitGuardianDir\results.sarif"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
