@@ -380,6 +380,74 @@ Write-Host "npm pack completed successfully. Created .tgz package."]]></param>
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
+      <runner id="Attest_NPM_Package" name="Attest NPM Package" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# Define paths and variables
+$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\packages\PortfolioofGurdipSira.$env:SIMPLE_VERSION.tgz"
+$provenanceFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\provenance.json"
+
+# Calculate SHA256 hash
+$hashBytes = Get-FileHash -Path $packageFile -Algorithm SHA256
+$hash = $hashBytes.Hash.ToLower()
+
+Write-Host "Package file: $packageFile"
+Write-Host "SHA256 hash: $hash"
+
+# Get git commit hash
+Push-Location $env:BUILD_CHECKOUTDIR
+$gitCommit = git rev-parse HEAD
+$gitRemote = git config --get remote.origin.url
+Pop-Location
+
+# Generate provenance JSON
+$provenanceJson = @"
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "subject": [{
+    "name": "$packageFile",
+    "digest": {
+      "sha256": "$hash"
+    }
+  }],
+  "predicateType": "https://slsa.dev/provenance/v0.2",
+  "predicate": {
+    "buildType": "nuke-build",
+    "builder": {
+      "id": "teamcity://build/$env:BUILD_NUMBER"
+    },
+    "invocation": {
+      "command": "npm pack"
+    },
+    "materials": [{
+      "uri": "$gitRemote",
+      "digest": {
+        "sha1": "$gitCommit"
+      }
+    }]
+  }
+}
+"@
+
+# Write provenance file
+Set-Content -Path $provenanceFile -Value $provenanceJson -Encoding UTF8
+Write-Host "Provenance file created: $provenanceFile"
+
+# Run cosign attest-blob
+Write-Host "Running cosign attest-blob..."
+& cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key cosign.key $packageFile
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "cosign attest-blob failed with exit code $LASTEXITCODE"
+    exit $LASTEXITCODE
+}
+
+Write-Host "Attestation completed successfully"]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
