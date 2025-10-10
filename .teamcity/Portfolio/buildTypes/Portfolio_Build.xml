@@ -75,6 +75,13 @@ if ($process.ExitCode -ne 0) {
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
+      <runner id="Set_Version" name="Set Version" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="npx nbgv cloud" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
