@@ -14,6 +14,7 @@
     <parameters>
       <param name="SectionDirctory" value="%system.teamcity.build.checkoutDir%/src/data/sections" />
       <param name="env.DOTNET_CLI_HOME" value="/tmp" />
+      <param name="env.GITGUARDIAN_TOKEN" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='S' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.GitGuardianDir" value="%teamcity.build.checkoutDir%/artifacts/gitguardian" />
       <param name="env.SBOMPath" value="%teamcity.build.checkoutDir%/artifacts/cyclonedx/sbom.json" />
     </parameters>
