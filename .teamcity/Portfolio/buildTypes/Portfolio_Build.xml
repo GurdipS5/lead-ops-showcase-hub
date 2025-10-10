@@ -111,6 +111,7 @@ finally {
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_scriptArguments" value="-Version %build.number%" />
           <param name="jetbrains_powershell_script_code"><![CDATA[param(
     [Parameter(Mandatory=$true)]
     [string]$Version
