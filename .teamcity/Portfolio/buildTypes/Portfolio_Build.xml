@@ -315,7 +315,7 @@ catch {
       </runner>
       <runner id="Execute_Snyk" name="Execute Snyk" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="snyk auth %SNYK_TOKEN%; snyk code test" />
+          <param name="script.content" value="snyk auth %env.SNYK_TOKEN%; snyk code test" />
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
         </parameters>
