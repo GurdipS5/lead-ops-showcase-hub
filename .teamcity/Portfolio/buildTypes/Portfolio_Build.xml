@@ -428,6 +428,13 @@ Write-Host "Attestation completed successfully"]]></param>
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
+      <runner id="Snyk_Code_Test" name="Snyk Code Test" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="snyk code test" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
