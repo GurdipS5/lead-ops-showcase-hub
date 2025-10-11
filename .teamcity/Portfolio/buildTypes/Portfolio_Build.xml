@@ -448,7 +448,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "Attestation completed successfully"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
     </build-runners>
