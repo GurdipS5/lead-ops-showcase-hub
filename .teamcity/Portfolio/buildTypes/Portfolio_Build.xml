@@ -385,7 +385,7 @@ Write-Host "npm pack completed successfully. Created .tgz package."]]></param>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
           <param name="jetbrains_powershell_script_code"><![CDATA[# Define paths and variables
-$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\packages\PortfolioofGurdipSira.$env:SIMPLE_VERSION.tgz"
+$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\packages\Portfolio.%build.number%.tgz"
 $provenanceFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\provenance.json"
 
 # Calculate SHA256 hash
@@ -413,7 +413,7 @@ $provenanceJson = @"
   }],
   "predicateType": "https://slsa.dev/provenance/v0.2",
   "predicate": {
-    "buildType": "nuke-build",
+    "buildType": "teamcity-build",
     "builder": {
       "id": "teamcity://build/$env:BUILD_NUMBER"
     },
