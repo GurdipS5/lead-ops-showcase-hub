@@ -442,6 +442,47 @@ Write-Host "Attestation completed successfully"]]></param>
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
+      <runner id="Create_Kosli_Flow" name="Create Kosli Flow" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# Kosli Begin Trail - TeamCity Build Step
+
+Write-Host "Starting Kosli Begin Trail..."
+
+$ErrorActionPreference = "Stop"
+
+# Prepare arguments
+$arguments = @(
+    "begin",
+    "trail",
+    "PortfolioTrailTest",
+    "--flow", "PortfolioFlow",
+    "--description", "test",
+    "--org", "gurdipdev",
+    "--api-token", "$env:KOSLI_API_TOKEN"
+)
+
+# Start process
+$process = Start-Process -FilePath "kosli" -ArgumentList $arguments `
+    -NoNewWindow -PassThru -Wait `
+    -RedirectStandardOutput "kosli_out.log" `
+    -RedirectStandardError "kosli_err.log"
+
+# Output logs to TeamCity console
+Get-Content "kosli_out.log" | ForEach-Object { Write-Host $_ }
+Get-Content "kosli_err.log" | ForEach-Object { Write-Error $_ }
+
+# Check exit code
+if ($process.ExitCode -ne 0) {
+    throw "Kosli exited with code $($process.ExitCode)"
+}
+
+Write-Host "Kosli Begin Trail completed successfully."]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
