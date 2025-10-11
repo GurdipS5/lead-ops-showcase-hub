@@ -353,22 +353,7 @@ Set-Location $PSScriptRoot
 Write-Host "Running npm pack..."
 
 # Execute npm pack and capture output
-$output = & npm pack 2>&1
-
-# Display all output
-$output | ForEach-Object { 
-    if ($_ -is [System.Management.Automation.ErrorRecord]) {
-        Write-Host "ERROR: $_" -ForegroundColor Red
-    } else {
-        Write-Host $_
-    }
-}
-
-# Check if npm pack succeeded
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "npm pack failed with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
-}
+$output = & npm pack %teamcity.build.checkoutDir%
 
 Write-Host "npm pack completed successfully. Created .tgz package." -ForegroundColor Green]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
