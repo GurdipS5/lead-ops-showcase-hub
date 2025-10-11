@@ -251,6 +251,13 @@ if ($LASTEXITCODE -eq 0) {
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
+      <runner id="Run_Sonar_Scan" name="Run Sonar Scan" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="node sonar.js" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
       <runner id="Checkin_to_GitHub" name="Checkin to GitHub" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
@@ -433,13 +440,6 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Attestation completed successfully"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
-        </parameters>
-      </runner>
-      <runner id="Run_Sonar_Scan" name="Run Sonar Scan" type="simpleRunner">
-        <parameters>
-          <param name="script.content" value="node sonar.js" />
-          <param name="teamcity.step.mode" value="execute_if_failed" />
-          <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
     </build-runners>
