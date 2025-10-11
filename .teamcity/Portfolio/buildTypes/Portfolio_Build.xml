@@ -380,7 +380,7 @@ if ($process.ExitCode -ne 0) {
 
 Write-Host "npm pack completed successfully. Created .tgz package."]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
       <runner id="Attest_NPM_Package" name="Attest NPM Package" type="jetbrains_powershell">
