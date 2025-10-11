@@ -322,6 +322,13 @@ catch {
           <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
+      <runner id="Snyk_Code_Test" name="Snyk Code Test" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="snyk code test" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
       <runner id="Execute_GitGuardian" name="Execute GitGuardian" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
@@ -426,13 +433,6 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Attestation completed successfully"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
-        </parameters>
-      </runner>
-      <runner id="Snyk_Code_Test" name="Snyk Code Test" type="simpleRunner">
-        <parameters>
-          <param name="script.content" value="snyk code test" />
-          <param name="teamcity.step.mode" value="execute_if_failed" />
-          <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
     </build-runners>
