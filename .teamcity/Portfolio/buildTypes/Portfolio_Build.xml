@@ -352,33 +352,25 @@ Set-Location $PSScriptRoot
 # Run npm pack
 Write-Host "Running npm pack..."
 
-$process = Start-Process -FilePath "npm" `
-    -ArgumentList "pack" `
-    -WorkingDirectory $PSScriptRoot `
-    -NoNewWindow `
-    -Wait `
-    -PassThru `
-    -RedirectStandardOutput "npm-pack-output.log" `
-    -RedirectStandardError "npm-pack-error.log"
+# Execute npm pack and capture output
+$output = & npm pack 2>&1
 
-# Display output
-if (Test-Path "npm-pack-output.log") {
-    Get-Content "npm-pack-output.log" | ForEach-Object { Write-Host $_ }
-    Remove-Item "npm-pack-output.log"
+# Display all output
+$output | ForEach-Object { 
+    if ($_ -is [System.Management.Automation.ErrorRecord]) {
+        Write-Host "ERROR: $_" -ForegroundColor Red
+    } else {
+        Write-Host $_
+    }
 }
 
-# Display errors
-if (Test-Path "npm-pack-error.log") {
-    Get-Content "npm-pack-error.log" | ForEach-Object { Write-Host "ERROR: $_" }
-    Remove-Item "npm-pack-error.log"
+# Check if npm pack succeeded
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "npm pack failed with exit code $LASTEXITCODE"
+    exit $LASTEXITCODE
 }
 
-# Check exit code
-if ($process.ExitCode -ne 0) {
-    throw "npm pack failed with exit code $($process.ExitCode)"
-}
-
-Write-Host "npm pack completed successfully. Created .tgz package."]]></param>
+Write-Host "npm pack completed successfully. Created .tgz package." -ForegroundColor Green]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
