@@ -13,6 +13,7 @@
     </disabled-settings>
     <parameters>
       <param name="SectionDirctory" value="%system.teamcity.build.checkoutDir%/src/data/sections" />
+      <param name="env.COSIGN_PASSWORD" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/COSIGN_PASSWORD!/cosign_password' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.DOTNET_CLI_HOME" value="/tmp" />
       <param name="env.GITGUARDIAN_API_KEY" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/GITGUARDIAN_TOKEN!/gitguardian_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.GitGuardianDir" value="%teamcity.build.checkoutDir%/artifacts/gitguardian/" />
