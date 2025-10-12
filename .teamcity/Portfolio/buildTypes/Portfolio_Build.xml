@@ -503,9 +503,9 @@ if (-not $version) {
 $harborRegistry = "harbor.gssira.com"
 $project = "Portfolio"
 $packageName = "portfolio"
-$artifactFile = "artifacts/portfolio-$version.tgz"
-$attestationFile = "artifacts/portfolio-$version.intoto.jsonl"
-$sbomFile = "artifacts/portfolio-$version.sbom.json"
+$artifactFile = "artifacts/output/portfolio-$version.tgz"
+$attestationFile = "artifacts/attestation/portfolio-$version.intoto.jsonl"
+$sbomFile = "artifacts/sbom/portfolio-$version.sbom.json"
 
 # ORAS full reference
 $fullRef = "$harborRegistry/$project/$packageName`:$version"
