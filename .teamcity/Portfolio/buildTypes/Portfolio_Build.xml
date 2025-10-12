@@ -688,6 +688,15 @@ finally {
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
+      <runner id="Scan_with_Qodana" name="Scan with Qodana" type="Qodana">
+        <parameters>
+          <param name="code-inspection-xml-config" value="Default" />
+          <param name="linterVersion" value="latest" />
+          <param name="namesAndTags" value="public-image-qodana-js" />
+          <param name="secure:cloud-token" value="zxx1af0235e338982e6" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
