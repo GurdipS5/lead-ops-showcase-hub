@@ -624,6 +624,70 @@ catch {
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
+      <runner id="Sign_with_Cosign" name="Sign with Cosign" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# PowerShell Script for TeamCity - Sign with Cosign
+
+$ErrorActionPreference = "Stop"
+
+# Get version from TeamCity build number
+$version = $env:BUILD_NUMBER
+
+if (-not $version) {
+    Write-Error "❌ BUILD_NUMBER environment variable is not set"
+    exit 1
+}
+
+# Configuration
+$image = "harbor.gssira.com/Portfolio/portfolio:$version"
+$cosignKeyContent = $env:COSIGN_PRIVATE_KEY
+$cosignPassword = $env:COSIGN_PASSWORD
+
+# Validate required environment variables
+if (-not $cosignKeyContent) {
+    Write-Error "❌ COSIGN_PRIVATE_KEY environment variable not set."
+    exit 1
+}
+
+# Create a temporary key file
+$tempKeyFile = "cosign-temp.key"
+
+try {
+    Write-Host "📝 Creating temporary Cosign key file..." -ForegroundColor Cyan
+    Set-Content -Path $tempKeyFile -Value $cosignKeyContent -NoNewline
+    
+    Write-Host "🔏 Signing $image with Cosign..." -ForegroundColor Cyan
+    
+    # Set COSIGN_PASSWORD environment variable for the cosign process
+    $env:COSIGN_PASSWORD = $cosignPassword
+    
+    # Run Cosign sign command
+    cosign sign --key $tempKeyFile --yes $image
+    
+    if ($LASTEXITCODE -ne 0) {
+        throw "Cosign signing failed with exit code $LASTEXITCODE"
+    }
+    
+    Write-Host "✅ Cosign signature completed successfully." -ForegroundColor Green
+    exit 0
+}
+catch {
+    Write-Error "❌ Error: $_"
+    exit 1
+}
+finally {
+    # Clean up temp file
+    if (Test-Path $tempKeyFile) {
+        Remove-Item $tempKeyFile -Force
+        Write-Host "🧹 Deleted temporary Cosign key file." -ForegroundColor Yellow
+    }
+}]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
