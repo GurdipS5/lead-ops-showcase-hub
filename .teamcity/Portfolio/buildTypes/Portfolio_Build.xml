@@ -483,6 +483,146 @@ Write-Host "Kosli Begin Trail completed successfully."]]></param>
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
+      <runner id="Push_To_Harbor" name="Push To Harbor" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# PowerShell Script for TeamCity - Push to Harbor with Cosign
+
+$ErrorActionPreference = "Stop"
+
+# Get version from TeamCity build number
+$version = $env:BUILD_NUMBER
+
+if (-not $version) {
+    Write-Error "❌ BUILD_NUMBER environment variable is not set"
+    exit 1
+}
+
+# Configuration
+$harborRegistry = "harbor.gssira.com"
+$project = "Portfolio"
+$packageName = "portfolio"
+$artifactFile = "artifacts/portfolio-$version.tgz"
+$attestationFile = "artifacts/portfolio-$version.intoto.jsonl"
+$sbomFile = "artifacts/portfolio-$version.sbom.json"
+
+# ORAS full reference
+$fullRef = "$harborRegistry/$project/$packageName`:$version"
+
+# Get credentials from environment variables
+$username = $env:HARBOR_USERNAME
+$password = $env:HARBOR_ROBOT
+$cosignPassword = $env:COSIGN_PASSWORD
+$cosignPrivateKey = $env:COSIGN_PRIVATE_KEY
+
+if (-not $username -or -not $password) {
+    Write-Error "❌ HARBOR_USERNAME or HARBOR_ROBOT environment variables are not set"
+    exit 1
+}
+
+# Check if artifact exists
+if (-not (Test-Path $artifactFile)) {
+    Write-Error "❌ Artifact file not found: $artifactFile"
+    exit 1
+}
+
+try {
+    # Login to Harbor
+    Write-Host "🔐 Logging in to Harbor $harborRegistry..." -ForegroundColor Cyan
+    oras login $harborRegistry -u $username -p $password
+    
+    if ($LASTEXITCODE -ne 0) {
+        throw "Harbor login failed with exit code $LASTEXITCODE"
+    }
+    
+    # Also login with cosign (uses same credentials)
+    Write-Host "🔐 Logging in to Harbor with cosign..." -ForegroundColor Cyan
+    cosign login $harborRegistry -u $username -p $password
+    
+    if ($LASTEXITCODE -ne 0) {
+        throw "Cosign login failed with exit code $LASTEXITCODE"
+    }
+    
+    # Push artifact
+    Write-Host "📤 Pushing artifact $artifactFile to $fullRef..." -ForegroundColor Cyan
+    oras push $fullRef --artifact-type application/vnd.npm.package $artifactFile
+    
+    if ($LASTEXITCODE -ne 0) {
+        throw "ORAS push failed with exit code $LASTEXITCODE"
+    }
+    
+    Write-Host "✅ Successfully pushed $fullRef" -ForegroundColor Green
+    
+    # Sign the artifact with cosign
+    Write-Host "✍️ Signing artifact with cosign..." -ForegroundColor Cyan
+    
+    if ($cosignPrivateKey -and $cosignPassword) {
+        # Sign with private key
+        Write-Host "Using private key for signing..." -ForegroundColor Yellow
+        $env:COSIGN_PASSWORD = $cosignPassword
+        cosign sign --key $cosignPrivateKey --yes $fullRef
+    } else {
+        # Keyless signing (requires OIDC token)
+        Write-Host "Using keyless signing..." -ForegroundColor Yellow
+        cosign sign --yes $fullRef
+    }
+    
+    if ($LASTEXITCODE -ne 0) {
+        throw "Cosign signing failed with exit code $LASTEXITCODE"
+    }
+    
+    Write-Host "✅ Successfully signed $fullRef" -ForegroundColor Green
+    
+    # Attach attestation if it exists
+    if (Test-Path $attestationFile) {
+        Write-Host "📎 Attaching attestation to $fullRef..." -ForegroundColor Cyan
+        
+        if ($cosignPrivateKey -and $cosignPassword) {
+            cosign attest --key $cosignPrivateKey --predicate $attestationFile --type slsaprovenance --yes $fullRef
+        } else {
+            cosign attest --predicate $attestationFile --type slsaprovenance --yes $fullRef
+        }
+        
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "⚠️ Failed to attach attestation (exit code $LASTEXITCODE)"
+        } else {
+            Write-Host "✅ Successfully attached attestation" -ForegroundColor Green
+        }
+    } else {
+        Write-Host "ℹ️ No attestation file found at $attestationFile, skipping..." -ForegroundColor Yellow
+    }
+    
+    # Attach SBOM if it exists
+    if (Test-Path $sbomFile) {
+        Write-Host "📎 Attaching SBOM to $fullRef..." -ForegroundColor Cyan
+        
+        if ($cosignPrivateKey -and $cosignPassword) {
+            cosign attach sbom --sbom $sbomFile --type spdx $fullRef
+        } else {
+            cosign attach sbom --sbom $sbomFile --type spdx $fullRef
+        }
+        
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "⚠️ Failed to attach SBOM (exit code $LASTEXITCODE)"
+        } else {
+            Write-Host "✅ Successfully attached SBOM" -ForegroundColor Green
+        }
+    } else {
+        Write-Host "ℹ️ No SBOM file found at $sbomFile, skipping..." -ForegroundColor Yellow
+    }
+    
+    Write-Host "🎉 All operations completed successfully!" -ForegroundColor Green
+    exit 0
+}
+catch {
+    Write-Error "❌ Error: $_"
+    exit 1
+}]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
