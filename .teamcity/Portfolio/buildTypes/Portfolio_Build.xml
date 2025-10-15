@@ -521,7 +521,7 @@ if (-not $version) {
 }
 
 # Configuration
-$image = "harbor.gssira.com/Portfolio/portfolio:$version"
+$image = "https://cloudsmith.io/~gurdipdevops/repos/portfolio/portfolio:$version" 
 $cosignKeyContent = $env:COSIGN_PRIVATE_KEY
 $cosignPassword = $env:COSIGN_PASSWORD
 
@@ -544,7 +544,7 @@ try {
     $env:COSIGN_PASSWORD = $cosignPassword
     
     # Run Cosign sign command
-    cosign sign --key $tempKeyFile --yes $image
+    cosign sign --key $tempKeyFile --output-signature sig.cosign --output-certificate cert.crt $image
     
     if ($LASTEXITCODE -ne 0) {
         throw "Cosign signing failed with exit code $LASTEXITCODE"
