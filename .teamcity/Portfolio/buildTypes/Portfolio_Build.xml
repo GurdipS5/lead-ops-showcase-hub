@@ -508,62 +508,102 @@ Write-Host "Kosli Begin Trail completed successfully."]]></param>
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# PowerShell Script for TeamCity - Sign with Cosign
+          <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
+# Define paths and variables
+# ==============================
+$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\packages\Portfolio.$($env:BUILD_NUMBER).tgz"
+$provenanceFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\provenance.json"
+$attestationFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\attestation.sig"
+$cosignKeyFile = Join-Path $env:BUILD_CHECKOUTDIR "cosign.key"
 
-$ErrorActionPreference = "Stop"
+# Cloudsmith repo address (change to your repo)
+$cloudsmithRepo = "username/repo"   # e.g., "gurdip/portfolio"
 
-# Get version from TeamCity build number
-$version = $env:BUILD_NUMBER
+# ==============================
+# Calculate SHA256 hash
+# ==============================
+$hashBytes = Get-FileHash -Path $packageFile -Algorithm SHA256
+$hash = $hashBytes.Hash.ToLower()
 
-if (-not $version) {
-    Write-Error "❌ BUILD_NUMBER environment variable is not set"
-    exit 1
-}
+Write-Host "Package file: $packageFile"
+Write-Host "SHA256 hash: $hash"
 
-# Configuration
-$image = "https://cloudsmith.io/~gurdipdevops/repos/portfolio/portfolio:$version" 
-$cosignKeyContent = $env:COSIGN_PRIVATE_KEY
-$cosignPassword = $env:COSIGN_PASSWORD
+# ==============================
+# Get git commit hash
+# ==============================
+Push-Location $env:BUILD_CHECKOUTDIR
+$gitCommit = git rev-parse HEAD
+$gitRemote = git config --get remote.origin.url
+Pop-Location
 
-# Validate required environment variables
-if (-not $cosignKeyContent) {
-    Write-Error "❌ COSIGN_PRIVATE_KEY environment variable not set."
-    exit 1
-}
-
-# Create a temporary key file
-$tempKeyFile = "cosign-temp.key"
-
-try {
-    Write-Host "📝 Creating temporary Cosign key file..." -ForegroundColor Cyan
-    Set-Content -Path $tempKeyFile -Value $cosignKeyContent -NoNewline
-    
-    Write-Host "🔏 Signing $image with Cosign..." -ForegroundColor Cyan
-    
-    # Set COSIGN_PASSWORD environment variable for the cosign process
-    $env:COSIGN_PASSWORD = $cosignPassword
-    
-    # Run Cosign sign command
-    cosign sign --key $tempKeyFile --output-signature sig.cosign --output-certificate cert.crt $image
-    
-    if ($LASTEXITCODE -ne 0) {
-        throw "Cosign signing failed with exit code $LASTEXITCODE"
+# ==============================
+# Generate provenance JSON
+# ==============================
+$provenanceJson = @"
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "subject": [{
+    "name": "$packageFile",
+    "digest": {
+      "sha256": "$hash"
     }
-    
-    Write-Host "✅ Cosign signature completed successfully." -ForegroundColor Green
-    exit 0
+  }],
+  "predicateType": "https://slsa.dev/provenance/v0.2",
+  "predicate": {
+    "buildType": "teamcity-build",
+    "builder": {
+      "id": "teamcity://build/$($env:BUILD_NUMBER)"
+    },
+    "invocation": {
+      "command": "npm pack"
+    },
+    "materials": [{
+      "uri": "$gitRemote",
+      "digest": {
+        "sha1": "$gitCommit"
+      }
+    }]
+  }
 }
-catch {
-    Write-Error "❌ Error: $_"
-    exit 1
+"@
+
+# Write provenance file
+Set-Content -Path $provenanceFile -Value $provenanceJson -Encoding UTF8
+Write-Host "Provenance file created: $provenanceFile"
+
+# ==============================
+# Attest the package (generate local attestation)
+# ==============================
+Write-Host "Running cosign attest-blob..."
+& cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile --output $attestationFile $packageFile
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "cosign attest-blob failed with exit code $LASTEXITCODE"
+    exit $LASTEXITCODE
 }
-finally {
-    # Clean up temp file
-    if (Test-Path $tempKeyFile) {
-        Remove-Item $tempKeyFile -Force
-        Write-Host "🧹 Deleted temporary Cosign key file." -ForegroundColor Yellow
-    }
-}]]></param>
+
+Write-Host "Attestation created: $attestationFile"
+
+# ==============================
+# Upload package and attestation to Cloudsmith
+# ==============================
+Write-Host "Uploading package to Cloudsmith..."
+& cloudsmith push raw $cloudsmithRepo $packageFile
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to upload package to Cloudsmith"
+    exit $LASTEXITCODE
+}
+
+Write-Host "Uploading attestation to Cloudsmith..."
+& cloudsmith push raw $cloudsmithRepo $attestationFile
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to upload attestation to Cloudsmith"
+    exit $LASTEXITCODE
+}
+
+Write-Host "Package and attestation uploaded successfully!"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
