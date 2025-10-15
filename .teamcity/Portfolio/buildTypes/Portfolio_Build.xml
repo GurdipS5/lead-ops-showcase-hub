@@ -531,6 +531,13 @@ Write-Host "Package and attestation uploaded successfully!"]]></param>
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
+      <runner id="Login_to_Kosli" name="Login to Kosli" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="kosli login --org &lt;ORG_NAME&gt; --api-key %env.KOSLI_KEY%" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
