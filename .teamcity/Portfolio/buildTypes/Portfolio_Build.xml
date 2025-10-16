@@ -577,6 +577,7 @@ Write-Host "Attestation created: $attestationFile"]]></param>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
           <param name="jetbrains_powershell_script_code"><![CDATA[$cloudsmithRepo = "gurdipdevops/portfolio"  # replace with your Cloudsmith repo
+$attestationFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\attestation\attestation.sig"
 
 Write-Host "Uploading $packageFile to Cloudsmith OCI..."
 cloudsmith push oci $cloudsmithRepo $packageFile --tag "portfolio-$($env:BUILD_NUMBER)"
