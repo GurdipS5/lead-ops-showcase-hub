@@ -468,6 +468,23 @@ Write-Host "Kosli Begin Trail completed successfully."]]></param>
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
+      <runner id="Package_dist_folder" name="Package dist folder" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[$distFolder = Join-Path $env:BUILD_CHECKOUTDIR "dist"
+$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\Portfolio.$($env:BUILD_NUMBER).tgz"
+
+# Ensure artifacts folder exists
+New-Item -ItemType Directory -Path (Split-Path $packageFile) -Force | Out-Null
+
+# Create a tarball of the dist folder
+Write-Host "Packaging dist folder into $packageFile..."
+tar -czf $packageFile -C $distFolder .]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
       <runner id="Sign_with_Cosign" name="Sign with Cosign" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
@@ -568,23 +585,6 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "Package and attestation uploaded successfully!"]]></param>
-          <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
-        </parameters>
-      </runner>
-      <runner id="Package_dist_folder" name="Package dist folder" type="jetbrains_powershell">
-        <parameters>
-          <param name="jetbrains_powershell_execution" value="PS1" />
-          <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[$distFolder = Join-Path $env:BUILD_CHECKOUTDIR "dist"
-$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\Portfolio.$($env:BUILD_NUMBER).tgz"
-
-# Ensure artifacts folder exists
-New-Item -ItemType Directory -Path (Split-Path $packageFile) -Force | Out-Null
-
-# Create a tarball of the dist folder
-Write-Host "Packaging dist folder into $packageFile..."
-tar -czf $packageFile -C $distFolder .]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
