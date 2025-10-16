@@ -403,6 +403,31 @@ Write-Host "Starting Kosli Begin Trail..."
 
 $ErrorActionPreference = "Stop"
 
+# CONFIGURATION
+$KosliOrg = "<YOUR_KOSLI_ORG>"
+$KosliAPIKey = "<YOUR_KOSLI_API_KEY>"
+$FlowName = "sonar-quality-flow"
+$FlowDescription = "Flow for SonarQube scan attestation"
+$FlowRepo = "<YOUR_REPO_NAME>"
+
+# Login to Kosli
+kosli login --org $KosliOrg --api-key $KosliAPIKey
+
+# Check if flow exists
+$flowExists = kosli flow list --org $KosliOrg | Select-String $FlowName
+
+if (-not $flowExists) {
+    Write-Host "Creating Kosli flow: $FlowName..."
+    kosli flow create `
+        --org $KosliOrg `
+        --name $FlowName `
+        --description $FlowDescription `
+        --repo $FlowRepo
+} else {
+    Write-Host "Flow $FlowName already exists."
+}
+
+
 # Prepare arguments
 $arguments = @(
     "begin",
