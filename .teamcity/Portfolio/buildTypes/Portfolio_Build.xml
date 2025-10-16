@@ -383,23 +383,27 @@ Write-Host "Starting Kosli Begin Trail..."
 $ErrorActionPreference = "Stop"
 
 # CONFIGURATION
-$KosliOrg = "gurdipdev"
-$KosliAPIKey = %env.KOSLI_KEY%
-$FlowName = "portfolio-flow"
+$KosliOrg = "gurdipdevops"
+$KosliAPIKey = "hvs.vwcrYLioLRZBO3tbsplBAMzA"
+$FlowName = "portfolio-flow2"
 $FlowDescription = "Flow for SonarQube scan attestation"
-$FlowRepo = "<YOUR_REPO_NAME>"
+$FlowRepo = "xxx"
 
 # Check if flow exists
 $flowExists = kosli flow list --org $KosliOrg | Select-String $FlowName
 
 if (-not $flowExists) {
     Write-Host "Creating Kosli flow: $FlowName..."
-    kosli flow create --org $KosliOrg --name $FlowName --description $FlowDescription --repo $FlowRepo --api-token %env.KOSLI_KEY%
+    kosli flow create `
+        --org $KosliOrg `
+        --name $FlowName `
+        --description $FlowDescription `
+        --repo $FlowRepo
 } else {
     Write-Host "Flow $FlowName already exists."
 }
 
-kosli begin trail "Portfolio-%env.BUILD_NUMBER%" --flow "portfolio-flow" --description "Portfolio trail for %env.BUILD_NUMBER%" --org "gurdipdev" --api-token  "$env:KOSLI_API_TOKEN"
+kosli begin trail "PortfolioTrail" --flow $FlowName --description "Trail for portfolio %env.BUILD_NUMBER%" --org "gurdipdev" --api-token  "$env:KOSLI_API_TOKEN"
 
 # Output logs to TeamCity console
 Get-Content "kosli_out.log" | ForEach-Object { Write-Host $_ }
