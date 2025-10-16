@@ -393,7 +393,7 @@ Write-Host "npm pack completed successfully. Created .tgz package." -ForegroundC
           <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
-      <runner id="Create_Kosli_Flow" name="Create Kosli Flow" type="jetbrains_powershell">
+      <runner id="Create_Kosli_Flow" name="Create Kosli Flow &amp; Trail" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
