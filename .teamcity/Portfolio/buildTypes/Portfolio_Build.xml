@@ -570,27 +570,6 @@ Write-Host "   Cloudsmith Tag: $tag"]]></param>
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
-      <runner id="Push_to_Cloudsmith" name="Push to Cloudsmith" type="jetbrains_powershell">
-        <parameters>
-          <param name="jetbrains_powershell_execution" value="PS1" />
-          <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[$cloudsmithRepo = "gurdipdevops/portfolio"  # replace with your Cloudsmith repo
-$attestationFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\attestation\attestation.sig"
-
-Write-Host "Uploading $packageFile to Cloudsmith OCI..."
-cloudsmith push oci $cloudsmithRepo $packageFile --tag "portfolio-$($env:BUILD_NUMBER)"
-cloudsmith push oci $cloudsmithRepo $attestationFile --tag "portfolio-$($env:BUILD_NUMBER)-attestation"
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to upload OCI package to Cloudsmith"
-    exit $LASTEXITCODE
-}
-
-Write-Host "Package uploaded successfully!"]]></param>
-          <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
-        </parameters>
-      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
