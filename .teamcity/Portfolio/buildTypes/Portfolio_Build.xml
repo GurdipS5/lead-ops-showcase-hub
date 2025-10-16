@@ -268,7 +268,7 @@ if ($LASTEXITCODE -eq 0) {
           <param name="linterVersion" value="latest" />
           <param name="namesAndTags" value="public-image-qodana-js" />
           <param name="secure:cloud-token" value="zxx1af0235e338982e6" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
       <runner id="Checkin_to_GitHub" name="Checkin to GitHub" type="jetbrains_powershell">
