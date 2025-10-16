@@ -557,29 +557,16 @@ Write-Host "Provenance file created: $provenanceFile"
 # ==============================
 # Attest the package (generate local attestation)
 # ==============================
-# Ensure COSIGN_PASSWORD is set (TeamCity secret or environment variable)
-if (-not $env:COSIGN_PASSWORD) {
-    Write-Error "COSIGN_PASSWORD not set. Put the private-key passphrase in a secure pipeline secret named COSIGN_PASSWORD."
-    exit 1
-}
-
-Write-Host "Running cosign attest-blob (non-interactive)..."
-# --yes skips confirmation prompts; --type slsaprovenance as before
-& cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile --yes $packageFile
+Write-Host "Running cosign attest-blob..."
+$signature = & cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile $packageFile
+Set-Content -Path $attestationFile -Value $signature
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "cosign attest-blob failed with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
 }
 
-# cosign writes a signature file next to the package by default: <package>.sig
-$defaultSig = "$packageFile.sig"
-if (Test-Path $defaultSig) {
-    Move-Item -Path $defaultSig -Destination $attestationFile -Force
-    Write-Host "Attestation moved to: $attestationFile"
-} else {
-    Write-Warning "Expected signature file $defaultSig not found. cosign may have emitted the signature to stdout. Check output."
-}]]></param>
+Write-Host "Attestation created: $attestationFile"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
