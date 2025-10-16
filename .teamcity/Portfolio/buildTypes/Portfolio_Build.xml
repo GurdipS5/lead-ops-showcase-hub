@@ -365,28 +365,6 @@ ggshield secret scan commit-range HEAD~1 --format sarif |
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
-      <runner id="NPM_Pack" name="NPM Pack" type="jetbrains_powershell">
-        <parameters>
-          <param name="jetbrains_powershell_execution" value="PS1" />
-          <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# Define directories
-$contentDir = Join-Path $PSScriptRoot "dist"
-$outputDir = Join-Path $PSScriptRoot "artifacts\output"
-
-# Ensure we're in the root directory
-Set-Location $PSScriptRoot
-
-# Run npm pack
-Write-Host "Running npm pack..."
-
-# Execute npm pack and capture output
-$output = & npm pack %teamcity.build.checkoutDir%
-
-Write-Host "npm pack completed successfully. Created .tgz package." -ForegroundColor Green]]></param>
-          <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="execute_if_failed" />
-        </parameters>
-      </runner>
       <runner id="Login_to_Kosli" name="Login to Kosli" type="simpleRunner">
         <parameters>
           <param name="script.content" value="kosli login --org &lt;ORG_NAME&gt; --api-key %env.KOSLI_KEY%" />
