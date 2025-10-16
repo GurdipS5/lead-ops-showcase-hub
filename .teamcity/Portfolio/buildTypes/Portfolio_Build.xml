@@ -365,13 +365,6 @@ ggshield secret scan commit-range HEAD~1 --format sarif |
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
-      <runner id="Login_to_Kosli" name="Login to Kosli" type="simpleRunner">
-        <parameters>
-          <param name="script.content" value="kosli login --org &lt;ORG_NAME&gt; --api-key %env.KOSLI_KEY%" />
-          <param name="teamcity.step.mode" value="default" />
-          <param name="use.custom.script" value="true" />
-        </parameters>
-      </runner>
       <runner id="Create_Kosli_Flow" name="Create Kosli Flow &amp; Trail" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
