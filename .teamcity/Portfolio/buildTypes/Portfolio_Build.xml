@@ -563,28 +563,7 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Host "Attestation created: $attestationFile"
-
-# ==============================
-# Upload package and attestation to Cloudsmith
-# ==============================
-Write-Host "Uploading package to Cloudsmith..."
-& cloudsmith push raw $cloudsmithRepo $packageFile
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to upload package to Cloudsmith"
-    exit $LASTEXITCODE
-}
-
-Write-Host "Uploading attestation to Cloudsmith..."
-& cloudsmith push raw $cloudsmithRepo $attestationFile
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to upload attestation to Cloudsmith"
-    exit $LASTEXITCODE
-}
-
-Write-Host "Package and attestation uploaded successfully!"]]></param>
+Write-Host "Attestation created: $attestationFile"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
