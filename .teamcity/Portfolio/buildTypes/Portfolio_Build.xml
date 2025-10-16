@@ -30,7 +30,7 @@
           <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
-      <runner id="simpleRunner_1" name="" type="simpleRunner">
+      <runner id="simpleRunner_1" name="NPM Install" type="simpleRunner">
         <parameters>
           <param name="script.content" value="npm install" />
           <param name="teamcity.step.mode" value="default" />
