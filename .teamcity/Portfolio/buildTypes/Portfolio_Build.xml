@@ -440,20 +440,25 @@ tar -czf $packageFile -C $distFolder .]]></param>
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
-      <runner id="Sign_with_Cosign" name="Sign with Cosign" type="jetbrains_powershell">
+      <runner id="Sign_with_Cosign" name="Sign with Cosign &amp; Push Package" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
           <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
 # Define paths and variables
 # ==============================
-$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\packages\Portfolio-%env.BUILD_NUMBER%.tgz"
+$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\packages\Portfolio-$($env:BUILD_NUMBER).tgz"
 $provenanceFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\provenance.json"
 $attestationFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\attestation\attestation.sig"
+$signatureFile = "$packageFile.sig"
 $cosignKeyFile = Join-Path $env:BUILD_CHECKOUTDIR "cosign.key"
 
-# Cloudsmith repo address (change to your repo)
-$cloudsmithRepo = "username/repo"   # e.g., "gurdip/portfolio"
+# Cloudsmith repo address (e.g. "gurdip/portfolio")
+$cloudsmithRepo = "gurdip/portfolio"
+
+# Create required directories if missing
+New-Item -ItemType Directory -Force -Path (Split-Path $provenanceFile) | Out-Null
+New-Item -ItemType Directory -Force -Path (Split-Path $attestationFile) | Out-Null
 
 # ==============================
 # Calculate SHA256 hash
@@ -461,11 +466,11 @@ $cloudsmithRepo = "username/repo"   # e.g., "gurdip/portfolio"
 $hashBytes = Get-FileHash -Path $packageFile -Algorithm SHA256
 $hash = $hashBytes.Hash.ToLower()
 
-Write-Host "Package file: $packageFile"
-Write-Host "SHA256 hash: $hash"
+Write-Host "📦 Package file: $packageFile"
+Write-Host "🔒 SHA256 hash: $hash"
 
 # ==============================
-# Get git commit hash
+# Get git commit and remote info
 # ==============================
 Push-Location $env:BUILD_CHECKOUTDIR
 $gitCommit = git rev-parse HEAD
@@ -503,23 +508,64 @@ $provenanceJson = @"
 }
 "@
 
-# Write provenance file
 Set-Content -Path $provenanceFile -Value $provenanceJson -Encoding UTF8
-Write-Host "Provenance file created: $provenanceFile"
+Write-Host "🧾 Provenance file created: $provenanceFile"
 
 # ==============================
-# Attest the package (generate local attestation)
+# Sign the package
 # ==============================
-Write-Host "Running cosign attest-blob..."
-$signature = & cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile $packageFile
-Set-Content -Path $attestationFile -Value $signature
-
+Write-Host "✍️  Signing package with cosign..."
+& cosign sign-blob --key $cosignKeyFile --output-signature $signatureFile $packageFile
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "cosign attest-blob failed with exit code $LASTEXITCODE"
+    Write-Error "❌ cosign sign-blob failed with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
 }
+Write-Host "✅ Package signed: $signatureFile"
 
-Write-Host "Attestation created: $attestationFile"]]></param>
+# ==============================
+# Create and sign attestation
+# ==============================
+Write-Host "🪪 Creating SLSA attestation..."
+$signature = & cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile $packageFile
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "❌ cosign attest-blob failed with exit code $LASTEXITCODE"
+    exit $LASTEXITCODE
+}
+Set-Content -Path $attestationFile -Value $signature
+Write-Host "✅ Attestation created: $attestationFile"
+
+# ==============================
+# Push to Cloudsmith (OCI)
+# ==============================
+Write-Host "📤 Pushing to Cloudsmith as OCI package..."
+$tag = "portfolio-$($env:BUILD_NUMBER)"
+
+# Push the main package
+& cloudsmith push oci $cloudsmithRepo $packageFile --tag $tag
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "❌ Cloudsmith push failed for package with exit code $LASTEXITCODE"
+    exit $LASTEXITCODE
+}
+Write-Host "✅ Package pushed: $tag"
+
+# Push the signature
+& cloudsmith push oci $cloudsmithRepo $signatureFile --tag "$tag-sig"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "❌ Cloudsmith push failed for signature with exit code $LASTEXITCODE"
+    exit $LASTEXITCODE
+}
+Write-Host "✅ Signature pushed: $tag-sig"
+
+# ==============================
+# Summary
+# ==============================
+Write-Host ""
+Write-Host "🎉 All steps completed successfully!"
+Write-Host "   Package:        $packageFile"
+Write-Host "   Signature:      $signatureFile"
+Write-Host "   Provenance:     $provenanceFile"
+Write-Host "   Attestation:    $attestationFile"
+Write-Host "   Cloudsmith Tag: $tag"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
