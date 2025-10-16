@@ -335,7 +335,7 @@ catch {
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
-      <runner id="Execute_Snyk" name="Execute Snyk" type="simpleRunner">
+      <runner id="Execute_Snyk" name="Authenticate Snyk" type="simpleRunner">
         <parameters>
           <param name="script.content" value="snyk auth %env.SNYK_TOKEN%" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
