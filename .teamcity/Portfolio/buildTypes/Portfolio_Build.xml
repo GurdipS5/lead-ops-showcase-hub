@@ -580,6 +580,7 @@ Write-Host "Attestation created: $attestationFile"]]></param>
 
 Write-Host "Uploading $packageFile to Cloudsmith OCI..."
 cloudsmith push oci $cloudsmithRepo $packageFile --tag "portfolio-$($env:BUILD_NUMBER)"
+cloudsmith oci push $cloudsmithRepo $attestationFile --tag "portfolio-$($env:BUILD_NUMBER)-attestation"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to upload OCI package to Cloudsmith"
