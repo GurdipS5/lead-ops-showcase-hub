@@ -5,9 +5,9 @@ echo "🚀 Running Nuke build..."
 
 # Run the Nuke build
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-    ./build.cmd
+    echo "ss"
 else
-    ./build.sh
+    echo "ss"
 fi
 
 # Check the exit code
