@@ -36,8 +36,8 @@ $ErrorActionPreference = "Stop"
 
 # CONFIGURATION
 $KosliOrg = "gurdipdevops"
-$FlowName = "portfolio-flow2"
-$FlowDescription = "Flow for SonarQube scan attestation"
+$FlowName = "portfolio-flow"
+$FlowDescription = "Flow for governance attestation"
 $FlowRepo = "xxx"
 
 # Check if flow exists
@@ -45,16 +45,12 @@ $flowExists = kosli list flow --org $KosliOrg --api-token %env.KOSLI_KEY% | Sele
 
 if (-not $flowExists) {
     Write-Host "Creating Kosli flow: $FlowName..."
-    kosli create flow --org $KosliOrg --name $FlowName --description $FlowDescription --repo $FlowRepo
+    kosli create flow $flowName --org $KosliOrg --description $FlowDescription --api-token %env.KOSLI_KEY%
 } else {
     Write-Host "Flow $FlowName already exists."
 }
 
 kosli begin trail "PortfolioTrail-%env.BUILD_NUMBER%" --flow $FlowName --description "Trail for Portfolio build %env.BUILD_NUMBER%" --org "gurdipdev" --api-token  %env.KOSLI_KEY%
-
-# Output logs to TeamCity console
-Get-Content "kosli_out.log" | ForEach-Object { Write-Host $_ }
-Get-Content "kosli_err.log" | ForEach-Object { Write-Error $_ }
 
 # Check exit code
 if ($process.ExitCode -ne 0) {
