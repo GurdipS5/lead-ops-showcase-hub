@@ -258,7 +258,7 @@ if ($LASTEXITCODE -eq 0) {
       </runner>
       <runner id="Run_Sonar_Scan" name="Run Sonar Scan" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="node -e &quot;console.log(process.env.SONAR_TOKEN)&quot;" />
+          <param name="script.content" value="node sonar.js" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
           <param name="use.custom.script" value="true" />
         </parameters>
