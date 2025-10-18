@@ -10,7 +10,7 @@
   <param name="submoduleCheckout" value="CHECKOUT" />
   <param name="teamcity:branchSpec" value="refs/heads/*" />
   <param name="url" value="https://github.com/GurdipS5/lead-ops-showcase-hub" />
-  <param name="useAlternates" value="USE_MIRRORS" />
+  <param name="useAlternates" value="SHALLOW_CLONE" />
   <param name="username" value="GurdipS5" />
   <param name="usernameStyle" value="USERID" />
 </vcs-root>
