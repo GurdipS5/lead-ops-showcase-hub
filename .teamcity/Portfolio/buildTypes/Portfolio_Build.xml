@@ -52,7 +52,7 @@ if (-not $flowExists) {
     Write-Host "Flow $FlowName already exists."
 }
 
-kosli begin trail "Portfolio trail %env.BUILD_NUMBER%" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --flow $flowName --org $KosliOrg --api-token %env.KOSLI_KEY%
+kosli begin trail "Portfolio-trail-%env.BUILD_NUMBER%" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --flow $flowName --org $KosliOrg --api-token %env.KOSLI_KEY%
 
 # Check exit code
 if ($process.ExitCode -ne 0) {
