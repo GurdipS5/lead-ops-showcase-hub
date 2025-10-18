@@ -39,7 +39,6 @@ $KosliOrg = "gurdipdevops"
 $FlowName = "portfolio-flow"
 $FlowDescription = "Flow for governance attestation"
 $FlowRepo = "xxx"
-$commitHash = "%build.vcs.number%"
 $repoUrl = "%vcsroot.Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain.url%"
 ####
 
