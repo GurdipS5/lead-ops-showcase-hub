@@ -541,7 +541,8 @@ Write-Host "📤 Pushing to Cloudsmith as OCI package..."
 $tag = "portfolio-$($env:BUILD_NUMBER)"
 
 # Push the main package
-& cloudsmith push oci $cloudsmithRepo $packageFile --tag $tag
+& cloudsmith push docker $cloudsmithRepo $packageFile --tag $tag
+
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for package with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
