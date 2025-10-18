@@ -39,6 +39,8 @@ $KosliOrg = "gurdipdevops"
 $FlowName = "portfolio-flow"
 $FlowDescription = "Flow for governance attestation"
 $FlowRepo = "xxx"
+$commitHash = "%build.vcs.number%"
+$repoUrl = %vcsroot.Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain.url%
 
 # Check if flow exists
 $flowExists = kosli list flow --org $KosliOrg --api-token %env.KOSLI_KEY% | Select-String $FlowName
@@ -50,7 +52,9 @@ if (-not $flowExists) {
     Write-Host "Flow $FlowName already exists."
 }
 
-kosli begin trail "PortfolioTrail-%env.BUILD_NUMBER%" --flow $FlowName --description "Trail for Portfolio build %env.BUILD_NUMBER%" --org "gurdipdev" --api-token  %env.KOSLI_KEY%
+kosli create trail "PortfolioTrail-%env.BUILD_NUMBER%" --flow $FlowName --description "Trail for Portfolio build %env.BUILD_NUMBER%" --org $gurdipdevops --api-token  %env.KOSLI_KEY%
+
+kosli begin-trail --commit $commitHash --repo "my-org/my-repo" --branch "%teamcity.build.branch%" --build "%build.number%" --ci-server "TeamCity" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --repo $repoUrl
 
 # Check exit code
 if ($process.ExitCode -ne 0) {
