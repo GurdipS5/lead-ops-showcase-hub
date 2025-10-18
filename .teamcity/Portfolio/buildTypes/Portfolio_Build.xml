@@ -48,7 +48,7 @@
       </runner>
       <runner id="CSpell" name="CSpell" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="npx cspell &quot;**/*.{js,ts,md,txt}&quot;" />
+          <param name="script.content" value="npx cspell --config ./cspell.json &quot;**/*.{js,ts,md,txt}&quot;" />
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
         </parameters>
