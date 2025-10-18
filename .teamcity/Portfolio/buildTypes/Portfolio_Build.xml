@@ -52,9 +52,7 @@ if (-not $flowExists) {
     Write-Host "Flow $FlowName already exists."
 }
 
-kosli create trail "PortfolioTrail-%env.BUILD_NUMBER%" --flow $FlowName --description "Trail for Portfolio build %env.BUILD_NUMBER%" --org $gurdipdevops --api-token  %env.KOSLI_KEY%
-
-kosli begin trail --commit $commitHash --repo "my-org/my-repo" --branch "%teamcity.build.branch%" --build "%build.number%" --ci-server "TeamCity" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --repo $repoUrl
+kosli begin trail --commit $commitHash --branch "%teamcity.build.branch%" --build "%build.number%" --ci-server "TeamCity" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --repo $repoUrl
 
 # Check exit code
 if ($process.ExitCode -ne 0) {
