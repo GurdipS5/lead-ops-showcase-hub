@@ -54,11 +54,6 @@ if (-not $flowExists) {
 
 kosli begin trail "Portfolio-trail-%env.BUILD_NUMBER%" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --flow $flowName --org $KosliOrg --api-token %env.KOSLI_KEY%
 
-# Check exit code
-if ($process.ExitCode -ne 0) {
-    throw "Kosli exited with code $($process.ExitCode)"
-}
-
 Write-Host "Kosli Begin Trail completed successfully."]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
