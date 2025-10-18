@@ -24,48 +24,6 @@
       <param name="env.SONAR_TOKEN" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/SONAR_TOKEN!/sonar_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
     </parameters>
     <build-runners>
-      <runner id="Create_Kosli_Flow" name="Create Kosli Flow &amp; Trail" type="jetbrains_powershell">
-        <parameters>
-          <param name="jetbrains_powershell_execution" value="PS1" />
-          <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# Kosli Begin Trail - TeamCity Build Step
-
-Write-Host "Starting Kosli Begin Trail..."
-
-$ErrorActionPreference = "Stop"
-
-# CONFIGURATION
-$KosliOrg = "gurdipdevops"
-$FlowName = "portfolio-flow"
-$FlowDescription = "Flow for governance attestation"
-$FlowRepo = "xxx"
-$repoUrl = "%vcsroot.Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain.url%"
-####
-
-# Check if flow exists
-$flowExists = kosli list flow --org $KosliOrg --api-token %env.KOSLI_KEY% | Select-String $FlowName
-
-if (-not $flowExists) {
-    Write-Host "Creating Kosli flow: $FlowName..."
-    kosli create flow $flowName --org $KosliOrg --description $FlowDescription --api-token %env.KOSLI_KEY%
-} else {
-    Write-Host "Flow $FlowName already exists."
-}
-
-kosli begin trail "Portfolio-trail-%env.BUILD_NUMBER%" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --flow $flowName --org $KosliOrg --api-token %env.KOSLI_KEY%
-
-Write-Host "Kosli Begin Trail completed successfully."]]></param>
-          <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="execute_if_failed" />
-        </parameters>
-      </runner>
-      <runner id="Set_Version" name="Set Version" type="simpleRunner">
-        <parameters>
-          <param name="script.content" value="npx nbgv cloud" />
-          <param name="teamcity.step.mode" value="default" />
-          <param name="use.custom.script" value="true" />
-        </parameters>
-      </runner>
       <runner id="simpleRunner_1" name="NPM Install" type="simpleRunner">
         <parameters>
           <param name="script.content" value="npm install" />
@@ -77,6 +35,13 @@ Write-Host "Kosli Begin Trail completed successfully."]]></param>
         <parameters>
           <param name="script.content" value="npm run build" />
           <param name="teamcity.build.workingDir" value="dist" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+      <runner id="Set_Version" name="Set Version" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="npx nbgv cloud" />
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
         </parameters>
@@ -400,6 +365,41 @@ ggshield secret scan commit-range HEAD~1 --format sarif |
     ConvertFrom-Json |
     ConvertTo-Json -Depth 10 |
     Tee-Object -FilePath "$env:GitGuardianDir\results.sarif"]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+        </parameters>
+      </runner>
+      <runner id="Create_Kosli_Flow" name="Create Kosli Flow &amp; Trail" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# Kosli Begin Trail - TeamCity Build Step
+
+Write-Host "Starting Kosli Begin Trail..."
+
+$ErrorActionPreference = "Stop"
+
+# CONFIGURATION
+$KosliOrg = "gurdipdevops"
+$FlowName = "portfolio-flow"
+$FlowDescription = "Flow for governance attestation"
+$FlowRepo = "xxx"
+$repoUrl = "%vcsroot.Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain.url%"
+####
+
+# Check if flow exists
+$flowExists = kosli list flow --org $KosliOrg --api-token %env.KOSLI_KEY% | Select-String $FlowName
+
+if (-not $flowExists) {
+    Write-Host "Creating Kosli flow: $FlowName..."
+    kosli create flow $flowName --org $KosliOrg --description $FlowDescription --api-token %env.KOSLI_KEY%
+} else {
+    Write-Host "Flow $FlowName already exists."
+}
+
+kosli begin trail "Portfolio-trail-%env.BUILD_NUMBER%" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --flow $flowName --org $KosliOrg --api-token %env.KOSLI_KEY%
+
+Write-Host "Kosli Begin Trail completed successfully."]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
