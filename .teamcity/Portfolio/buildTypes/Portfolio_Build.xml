@@ -53,7 +53,7 @@ if (-not $flowExists) {
     Write-Host "Flow $FlowName already exists."
 }
 
-kosli begin trail --commit $commitHash --ci-server "TeamCity" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%"
+kosli begin trail --commit $commitHash --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --flow $flowName
 
 # Check exit code
 if ($process.ExitCode -ne 0) {
