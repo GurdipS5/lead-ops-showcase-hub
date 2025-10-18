@@ -359,9 +359,7 @@ catch {
 }
 
 ggshield secret scan commit-range HEAD~1 --format sarif | 
-    Tee-Object "$env:GitGuardianDir\results.sarif" | 
-    ConvertFrom-Json | 
-    ConvertTo-Json -Depth 10]]></param>
+    Tee-Object "$env:GitGuardianDir\results.sarif"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
