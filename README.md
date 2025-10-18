@@ -6,10 +6,7 @@
 > **Note**: Replace `<BuildTypeId>` with your actual TeamCity build configuration ID from the URL when viewing your specific build configuration.
 [![Tech Stack](https://img.shields.io/badge/tech%20stack-Vite%20|%20React%20|%20TypeScript%20|%20Tailwind%20CSS-blueviolet)](https://lovable.dev)
 
-<div align="center">
-  <img src="https://lovable.dev/assets/logo.svg" alt="Lovable Logo" width="100" height="100">
-  <h3>Modern Lead Operations Dashboard</h3>
-</div>
+[![Hosted By: Cloudsmith](https://img.shields.io/badge/OSS%20hosting%20by-cloudsmith-blue?logo=cloudsmith&style=flat-square)](https://cloudsmith.com)
 
 ## 🚀 Project Overview
 

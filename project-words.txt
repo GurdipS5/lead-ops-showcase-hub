@@ -1,0 +1,16 @@
+AzureDevOps
+Terraform
+RBAC
+Helmfile
+AKS
+KeyVault
+DevOps
+CI/CD
+NukeBuild
+Codefresh
+Googlebot
+Bingbot
+Twitterbot
+facebookexternalhit
+sonarqube
+Qube

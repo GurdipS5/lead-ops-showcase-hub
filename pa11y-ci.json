@@ -1,0 +1,12 @@
+{
+  "defaults": {
+    "standard": "WCAG2AA",
+    "wait": 500,
+    "timeout": 30000,
+    "threshold": 0
+  },
+  "reporter": "json",
+  "urls": [
+    "https://gurdipsira.dev"
+  ]
+}
