@@ -380,7 +380,6 @@ $ErrorActionPreference = "Stop"
 
 # CONFIGURATION
 $KosliOrg = "gurdipdevops"
-$KosliAPIKey = "hvs.vwcrYLioLRZBO3tbsplBAMzA"
 $FlowName = "portfolio-flow2"
 $FlowDescription = "Flow for SonarQube scan attestation"
 $FlowRepo = "xxx"
@@ -390,16 +389,12 @@ $flowExists = kosli flow list --org $KosliOrg | Select-String $FlowName
 
 if (-not $flowExists) {
     Write-Host "Creating Kosli flow: $FlowName..."
-    kosli flow create `
-        --org $KosliOrg `
-        --name $FlowName `
-        --description $FlowDescription `
-        --repo $FlowRepo
+    kosli flow create --org $KosliOrg --name $FlowName --description $FlowDescription --repo $FlowRepo
 } else {
     Write-Host "Flow $FlowName already exists."
 }
 
-kosli begin trail "PortfolioTrail" --flow $FlowName --description "Trail for portfolio %env.BUILD_NUMBER%" --org "gurdipdev" --api-token  "$env:KOSLI_API_TOKEN"
+kosli begin trail "PortfolioTrail" --flow $FlowName --description "Trail for Portfolio build %env.BUILD_NUMBER%" --org "gurdipdev" --api-token  "%env.KOSLI_KEY%"
 
 # Output logs to TeamCity console
 Get-Content "kosli_out.log" | ForEach-Object { Write-Host $_ }
@@ -412,7 +407,7 @@ if ($process.ExitCode -ne 0) {
 
 Write-Host "Kosli Begin Trail completed successfully."]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
       <runner id="Attest_Snyk" name="Attest Snyk" type="jetbrains_powershell">
