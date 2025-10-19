@@ -438,18 +438,30 @@ tar -czf $packageFile -C $distFolder .]]></param>
           <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
 # Define paths and variables
 # ==============================
-$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\packages\Portfolio-$($env:BUILD_NUMBER).tgz"
+$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\packages\Portfolio-$($env:BUILD_NUMBER).tar"
 $provenanceFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\provenance.json"
 $attestationFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\attestation\attestation.sig"
 $signatureFile = "$packageFile.sig"
 $cosignKeyFile = Join-Path $env:BUILD_CHECKOUTDIR "cosign.key"
 
 # Cloudsmith repo address (e.g. "gurdip/portfolio")
-$cloudsmithRepo = "gurdip/portfolio"
+$cloudsmithRepo = "gurdipdevops/portfolio"
 
 # Create required directories if missing
 New-Item -ItemType Directory -Force -Path (Split-Path $provenanceFile) | Out-Null
 New-Item -ItemType Directory -Force -Path (Split-Path $attestationFile) | Out-Null
+
+# ==============================
+# Write COSIGN_KEY to file
+# ==============================
+if (-not $env:COSIGN_KEY) {
+    Write-Error "❌ COSIGN_KEY environment variable not found. Make sure it's defined in TeamCity."
+    exit 1
+}
+
+# Ensure newline-safe write
+[System.IO.File]::WriteAllText($cosignKeyFile, $env:COSIGN_KEY)
+Write-Host "🔑 Cosign key written to: $cosignKeyFile"
 
 # ==============================
 # Calculate SHA256 hash
@@ -541,7 +553,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "✅ Package pushed: $tag"
 
 # Push the signature
-& cloudsmith push oci $cloudsmithRepo $signatureFile --tag "$tag-sig"
+& cloudsmith push docker $cloudsmithRepo $signatureFile --tag "$tag-sig"
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for signature with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
