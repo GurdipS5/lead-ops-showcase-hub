@@ -445,11 +445,11 @@ tar -czf $packageFile -C $distFolder .]]></param>
           <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
 # Define paths and variables
 # ==============================
-$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\packages\Portfolio-$($env:BUILD_NUMBER).tar"
-$provenanceFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\provenance.json"
-$attestationFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\attestation\attestation.sig"
+$packageFile = Join-Path  %teamcity.build.checkoutDir% "artifacts\publish\packages\Portfolio-$($env:BUILD_NUMBER).tar"
+$provenanceFile = Join-Path  %teamcity.build.checkoutDir% "artifacts\provenance.json"
+$attestationFile = Join-Path %teamcity.build.checkoutDir%  "artifacts\attestation\attestation.sig"
 $signatureFile = "$packageFile.sig"
-$cosignKeyFile = Join-Path $env:BUILD_CHECKOUTDIR "cosign.key"
+$cosignKeyFile = Join-Path %teamcity.build.checkoutDir% "cosign.key"
 
 # Cloudsmith repo address (e.g. "gurdip/portfolio")
 $cloudsmithRepo = "gurdipdevops/portfolio"
@@ -525,7 +525,7 @@ Write-Host "🧾 Provenance file created: $provenanceFile"
 # Sign the package
 # ==============================
 Write-Host "✍️  Signing package with cosign..."
-& cosign sign-blob --key $cosignKeyFile --output-signature $signatureFile $packageFile
+& cosign sign-blob --key $cosignKeyFile --output-signature $signatureFile $packageFile --yes
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ cosign sign-blob failed with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
