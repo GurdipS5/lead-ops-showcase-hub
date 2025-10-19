@@ -578,7 +578,7 @@ Write-Host "   Provenance:     $provenanceFile"
 Write-Host "   Attestation:    $attestationFile"
 Write-Host "   Cloudsmith Tag: $tag"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
     </build-runners>
