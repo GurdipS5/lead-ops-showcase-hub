@@ -413,7 +413,7 @@ Write-Host "Kosli Begin Trail completed successfully."]]></param>
 
 kosli attest snyk --flow snyk-flow --trail test-1 --name synk-scan --scan-results code.json --commit HEAD]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
       <runner id="Package_dist_folder" name="Package dist folder" type="jetbrains_powershell">
