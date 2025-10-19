@@ -428,7 +428,7 @@ $packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\Portfolio.$($
 Write-Host "Packaging dist folder into $packageFile..."
 tar -czf $packageFile -C $distFolder .]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
       <runner id="Sign_with_Cosign" name="Sign with Cosign &amp; Push Package" type="jetbrains_powershell">
