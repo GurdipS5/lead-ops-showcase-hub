@@ -423,8 +423,6 @@ kosli attest snyk --flow snyk-flow --trail test-1 --name synk-scan --scan-result
           <param name="jetbrains_powershell_script_code"><![CDATA[$distFolder = Join-Path $env:BUILD_CHECKOUTDIR "dist"
 $packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\Portfolio.$($env:BUILD_NUMBER).tgz"
 
-# Ensure artifacts folder exists
-New-Item -ItemType Directory -Path (Split-Path $packageFile) -Force | Out-Null
 
 # Create a tarball of the dist folder
 Write-Host "Packaging dist folder into $packageFile..."
