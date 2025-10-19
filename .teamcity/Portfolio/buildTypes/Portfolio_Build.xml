@@ -416,6 +416,13 @@ kosli attest snyk --flow snyk-flow --trail test-1 --name synk-scan --scan-result
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
+      <runner id="Attest_Sonar" name="Attest  Sonar" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="kosli attest sonar --name SonarAttestation --sonar-api-token %env.SONAR_TOKEN% --sonar-project-key portfolio --sonar-server-url http://sonarqube.gssira.com:9000 --trail &quot;Portfolio-trail-%env.BUILD_NUMBER%&quot;" />
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
       <runner id="Package_dist_folder" name="Package dist folder" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
@@ -572,13 +579,6 @@ Write-Host "   Attestation:    $attestationFile"
 Write-Host "   Cloudsmith Tag: $tag"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
-        </parameters>
-      </runner>
-      <runner id="Attest_Sonar" name="Attest  Sonar" type="simpleRunner">
-        <parameters>
-          <param name="script.content" value="kosli attest sonar --name SonarAttestation --sonar-api-token %env.SONAR_TOKEN% --sonar-project-key portfolio --sonar-server-url http://sonarqube.gssira.com:9000 --trail &quot;Portfolio-trail-%env.BUILD_NUMBER%&quot;" />
-          <param name="teamcity.step.mode" value="default" />
-          <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
     </build-runners>
