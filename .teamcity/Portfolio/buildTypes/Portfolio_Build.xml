@@ -576,7 +576,7 @@ Write-Host "   Cloudsmith Tag: $tag"]]></param>
       </runner>
       <runner id="Attest_Sonar" name="Attest  Sonar" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="kosli attest sonar --name SonarAttestation --sonar-api-token %env.SONAR_TOKEN% --sonar-project-key portfolio" />
+          <param name="script.content" value="kosli attest sonar --name SonarAttestation --sonar-api-token %env.SONAR_TOKEN% --sonar-project-key portfolio --sonar-server-url http://sonarqube.gssira.com:9000 --trail &quot;Portfolio-trail-%env.BUILD_NUMBER%&quot;" />
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
         </parameters>
