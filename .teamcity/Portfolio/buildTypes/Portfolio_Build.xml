@@ -24,6 +24,17 @@
       <param name="env.SONAR_TOKEN" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/SONAR_TOKEN!/sonar_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
     </parameters>
     <build-runners>
+      <runner id="Test" name="Test" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[$checkoutDir = "%teamcity.build.checkoutDir%"
+
+Write-Host $checkoutDir]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
       <runner id="Create_artifact_dirs" name="Create artifact dirs" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
@@ -120,17 +131,6 @@ $Artifacts = $result
 return $result]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
-        </parameters>
-      </runner>
-      <runner id="Test" name="Test" type="jetbrains_powershell">
-        <parameters>
-          <param name="jetbrains_powershell_execution" value="PS1" />
-          <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[$checkoutDir = "%teamcity.build.checkoutDir%"
-
-Write-Host $checkoutDir]]></param>
-          <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
       <runner id="simpleRunner_1" name="NPM Install" type="simpleRunner">
