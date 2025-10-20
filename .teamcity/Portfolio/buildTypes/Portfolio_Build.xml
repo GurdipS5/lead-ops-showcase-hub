@@ -598,11 +598,15 @@ Pop-Location
 # ==============================
 # Generate provenance JSON
 # ==============================
+# Escape backslashes for JSON
+$packageFileJson = $packageFile -replace '\\', '\\\\'
+$gitRemoteJson = $gitRemote -replace '\\', '\\\\'
+
 $provenanceJson = @"
 {
   "_type": "https://in-toto.io/Statement/v0.1",
   "subject": [{
-    "name": "$packageFile",
+    "name": "$packageFileJson",
     "digest": {
       "sha256": "$hash"
     }
@@ -617,7 +621,7 @@ $provenanceJson = @"
       "command": "npm pack"
     },
     "materials": [{
-      "uri": "$gitRemote",
+      "uri": "$gitRemoteJson",
       "digest": {
         "sha1": "$gitCommit"
       }
