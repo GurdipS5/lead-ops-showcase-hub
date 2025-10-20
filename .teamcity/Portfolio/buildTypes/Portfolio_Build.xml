@@ -518,7 +518,7 @@ Write-Host "Kosli Begin Trail completed successfully."]]></param>
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[$packageFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\snyk\snyk.json"
+          <param name="jetbrains_powershell_script_code"><![CDATA[$packageFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\snyk\snyk-results.sarif"
 
 kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMBER%"  --name synk-scan --scan-results $packageFile --api-token "%env.KOSLI_KEY%" --org "gurdipdevops"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
