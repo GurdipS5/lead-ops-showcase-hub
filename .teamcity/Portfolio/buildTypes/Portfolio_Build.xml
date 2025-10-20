@@ -439,8 +439,8 @@ kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMB
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
           <param name="jetbrains_powershell_script_code"><![CDATA[$checkoutDir = "%teamcity.build.checkoutDir%
-$distFolder = Join-Path $checkoutDir "dist"
-$packageFile = Join-Path $checkoutDir "artifacts\publish\Portfolio-%build.number%.tar"
+$distFolder = Join-Path -Path $checkoutDir -ChildPath "dist"
+$packageFile = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish\Portfolio-%build.number%.tar"
 
 Write-Host "Packaging dist folder into $packageFile..."
 tar -czf $packageFile -C $distFolder .]]></param>
