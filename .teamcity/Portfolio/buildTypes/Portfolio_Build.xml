@@ -569,7 +569,7 @@ New-Item -ItemType Directory -Force -Path (Split-Path $attestationFile) | Out-Nu
 # ==============================
 # Write COSIGN_KEY to file
 # ==============================
-if (-not $env:COSIGN_KEY) {
+if (-not "%env.COSIGN_KEY%") {
     Write-Error "❌ COSIGN_KEY environment variable not found. Make sure it's defined in TeamCity."
     exit 1
 }
@@ -658,7 +658,7 @@ Write-Host "✅ Attestation created: $attestationFile"
 # Push to Cloudsmith (OCI)
 # ==============================
 Write-Host "📤 Pushing to Cloudsmith as OCI package..."
-$tag = "portfolio-$($env:BUILD_NUMBER)"
+$tag = "portfolio-%build.number%"
 
 # Push the main package
 & cloudsmith push docker $cloudsmithRepo $packageFile --tag $tag
