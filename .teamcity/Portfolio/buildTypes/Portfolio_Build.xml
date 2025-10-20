@@ -553,9 +553,9 @@ tar -czf $packageFile -C $distFolder .]]></param>
           <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
 # Define paths and variables
 # ==============================
-$packageFile = Join-Path  %teamcity.build.checkoutDir% "artifacts\publish\packages\Portfolio-$($env:BUILD_NUMBER).tar"
-$provenanceFile = Join-Path  %teamcity.build.checkoutDir% "artifacts\provenance.json"
-$attestationFile = Join-Path %teamcity.build.checkoutDir%  "artifacts\attestation\attestation.sig"
+$packageFile = Join-Path  -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\publish\Portfolio-$($env:BUILD_NUMBER).tar"
+$provenanceFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\provenance.json"
+$attestationFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\attestation\attestation.sig"
 $signatureFile = "$packageFile.sig"
 $cosignKeyFile = Join-Path %teamcity.build.checkoutDir% "cosign.key"
 
