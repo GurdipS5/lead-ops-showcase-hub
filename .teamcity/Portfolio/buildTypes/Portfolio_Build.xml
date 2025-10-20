@@ -644,7 +644,7 @@ Write-Host "✅ Package signed: $signatureFile"
 # Create and sign attestation
 # ==============================
 Write-Host "🪪 Creating SLSA attestation..."
-$signature = & cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile $packageFile
+$signature = & cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile $packageFile --yes
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ cosign attest-blob failed with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
