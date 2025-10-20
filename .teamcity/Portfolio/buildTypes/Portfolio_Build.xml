@@ -375,6 +375,7 @@ if ($LASTEXITCODE -eq 0) {
       </runner>
       <runner id="Scan_with_Qodana" name="Scan with Qodana" type="Qodana">
         <parameters>
+          <param name="cli" value="v2025.1.1" />
           <param name="code-inspection-xml-config" value="Default" />
           <param name="linterVersion" value="latest" />
           <param name="namesAndTags" value="public-image-qodana-js" />
