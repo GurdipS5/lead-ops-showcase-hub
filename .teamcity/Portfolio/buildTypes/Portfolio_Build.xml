@@ -596,37 +596,44 @@ $gitRemote = git config --get remote.origin.url
 Pop-Location
 
 # ==============================
-# Generate provenance JSON
+# Generate provenance JSON (predicate only)
 # ==============================
 # Escape backslashes for JSON
 $packageFileJson = $packageFile -replace '\\', '\\\\'
 $gitRemoteJson = $gitRemote -replace '\\', '\\\\'
 
+# Only include the predicate content - cosign will wrap it in the in-toto statement
 $provenanceJson = @"
 {
-  "_type": "https://in-toto.io/Statement/v0.1",
-  "subject": [{
-    "name": "$packageFileJson",
-    "digest": {
-      "sha256": "$hash"
-    }
-  }],
-  "predicateType": "https://slsa.dev/provenance/v0.2",
-  "predicate": {
-    "buildType": "teamcity-build",
-    "builder": {
-      "id": "teamcity://build/$($env:BUILD_NUMBER)"
-    },
-    "invocation": {
-      "command": "npm pack"
-    },
-    "materials": [{
+  "builder": {
+    "id": "teamcity://build/$($env:BUILD_NUMBER)"
+  },
+  "buildType": "teamcity-build",
+  "invocation": {
+    "configSource": {
       "uri": "$gitRemoteJson",
       "digest": {
         "sha1": "$gitCommit"
       }
-    }]
-  }
+    }
+  },
+  "metadata": {
+    "buildStartedOn": "$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))",
+    "completeness": {
+      "parameters": false,
+      "environment": false,
+      "materials": false
+    },
+    "reproducible": false
+  },
+  "materials": [
+    {
+      "uri": "$gitRemoteJson",
+      "digest": {
+        "sha1": "$gitCommit"
+      }
+    }
+  ]
 }
 "@
 
