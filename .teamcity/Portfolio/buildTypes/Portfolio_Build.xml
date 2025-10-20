@@ -626,7 +626,9 @@ $provenanceJson = @"
 }
 "@
 
-Set-Content -Path $provenanceFile -Value $provenanceJson -Encoding UTF8
+# Write without BOM using .NET method
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+[System.IO.File]::WriteAllText($provenanceFile, $provenanceJson, $utf8NoBom)
 Write-Host "🧾 Provenance file created: $provenanceFile"
 
 # ==============================
@@ -644,7 +646,7 @@ Write-Host "✅ Package signed: $signatureFile"
 # Create and sign attestation
 # ==============================
 Write-Host "🪪 Creating SLSA attestation..."
-$signature = & cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile $packageFile --yes
+$signature = & cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile --yes $packageFile
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ cosign attest-blob failed with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
