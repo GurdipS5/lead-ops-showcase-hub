@@ -520,7 +520,7 @@ Write-Host "Kosli Begin Trail completed successfully."]]></param>
           <param name="jetbrains_powershell_noprofile" value="true" />
           <param name="jetbrains_powershell_script_code"><![CDATA[$packageFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\snyk\snyk.json"
 
-kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMBER%"  --name synk-scan --scan-results $packageFile --api-token "%env.KOSLI_KEY%"]]></param>
+kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMBER%"  --name synk-scan --scan-results $packageFile --api-token "%env.KOSLI_KEY%" --org "gurdipdevops"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
