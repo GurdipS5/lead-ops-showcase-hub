@@ -409,7 +409,7 @@ if (-not $flowExists) {
     Write-Host "Flow $FlowName already exists."
 }
 
-kosli begin trail "Portfolio-trail-%env.BUILD_NUMBER%" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --flow $flowName --org $KosliOrg --api-token %env.KOSLI_KEY%
+kosli begin trail "Portfolio-trail-%build.number%" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --flow $flowName --org $KosliOrg --api-token %env.KOSLI_KEY%
 
 Write-Host "Kosli Begin Trail completed successfully."]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
