@@ -676,7 +676,7 @@ $tag = "%build.number%"
 Write-Host "docker.cloudsmith.io/${cloudsmithRepo}:${tag}"
 
 # Push the main package
-& oras push docker "docker.cloudsmith.io/${cloudsmithRepo}:${tag}" $packagefile --disable-path-validation flag
+& oras push "docker.cloudsmith.io/${cloudsmithRepo}:${tag}" $packagefile --disable-path-validation flag
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for package with exit code $LASTEXITCODE"
@@ -686,7 +686,7 @@ Write-Host "✅ Package pushed: $tag"
 
 # Push the signature
 
-& oras attach --artifact-type "application/vnd.cloudsmith.attachment.v1 docker.cloudsmith.io/gurdipdevops/portfolio/portfolio:%build.number%" $sigFile --disable-path-validation flag
+& oras attach --artifact-type "application/vnd.cloudsmith.attachment.v1 docker.cloudsmith.io/gurdipdevops/portfolio/portfolio:%build.number%" $sigFile --disable-path-validation
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for signature with exit code $LASTEXITCODE"
