@@ -783,16 +783,6 @@ Write-Host "✅ Successfully created build information for $PackageId:$BuildNumb
           <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
-      <runner id="Test_1" name="Test (1)" type="jetbrains_powershell">
-        <parameters>
-          <param name="jetbrains_powershell_execution" value="PS1" />
-          <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[$BuildNumber   = "$env:BUILD_NUMBER"
-Write-Host $BuildNumber]]></param>
-          <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
-        </parameters>
-      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
