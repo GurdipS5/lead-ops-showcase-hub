@@ -676,7 +676,7 @@ $tag = "%build.number%"
 Write-Host "docker.cloudsmith.io/${cloudsmithRepo}:${tag}"
 
 # Push the main package
-& oras push "docker.cloudsmith.io/${cloudsmithRepo}:${tag}" $packagefile --disable-path-validation flag
+& oras push "docker.cloudsmith.io/${cloudsmithRepo}:${tag}" $packagefile --disable-path-validation
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for package with exit code $LASTEXITCODE"
