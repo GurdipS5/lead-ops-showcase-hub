@@ -674,7 +674,7 @@ Write-Host "📤 Pushing to Cloudsmith as OCI package..."
 $tag = "portfolio-%build.number%"
 
 # Push the main package
-& cloudsmith push docker $cloudsmithRepo $packageFile --tag $tag
+& oras push docker $cloudsmithRepo $packageFile --tag $tag
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for package with exit code $LASTEXITCODE"
@@ -683,7 +683,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "✅ Package pushed: $tag"
 
 # Push the signature
-& cloudsmith push docker $cloudsmithRepo $signatureFile --tag "$tag-sig"
+& oras push docker $cloudsmithRepo $signatureFile --tag "$tag-sig"
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for signature with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
