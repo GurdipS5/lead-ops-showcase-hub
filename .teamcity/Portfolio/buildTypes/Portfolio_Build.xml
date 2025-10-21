@@ -673,6 +673,8 @@ Write-Host "✅ Attestation created: $attestationFile"
 Write-Host "📤 Pushing to Cloudsmith as OCI package..."
 $tag = "%build.number%"
 
+Write-Host "docker.cloudsmith.io/$cloudsmithRepo/portfolio:$tag"
+
 # Push the main package
 & oras push docker "docker.cloudsmith.io/$cloudsmithRepo/portfolio:$tag" $packagefile --disable-path-validation flag
 
