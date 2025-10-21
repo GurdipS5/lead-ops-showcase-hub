@@ -729,7 +729,7 @@ $TeamCityUrl   = "$env:TEAMCITY_SERVER_URL"
 
 # Octopus configuration (set as TeamCity environment parameters)
 $OctoServer    = "$env:OCTOPUS_SERVER"       # e.g. https://octopus.mycompany.com
-$OctoApiKey    = "$env:OCTOPUS_API_KEY"
+$OctoApiKey    = "$env:OCTOPUS_KEY"
 $ProjectName   = "$env:OCTOPUS_PROJECT_NAME" # optional, for logging
 $PackageId     = "$env:PACKAGE_ID"           # e.g. "MyApp"
 
@@ -785,7 +785,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "✅ Successfully created build information for $PackageId:$BuildNumber"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
     </build-runners>
