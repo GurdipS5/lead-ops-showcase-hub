@@ -671,10 +671,11 @@ Write-Host "✅ Attestation created: $attestationFile"
 # Push to Cloudsmith (OCI)
 # ==============================
 Write-Host "📤 Pushing to Cloudsmith as OCI package..."
-$tag = "portfolio-%build.number%"
+$tag = "%build.number%"
 
 # Push the main package
-& oras push docker $cloudsmithRepo $packageFile --tag $tag
+& oras push docker "docker.cloudsmith.io/$cloudsmithRepo/gurdipdevops/portfolio:$tag" $packagefile
+
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for package with exit code $LASTEXITCODE"
@@ -683,7 +684,9 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "✅ Package pushed: $tag"
 
 # Push the signature
-& oras push docker $cloudsmithRepo $signatureFile --tag "$tag-sig"
+
+& oras attach --artifact-type "application/vnd.cloudsmith.attachment.v1 docker.cloudsmith.io/gurdipdevops/portfolio/portfolio:%build.number%" $sigFile
+
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for signature with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
