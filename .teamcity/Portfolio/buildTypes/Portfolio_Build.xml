@@ -20,14 +20,118 @@
       <param name="env.GITGUARDIAN_API_KEY" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/GITGUARDIAN_TOKEN!/gitguardian_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.GitGuardianDir" value="%teamcity.build.checkoutDir%/artifacts/gitguardian/" />
       <param name="env.KOSLI_KEY" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/KOSLI_API_KEY!/kosli_api_key' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
+      <param name="env.OCTOPUS_PROJECT_NAME" value="Portfolio" />
       <param name="env.SBOMPath" value="%teamcity.build.checkoutDir%/artifacts/cyclonedx/sbom.json" />
+      <param name="env.SONAR_TOKEN" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/SONAR_TOKEN!/sonar_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
     </parameters>
     <build-runners>
-      <runner id="Set_Version" name="Set Version" type="simpleRunner">
+      <runner id="Test" name="Test" type="jetbrains_powershell">
         <parameters>
-          <param name="script.content" value="npx nbgv cloud" />
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[$checkoutDir = "%teamcity.build.checkoutDir%"
+
+Write-Host $checkoutDir]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
-          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
+      <runner id="Create_artifact_dirs" name="Create artifact dirs" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[<#
+.SYNOPSIS
+  Build relative and absolute paths for artifact folders (and optionally create them).
+
+.EXAMPLE
+  # Create folders (default)
+  .\mk-artifacts.ps1
+
+  # Only show path info, don't create
+  .\mk-artifacts.ps1 -Create:$false
+#>
+
+param(
+    [switch] $Create = $true
+)
+
+function Get-RepoRoot {
+    # Prefer TeamCity checkout dir if present
+    if ("%teamcity.build.checkoutDir%"-and (Test-Path "%teamcity.build.checkoutDir")) {
+        return (Resolve-Path -Path $env:BUILD_CHECKOUTDIR).Path
+    }
+
+    # If git is available, try to find the git repo root
+    try {
+        $git = (Get-Command git -ErrorAction Stop)
+        $root = git rev-parse --show-toplevel 2>$null
+        if ($LASTEXITCODE -eq 0 -and $root) {
+            return (Resolve-Path -Path $root.Trim()).Path
+        }
+    } catch {
+        # ignore, fall back next
+    }
+
+    # Fall back to script directory, or current directory if running interactively
+    if ($MyInvocation.MyCommand.Path) {
+        return (Resolve-Path -Path (Split-Path -Path $MyInvocation.MyCommand.Path -Parent)).Path
+    }
+
+    return (Resolve-Path -Path .).Path
+}
+
+# main
+$baseDir = Get-RepoRoot
+Write-Host "Base directory: $baseDir"
+
+# list of artifact relative paths you asked for
+$relativePaths = @(
+    'artifacts\cyclonedx',
+    'artifacts\gitguardian',
+    'artifacts\snyk',
+    'artifacts\publish',
+    'artifacts\sonar'
+)
+
+$result = foreach ($rel in $relativePaths) {
+    # Keep the relative path as-is (relative to $baseDir)
+    $relNormalized = $rel -replace '/','\'
+
+    # compute absolute path
+    $abs = [System.IO.Path]::GetFullPath((Join-Path -Path $baseDir -ChildPath $relNormalized))
+
+    # create directory if requested
+    if ($Create) {
+        if (-not (Test-Path -Path $abs)) {
+            New-Item -ItemType Directory -Path $abs -Force | Out-Null
+            $created = $true
+        } else {
+            $created = $false
+        }
+    } else {
+        $created = $false
+    }
+
+    [PSCustomObject]@{
+        Name         = Split-Path -Path $relNormalized -Leaf
+        RelativePath = $relNormalized
+        AbsolutePath = $abs
+        Created      = $created
+    }
+}
+
+# show nicely
+$result | Format-Table -AutoSize
+
+# export to variables in the current session if the script is dot-sourced:
+# e.g. `. .\mk-artifacts.ps1` then $Artifacts will be available
+$Artifacts = $result
+
+# also return the array for pipelines
+return $result]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
       <runner id="simpleRunner_1" name="NPM Install" type="simpleRunner">
@@ -45,9 +149,17 @@
           <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
+      <runner id="Set_Version" name="Set Version" type="simpleRunner">
+        <parameters>
+          <param name="script.content"><![CDATA[git fetch --deepen=1000 || git fetch --unshallow
+npx nbgv cloud]]></param>
+          <param name="teamcity.step.mode" value="default" />
+          <param name="use.custom.script" value="true" />
+        </parameters>
+      </runner>
       <runner id="CSpell" name="CSpell" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="npx cspell &quot;**/*.{js,ts,md,txt}&quot;" />
+          <param name="script.content" value="npx cspell --config cspell.json &quot;**/*.{js,ts,md,txt}&quot;" />
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
         </parameters>
@@ -264,9 +376,11 @@ if ($LASTEXITCODE -eq 0) {
       </runner>
       <runner id="Scan_with_Qodana" name="Scan with Qodana" type="Qodana">
         <parameters>
+          <param name="cli" value="v2025.1.1" />
           <param name="code-inspection-xml-config" value="Default" />
           <param name="linterVersion" value="latest" />
           <param name="namesAndTags" value="public-image-qodana-js" />
+          <param name="report-as-test" value="true" />
           <param name="secure:cloud-token" value="zxx1af0235e338982e6" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
@@ -344,7 +458,7 @@ catch {
       </runner>
       <runner id="Snyk_Code_Test" name="Snyk Code Test" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="snyk code test --json-file-output=%system.teamcity.build.checkoutDir%s/artifacts/snyk/snyk-results.sarif --sarif" />
+          <param name="script.content" value="snyk code test --json-file-output=%system.teamcity.build.checkoutDir%/artifacts/snyk/snyk-results.sarif --sarif" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
           <param name="use.custom.script" value="true" />
         </parameters>
@@ -353,14 +467,16 @@ catch {
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[if (-not (Test-Path %env.GitGuardianDir%)) {
-    New-Item -ItemType Directory -Path %env.GitGuardianDir% | Out-Null
+          <param name="jetbrains_powershell_script_code"><![CDATA[# Ensure the GitGuardian directory exists
+if (-not (Test-Path $env:GitGuardianDir)) {
+    New-Item -ItemType Directory -Path $env:GitGuardianDir | Out-Null
 }
 
-ggshield secret scan commit-range HEAD~1 --format sarif | 
-    Tee-Object "$env:GitGuardianDir\results.sarif" | 
-    ConvertFrom-Json | 
-    ConvertTo-Json -Depth 10]]></param>
+# Run the scan, prettify JSON, and save to SARIF file
+ggshield secret scan commit-range HEAD~1 --format sarif |
+    ConvertFrom-Json |
+    ConvertTo-Json -Depth 10 |
+    Tee-Object -FilePath "$env:GitGuardianDir\results.sarif"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
@@ -377,67 +493,59 @@ $ErrorActionPreference = "Stop"
 
 # CONFIGURATION
 $KosliOrg = "gurdipdevops"
-$KosliAPIKey = "hvs.vwcrYLioLRZBO3tbsplBAMzA"
-$FlowName = "portfolio-flow2"
-$FlowDescription = "Flow for SonarQube scan attestation"
+$FlowName = "portfolio-flow"
+$FlowDescription = "Flow for governance attestation"
 $FlowRepo = "xxx"
+$repoUrl = "%vcsroot.Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain.url%"
+####
 
 # Check if flow exists
-$flowExists = kosli flow list --org $KosliOrg | Select-String $FlowName
+$flowExists = kosli list flow --org $KosliOrg --api-token %env.KOSLI_KEY% | Select-String $FlowName
 
 if (-not $flowExists) {
     Write-Host "Creating Kosli flow: $FlowName..."
-    kosli flow create `
-        --org $KosliOrg `
-        --name $FlowName `
-        --description $FlowDescription `
-        --repo $FlowRepo
+    kosli create flow $flowName --org $KosliOrg --description $FlowDescription --api-token %env.KOSLI_KEY%
 } else {
     Write-Host "Flow $FlowName already exists."
 }
 
-kosli begin trail "PortfolioTrail" --flow $FlowName --description "Trail for portfolio %env.BUILD_NUMBER%" --org "gurdipdev" --api-token  "$env:KOSLI_API_TOKEN"
-
-# Output logs to TeamCity console
-Get-Content "kosli_out.log" | ForEach-Object { Write-Host $_ }
-Get-Content "kosli_err.log" | ForEach-Object { Write-Error $_ }
-
-# Check exit code
-if ($process.ExitCode -ne 0) {
-    throw "Kosli exited with code $($process.ExitCode)"
-}
+kosli begin trail "Portfolio-trail-%build.number%" --description "Starting Kosli trail for Portfolio build %env.BUILD_NUMBER%" --flow $flowName --org $KosliOrg --api-token %env.KOSLI_KEY%
 
 Write-Host "Kosli Begin Trail completed successfully."]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
       <runner id="Attest_Snyk" name="Attest Snyk" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\snyk\snyk.json"
+          <param name="jetbrains_powershell_script_code"><![CDATA[$packageFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\snyk\snyk-results.sarif"
 
-kosli attest snyk --flow snyk-flow --trail test-1 --name synk-scan --scan-results code.json --commit HEAD]]></param>
+kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMBER%"  --name synk-scan --scan-results $packageFile --api-token "%env.KOSLI_KEY%" --org "gurdipdevops"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+        </parameters>
+      </runner>
+      <runner id="Attest_Sonar" name="Attest  Sonar" type="simpleRunner">
+        <parameters>
+          <param name="script.content" value="kosli attest sonar --name SonarAttestation --sonar-api-token %env.SONAR_TOKEN% --sonar-project-key portfolio --sonar-server-url http://sonarqube.gssira.com:9000 --trail &quot;Portfolio-trail-%env.BUILD_NUMBER%&quot; --api-token &quot;%env.KOSLI_KEY%&quot; --org &quot;gurdipdevops&quot;" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+          <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
       <runner id="Package_dist_folder" name="Package dist folder" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[$distFolder = Join-Path $env:BUILD_CHECKOUTDIR "dist"
-$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\Portfolio.$($env:BUILD_NUMBER).tgz"
+          <param name="jetbrains_powershell_script_code"><![CDATA[$checkoutDir = "%teamcity.build.checkoutDir%"
+$distFolder = Join-Path -Path $checkoutDir -ChildPath "dist"
+$packageFile = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish\Portfolio-%build.number%.tar"
 
-# Ensure artifacts folder exists
-New-Item -ItemType Directory -Path (Split-Path $packageFile) -Force | Out-Null
-
-# Create a tarball of the dist folder
 Write-Host "Packaging dist folder into $packageFile..."
 tar -czf $packageFile -C $distFolder .]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
       <runner id="Sign_with_Cosign" name="Sign with Cosign &amp; Push Package" type="jetbrains_powershell">
@@ -447,18 +555,30 @@ tar -czf $packageFile -C $distFolder .]]></param>
           <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
 # Define paths and variables
 # ==============================
-$packageFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\publish\packages\Portfolio-$($env:BUILD_NUMBER).tgz"
-$provenanceFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\provenance.json"
-$attestationFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\attestation\attestation.sig"
+$packageFile = Join-Path  -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\publish\Portfolio-$($env:BUILD_NUMBER).tar"
+$provenanceFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\provenance.json"
+$attestationFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\attestation\attestation.sig"
 $signatureFile = "$packageFile.sig"
-$cosignKeyFile = Join-Path $env:BUILD_CHECKOUTDIR "cosign.key"
+$cosignKeyFile = Join-Path %teamcity.build.checkoutDir% "cosign.key"
 
 # Cloudsmith repo address (e.g. "gurdip/portfolio")
-$cloudsmithRepo = "gurdip/portfolio"
+$cloudsmithRepo = "gurdipdevops/portfolio"
 
 # Create required directories if missing
 New-Item -ItemType Directory -Force -Path (Split-Path $provenanceFile) | Out-Null
 New-Item -ItemType Directory -Force -Path (Split-Path $attestationFile) | Out-Null
+
+# ==============================
+# Write COSIGN_KEY to file
+# ==============================
+if (-not "%env.COSIGN_KEY%") {
+    Write-Error "❌ COSIGN_KEY environment variable not found. Make sure it's defined in TeamCity."
+    exit 1
+}
+
+# Ensure newline-safe write
+[System.IO.File]::WriteAllText($cosignKeyFile, $env:COSIGN_KEY)
+Write-Host "🔑 Cosign key written to: $cosignKeyFile"
 
 # ==============================
 # Calculate SHA256 hash
@@ -478,44 +598,57 @@ $gitRemote = git config --get remote.origin.url
 Pop-Location
 
 # ==============================
-# Generate provenance JSON
+# Generate provenance JSON (predicate only)
 # ==============================
+# Escape backslashes for JSON
+$packageFileJson = $packageFile -replace '\\', '\\\\'
+$gitRemoteJson = $gitRemote -replace '\\', '\\\\'
+
+# Only include the predicate content - cosign will wrap it in the in-toto statement
 $provenanceJson = @"
 {
-  "_type": "https://in-toto.io/Statement/v0.1",
-  "subject": [{
-    "name": "$packageFile",
-    "digest": {
-      "sha256": "$hash"
-    }
-  }],
-  "predicateType": "https://slsa.dev/provenance/v0.2",
-  "predicate": {
-    "buildType": "teamcity-build",
-    "builder": {
-      "id": "teamcity://build/$($env:BUILD_NUMBER)"
-    },
-    "invocation": {
-      "command": "npm pack"
-    },
-    "materials": [{
-      "uri": "$gitRemote",
+  "builder": {
+    "id": "teamcity://build/$($env:BUILD_NUMBER)"
+  },
+  "buildType": "teamcity-build",
+  "invocation": {
+    "configSource": {
+      "uri": "$gitRemoteJson",
       "digest": {
         "sha1": "$gitCommit"
       }
-    }]
-  }
+    }
+  },
+  "metadata": {
+    "buildStartedOn": "$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))",
+    "completeness": {
+      "parameters": false,
+      "environment": false,
+      "materials": false
+    },
+    "reproducible": false
+  },
+  "materials": [
+    {
+      "uri": "$gitRemoteJson",
+      "digest": {
+        "sha1": "$gitCommit"
+      }
+    }
+  ]
 }
 "@
 
-Set-Content -Path $provenanceFile -Value $provenanceJson -Encoding UTF8
+# Write without BOM using .NET method
+$utf8NoBom = New-Object System.Text.UTF8Encoding $false
+[System.IO.File]::WriteAllText($provenanceFile, $provenanceJson, $utf8NoBom)
 Write-Host "🧾 Provenance file created: $provenanceFile"
 
 # ==============================
 # Sign the package
 # ==============================
 Write-Host "✍️  Signing package with cosign..."
-& cosign sign-blob --key $cosignKeyFile --output-signature $signatureFile $packageFile
+& cosign sign-blob --key $cosignKeyFile --output-signature $signatureFile $packageFile --yes
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ cosign sign-blob failed with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
@@ -526,7 +659,7 @@ Write-Host "✅ Package signed: $signatureFile"
 # Create and sign attestation
 # ==============================
 Write-Host "🪪 Creating SLSA attestation..."
-$signature = & cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile $packageFile
+$signature = & cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile --yes $packageFile
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ cosign attest-blob failed with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
@@ -538,10 +671,11 @@ Write-Host "✅ Attestation created: $attestationFile"
 # Push to Cloudsmith (OCI)
 # ==============================
 Write-Host "📤 Pushing to Cloudsmith as OCI package..."
-$tag = "portfolio-$($env:BUILD_NUMBER)"
+$tag = "portfolio-%build.number%"
 
 # Push the main package
-& cloudsmith push oci $cloudsmithRepo $packageFile --tag $tag
+& oras push docker $cloudsmithRepo $packageFile --tag $tag
+
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for package with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
@@ -549,7 +683,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "✅ Package pushed: $tag"
 
 # Push the signature
-& cloudsmith push oci $cloudsmithRepo $signatureFile --tag "$tag-sig"
+& oras push docker $cloudsmithRepo $signatureFile --tag "$tag-sig"
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Cloudsmith push failed for signature with exit code $LASTEXITCODE"
     exit $LASTEXITCODE
@@ -566,6 +700,85 @@ Write-Host "   Signature:      $signatureFile"
 Write-Host "   Provenance:     $provenanceFile"
 Write-Host "   Attestation:    $attestationFile"
 Write-Host "   Cloudsmith Tag: $tag"]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+        </parameters>
+      </runner>
+      <runner id="Create_Octopus_Build_Infomration" name="Create Octopus Build Infomration" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
+# Create Build Information in Octopus (TeamCity)
+# ==============================
+
+Write-Host "Starting Octopus Build Information creation..."
+
+# TeamCity predefined variables
+$BuildNumber   = "$env:BUILD_NUMBER"
+$BuildId       = "$env:BUILD_ID"
+$BuildBranch   = "$env:BUILD_VCS_BRANCH"
+$CommitSha     = "$env:BUILD_VCS_NUMBER"
+$RepoUrl       = "$env:BUILD_VCS_URL"
+$TeamCityUrl   = "$env:TEAMCITY_SERVER_URL"
+
+# Octopus configuration (set as TeamCity environment parameters)
+$OctoServer    = "$env:OCTOPUS_SERVER"       # e.g. https://octopus.mycompany.com
+$OctoApiKey    = "$env:OCTOPUS_API_KEY"
+$ProjectName   = "$env:OCTOPUS_PROJECT_NAME" # optional, for logging
+$PackageId     = "$env:PACKAGE_ID"           # e.g. "MyApp"
+
+# Validate required vars
+if (-not $OctoServer -or -not $OctoApiKey -or -not $PackageId -or -not $BuildNumber) {
+    Write-Error "Missing required variables. Ensure OCTOPUS_SERVER, OCTOPUS_API_KEY, PACKAGE_ID, and BUILD_NUMBER are defined as TeamCity environment parameters."
+    exit 1
+}
+
+# Construct Build Information JSON file
+$BuildInfoFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\octopus-buildinfo.json"
+$BuildUrl = "$TeamCityUrl/viewLog.html?buildId=$BuildId"
+
+# Build info structure
+$buildInfo = @{
+    BuildEnvironment = "TeamCity"
+    BuildNumber      = $BuildNumber
+    BuildUrl         = $BuildUrl
+    Branch           = $BuildBranch
+    VcsCommitNumber  = $CommitSha
+    VcsType          = "Git"
+    VcsRoot          = $RepoUrl
+}
+
+# Ensure artifacts directory exists
+$artifactsDir = Split-Path $BuildInfoFile
+if (-not (Test-Path $artifactsDir)) {
+    New-Item -ItemType Directory -Path $artifactsDir | Out-Null
+}
+
+# Write file
+$buildInfo | ConvertTo-Json -Depth 5 | Out-File -FilePath $BuildInfoFile -Encoding UTF8
+
+Write-Host "Generated build information file at: $BuildInfoFile"
+Write-Host "Contents:"
+Get-Content $BuildInfoFile | Write-Host
+
+# Call Octo CLI to push build info
+Write-Host "Pushing build information to Octopus Deploy..."
+& octo build-information create `
+    --server $OctoServer `
+    --apiKey $OctoApiKey `
+    --package-id $PackageId `
+    --version $BuildNumber `
+    --file $BuildInfoFile `
+    --overwrite-mode OverwriteExisting `
+    --verbose
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "❌ Failed to create build information in Octopus."
+    exit $LASTEXITCODE
+}
+
+Write-Host "✅ Successfully created build information for $PackageId:$BuildNumber"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
