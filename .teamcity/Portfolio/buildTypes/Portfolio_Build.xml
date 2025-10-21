@@ -562,7 +562,7 @@ $signatureFile = "$packageFile.sig"
 $cosignKeyFile = Join-Path %teamcity.build.checkoutDir% "cosign.key"
 
 # Cloudsmith repo address (e.g. "gurdip/portfolio")
-$cloudsmithRepo = "gurdipdevops/portfolio"
+$cloudsmithRepo = "gurdipdevops/portfolio/"
 
 # Create required directories if missing
 New-Item -ItemType Directory -Force -Path (Split-Path $provenanceFile) | Out-Null
@@ -674,7 +674,7 @@ Write-Host "📤 Pushing to Cloudsmith as OCI package..."
 $tag = "%build.number%"
 
 # Push the main package
-& oras push docker "docker.cloudsmith.io/$cloudsmithRepo/gurdipdevops/portfolio:$tag" $packagefile --disable-path-validation flag
+& oras push docker "docker.cloudsmith.io/$cloudsmithRepo/portfolio:$tag" $packagefile --disable-path-validation flag
 
 
 if ($LASTEXITCODE -ne 0) {
