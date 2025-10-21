@@ -673,6 +673,8 @@ Write-Host "✅ Attestation created: $attestationFile"
 Write-Host "📤 Pushing to Cloudsmith as OCI package..."
 $tag = "%build.number%"
 
+oras login -u "gurdip.sira@gmail.com" -p "%env.CLOUDSMITH_API_KEY%"
+
 Write-Host "docker.cloudsmith.io/${cloudsmithRepo}/portfolio:${tag}"
 
 # Push the main package
