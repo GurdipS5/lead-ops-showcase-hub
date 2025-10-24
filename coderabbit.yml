@@ -1,0 +1,95 @@
+# CodeRabbit Configuration for JavaScript Portfolio
+
+# Language settings
+language: en-US
+
+# Review settings
+reviews:
+  # Enable auto-review on pull requests
+  auto_review:
+    enabled: true
+    drafts: false
+
+  # Request changes for critical issues
+  request_changes_workflow: true
+
+  # High level summary
+  high_level_summary: true
+
+  # Poem style for fun (optional, can be disabled)
+  poem: false
+
+  # Review profile
+  profile: chill
+
+  # Enable file-level summaries
+  review_status: true
+
+  # Collapse walkthrough details
+  collapse_walkthrough: false
+
+# Chat settings
+chat:
+  # Enable auto-reply to comments
+  auto_reply: true
+
+# Code quality checks
+tone_instructions: "Be constructive, friendly, and focus on teaching best practices for modern JavaScript and web development."
+
+# Path-based instructions
+path_instructions:
+  - path: "**/*.js"
+    instructions: |
+      - Check for modern ES6+ syntax usage
+      - Suggest improvements for code readability
+      - Flag potential performance issues
+      - Ensure proper error handling
+      - Check for accessibility best practices
+
+  - path: "**/*.jsx"
+    instructions: |
+      - Review React component structure and hooks usage
+      - Check for proper prop validation
+      - Ensure accessibility (a11y) compliance
+      - Flag unnecessary re-renders
+      - Review state management patterns
+
+  - path: "**/*.ts"
+    instructions: |
+      - Verify TypeScript types are properly defined
+      - Check for 'any' type usage
+      - Ensure type safety
+      - Review interface and type definitions
+
+  - path: "**/*.css"
+    instructions: |
+      - Check for responsive design patterns
+      - Review CSS specificity and organization
+      - Suggest modern CSS features where applicable
+      - Flag potential browser compatibility issues
+
+  - path: "**/package.json"
+    instructions: |
+      - Review dependency versions for security
+      - Check for outdated packages
+      - Verify scripts are well-organized
+
+# Files to ignore
+ignore:
+  - "node_modules/**"
+  - "dist/**"
+  - "build/**"
+  - ".next/**"
+  - "out/**"
+  - "coverage/**"
+  - "**/*.min.js"
+  - "**/*.min.css"
+  - "**/*.bundle.js"
+  - ".cache/**"
+  - "public/assets/**"
+
+# Early access features
+early_access: false
+
+# Enable knowledge base
+enable_free_tier: true
