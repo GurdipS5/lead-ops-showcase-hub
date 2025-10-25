@@ -851,18 +851,18 @@ Write-Host "   Build Number:   %build.number%"]]></param>
 Write-Host "Starting Octopus Build Information creation..."
 
 # TeamCity predefined variables
-$BuildNumber   = "${env:BUILD_NUMBER}"
-$BuildId       = "${env:BUILD_ID}"
-$BuildBranch   = "${env:BUILD_VCS_BRANCH}"
-$CommitSha     = "${env:BUILD_VCS_NUMBER}"
-$RepoUrl       = "${env:BUILD_VCS_URL}"
-$TeamCityUrl   = "${env:TEAMCITY_SERVER_URL}"
+$BuildNumber   = "$env:BUILD_NUMBER"
+$BuildId       = "$env:BUILD_ID"
+$BuildBranch   = "$env:BUILD_VCS_BRANCH"
+$CommitSha     = "$env:BUILD_VCS_NUMBER"
+$RepoUrl       = "$env:BUILD_VCS_URL"
+$TeamCityUrl   = "$env:TEAMCITY_SERVER_URL"
 
 # Octopus configuration (set as TeamCity environment parameters)
-$OctoServer    = "${env:OCTOPUS_SERVER}"       # e.g. https://octopus.mycompany.com
-$OctoApiKey    = "${env:OCTOPUS_KEY}"
-$ProjectName   = "${env:OctopusProjectName}"   # optional, for logging
-$PackageId     = "${env:PACKAGE_ID}"           # e.g. "MyApp"
+$OctoServer    = "$env:OCTOPUS_SERVER"       # e.g. https://octopus.mycompany.com
+$OctoApiKey    = "$env:OCTOPUS_KEY"
+$ProjectName   = "$env:OctopusProjectName"   # optional, for logging
+$PackageId     = "$env:PACKAGE_ID"           # e.g. "MyApp"
 
 # Validate required vars
 if (-not $OctoServer -or -not $OctoApiKey -or -not $PackageId -or -not $BuildNumber) {
