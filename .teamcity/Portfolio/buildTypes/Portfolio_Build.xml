@@ -529,7 +529,7 @@ kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMB
       </runner>
       <runner id="Attest_Sonar" name="Attest  Sonar" type="simpleRunner">
         <parameters>
-          <param name="script.content" value="kosli attest sonar --name SonarAttestation --sonar-api-token %env.SONAR_TOKEN% --sonar-project-key portfolio --sonar-server-url http://sonarqube.gssira.com:9000 --trail &quot;Portfolio-trail-%env.BUILD_NUMBER%&quot; --api-token &quot;%env.KOSLI_KEY%&quot; --org &quot;gurdipdevops&quot;" />
+          <param name="script.content" value="kosli attest sonar --name SonarAttestation --sonar-api-token %env.SONAR_TOKEN% --sonar-project-key portfolio --sonar-server-url http://sonarqube.gssira.com:9000 --trail &quot;Portfolio-trail-%env.BUILD_NUMBER%&quot; --api-token &quot;%env.KOSLI_KEY%&quot; --org &quot;gurdipdevops&quot; --flow &quot;portfolio-flow&quot;" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
           <param name="use.custom.script" value="true" />
         </parameters>
@@ -538,12 +538,145 @@ kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMB
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[$checkoutDir = "%teamcity.build.checkoutDir%"
+          <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
+# TeamCity Build Step - npm pack
+# ==============================
+# TeamCity variables
+$checkoutDir = "%teamcity.build.checkoutDir%"
+$buildNumber = "%build.number%"
 $distFolder = Join-Path -Path $checkoutDir -ChildPath "dist"
-$packageFile = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish\Portfolio-%build.number%.tar"
+$artifactsDir = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish"
+$rootPackageJson = Join-Path -Path $checkoutDir -ChildPath "package.json"
+$distPackageJson = Join-Path -Path $distFolder -ChildPath "package.json"
 
-Write-Host "Packaging dist folder into $packageFile..."
-tar -czf $packageFile -C $distFolder .]]></param>
+# Fail fast
+$ErrorActionPreference = "Stop"
+
+Write-Host "=========================================="
+Write-Host "📦 npm pack - Build $buildNumber"
+Write-Host "=========================================="
+Write-Host "Checkout Dir: $checkoutDir"
+Write-Host "Source Dir:   $distFolder"
+Write-Host "Artifacts:    $artifactsDir"
+Write-Host ""
+
+# ==============================
+# Validate source directory exists
+# ==============================
+if (-not (Test-Path $distFolder)) {
+    Write-Host "##teamcity[message text='dist folder not found: $distFolder' status='ERROR']"
+    Write-Error "❌ dist folder not found: $distFolder"
+    exit 1
+}
+
+# ==============================
+# Validate root package.json exists
+# ==============================
+if (-not (Test-Path $rootPackageJson)) {
+    Write-Host "##teamcity[message text='package.json not found in root: $rootPackageJson' status='ERROR']"
+    Write-Error "❌ package.json not found in root: $rootPackageJson"
+    exit 1
+}
+
+# ==============================
+# Copy package.json to dist if needed
+# ==============================
+$packageJsonCopied = $false
+if (-not (Test-Path $distPackageJson)) {
+    Write-Host "📄 Copying package.json from root to dist folder..."
+    Copy-Item -Path $rootPackageJson -Destination $distPackageJson -Force
+    $packageJsonCopied = $true
+    Write-Host "✅ package.json copied to dist"
+} else {
+    Write-Host "✅ package.json already exists in dist"
+}
+
+# ==============================
+# Ensure artifacts folder exists
+# ==============================
+Write-Host ""
+Write-Host "📁 Ensuring artifacts directory exists..."
+if (-not (Test-Path $artifactsDir)) {
+    New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
+    Write-Host "✅ Artifacts directory created"
+} else {
+    Write-Host "✅ Artifacts directory exists"
+}
+
+# ==============================
+# Navigate to dist directory and pack
+# ==============================
+Write-Host ""
+Write-Host "==> Packing npm package from $distFolder..."
+Write-Host "##teamcity[progressMessage 'Packing npm package...']"
+
+Push-Location $distFolder
+try {
+    # Run npm pack using npm.cmd
+    & npm.cmd pack --silent
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "##teamcity[message text='npm pack failed with exit code $LASTEXITCODE' status='ERROR']"
+        Write-Error "❌ npm pack failed with exit code $LASTEXITCODE"
+        exit $LASTEXITCODE
+    }
+    
+    # Find the created .tgz file (npm pack creates it in the current directory)
+    $tgzFile = Get-ChildItem -Path . -Filter "*.tgz" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    
+    if (-not $tgzFile) {
+        Write-Host "##teamcity[message text='No .tgz file found after npm pack' status='ERROR']"
+        Write-Error "❌ No .tgz file found after npm pack"
+        exit 1
+    }
+    
+    Write-Host "Package created: $($tgzFile.Name)"
+    Write-Host "##teamcity[message text='npm pack created: $($tgzFile.Name)' status='NORMAL']"
+    
+    # Rename to include build number
+    $finalPackageName = "Portfolio-$buildNumber.tgz"
+    $dest = Join-Path -Path $artifactsDir -ChildPath $finalPackageName
+    
+    # Move and rename .tgz to artifacts folder
+    Move-Item $tgzFile.FullName $dest -Force
+    
+    Write-Host "✅ Package moved to artifacts folder: $dest"
+    Write-Host "##teamcity[message text='Package ready: $finalPackageName' status='NORMAL']"
+    
+    # Publish artifact path for TeamCity
+    Write-Host "##teamcity[publishArtifacts '$dest']"
+    
+    # Set TeamCity parameter with package path
+    Write-Host "##teamcity[setParameter name='npm.package.path' value='$dest']"
+    Write-Host "##teamcity[setParameter name='npm.package.name' value='$finalPackageName']"
+    
+}
+catch {
+    Write-Host "##teamcity[message text='npm pack failed: $($_.Exception.Message)' status='ERROR']"
+    Write-Error "❌ npm pack failed: $($_.Exception.Message)"
+    exit 1
+}
+finally {
+    Pop-Location
+    
+    # Clean up copied package.json if we created it
+    if ($packageJsonCopied -and (Test-Path $distPackageJson)) {
+        Write-Host ""
+        Write-Host "🧹 Cleaning up copied package.json..."
+        Remove-Item -Path $distPackageJson -Force
+        Write-Host "✅ Temporary package.json removed"
+    }
+}
+
+# ==============================
+# Summary
+# ==============================
+Write-Host ""
+Write-Host "##teamcity[progressMessage 'npm pack completed successfully']"
+Write-Host "🎉 npm pack completed successfully!"
+Write-Host "   Package: $finalPackageName"
+Write-Host "   Location: $artifactsDir"
+Write-Host ""]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
@@ -555,14 +688,14 @@ tar -czf $packageFile -C $distFolder .]]></param>
           <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
 # Define paths and variables
 # ==============================
-$packageFile = Join-Path  -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\publish\Portfolio-$($env:BUILD_NUMBER).tar"
+$packageFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\publish\Portfolio-$($env:BUILD_NUMBER).tgz"
 $provenanceFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\provenance.json"
 $attestationFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\attestation\attestation.sig"
-$signatureFile =  Join-Path -Path "%teamcity.build.checkoutDir%"  -ChildPath "\artifacts\publish\portfolio.sig"
-$cosignKeyFile = Join-Path %teamcity.build.checkoutDir% "cosign.key"
+$signatureFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\publish\portfolio.sig"
+$cosignKeyFile = Join-Path "%teamcity.build.checkoutDir%" "cosign.key"
 
-# Cloudsmith repo address (e.g. "gurdip/portfolio")
-$cloudsmithRepo = "gurdipdevops/portfolio"
+# Cloudsmith npm registry
+$npmRegistry = if ($env:NPM_REGISTRY) { $env:NPM_REGISTRY } else { "https://npm.cloudsmith.io/gurdipdevops/portfolio/" }
 
 # Create required directories if missing
 New-Item -ItemType Directory -Force -Path (Split-Path $provenanceFile) | Out-Null
@@ -571,7 +704,7 @@ New-Item -ItemType Directory -Force -Path (Split-Path $attestationFile) | Out-Nu
 # ==============================
 # Write COSIGN_KEY to file
 # ==============================
-if (-not "%env.COSIGN_KEY%") {
+if (-not $env:COSIGN_KEY) {
     Write-Error "❌ COSIGN_KEY environment variable not found. Make sure it's defined in TeamCity."
     exit 1
 }
@@ -592,7 +725,7 @@ Write-Host "🔒 SHA256 hash: $hash"
 # ==============================
 # Get git commit and remote info
 # ==============================
-Push-Location $env:BUILD_CHECKOUTDIR
+Push-Location "%teamcity.build.checkoutDir%"
 $gitCommit = git rev-parse HEAD
 $gitRemote = git config --get remote.origin.url
 Pop-Location
@@ -668,32 +801,30 @@ Set-Content -Path $attestationFile -Value $signature
 Write-Host "✅ Attestation created: $attestationFile"
 
 # ==============================
-# Push to Cloudsmith (OCI)
+# Publish to Cloudsmith npm registry
 # ==============================
-Write-Host "📤 Pushing to Cloudsmith as OCI package..."
-$tag = "%build.number%"
+Write-Host "📦 Publishing to Cloudsmith npm registry: $npmRegistry"
 
-Write-Host "docker.cloudsmith.io/${cloudsmithRepo}/portfolio:${tag}"
+# Check for authentication token
+$npmToken = if ($env:NPM_TOKEN) { $env:NPM_TOKEN } else { $env:CLOUDSMITH_API_KEY }
 
-# Push the main package
-& oras push "docker.cloudsmith.io/${cloudsmithRepo}/portfolio:${tag}" $packagefile --disable-path-validation
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ Cloudsmith push failed for package with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
-}
-Write-Host "✅ Package pushed: $tag"
-
-# Push the signature
-
-& oras attach --artifact-type "application/vnd.cloudsmith.attachment.v1" "docker.cloudsmith.io/gurdipdevops/portfolio/portfolio:%build.number%" $signatureFile --disable-path-validation
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ Cloudsmith push failed for signature with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
+if (-not $npmToken) {
+    Write-Error "❌ NPM_TOKEN or CLOUDSMITH_API_KEY not found. Cannot publish to npm."
+    exit 1
 }
 
-Write-Host "✅ Signature pushed: $tag-sig"
+# Configure npm authentication for Cloudsmith
+& npm config set "//npm.cloudsmith.io/gurdipdevops/portfolio/:_authToken" $npmToken
+
+# Publish the tarball to npm registry
+& npm publish $packageFile --registry $npmRegistry
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "❌ npm publish failed with exit code $LASTEXITCODE"
+    exit $LASTEXITCODE
+}
+
+Write-Host "✅ Package published to npm registry"
 
 # ==============================
 # Summary
@@ -704,7 +835,8 @@ Write-Host "   Package:        $packageFile"
 Write-Host "   Signature:      $signatureFile"
 Write-Host "   Provenance:     $provenanceFile"
 Write-Host "   Attestation:    $attestationFile"
-Write-Host "   Cloudsmith Tag: $tag"]]></param>
+Write-Host "   npm Registry:   $npmRegistry"
+Write-Host "   Build Number:   %build.number%"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
@@ -716,22 +848,21 @@ Write-Host "   Cloudsmith Tag: $tag"]]></param>
           <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
 # Create Build Information in Octopus (TeamCity)
 # ==============================
-
 Write-Host "Starting Octopus Build Information creation..."
 
 # TeamCity predefined variables
-$BuildNumber   = "$env:BUILD_NUMBER"
-$BuildId       = "$env:BUILD_ID"
-$BuildBranch   = "$env:BUILD_VCS_BRANCH"
-$CommitSha     = "$env:BUILD_VCS_NUMBER"
-$RepoUrl       = "$env:BUILD_VCS_URL"
-$TeamCityUrl   = "$env:TEAMCITY_SERVER_URL"
+$BuildNumber   = "${env:BUILD_NUMBER}"
+$BuildId       = "${env:BUILD_ID}"
+$BuildBranch   = "${env:BUILD_VCS_BRANCH}"
+$CommitSha     = "${env:BUILD_VCS_NUMBER}"
+$RepoUrl       = "${env:BUILD_VCS_URL}"
+$TeamCityUrl   = "${env:TEAMCITY_SERVER_URL}"
 
 # Octopus configuration (set as TeamCity environment parameters)
-$OctoServer    = "$env:OCTOPUS_SERVER"       # e.g. https://octopus.mycompany.com
-$OctoApiKey    = "$env:OCTOPUS_KEY"
-$ProjectName   = "$env:OCTOPUS_PROJECT_NAME" # optional, for logging
-$PackageId     = "$env:PACKAGE_ID"           # e.g. "MyApp"
+$OctoServer    = "${env:OCTOPUS_SERVER}"       # e.g. https://octopus.mycompany.com
+$OctoApiKey    = "${env:OCTOPUS_KEY}"
+$ProjectName   = "${env:OctopusProjectName}"   # optional, for logging
+$PackageId     = "${env:PACKAGE_ID}"           # e.g. "MyApp"
 
 # Validate required vars
 if (-not $OctoServer -or -not $OctoApiKey -or -not $PackageId -or -not $BuildNumber) {
@@ -740,8 +871,8 @@ if (-not $OctoServer -or -not $OctoApiKey -or -not $PackageId -or -not $BuildNum
 }
 
 # Construct Build Information JSON file
-$BuildInfoFile = Join-Path $env:BUILD_CHECKOUTDIR "artifacts\octopus-buildinfo.json"
-$BuildUrl = "$TeamCityUrl/viewLog.html?buildId=$BuildId"
+$BuildInfoFile = Join-Path ${env:BUILD_CHECKOUTDIR} "artifacts\octopus-buildinfo.json"
+$BuildUrl = "${TeamCityUrl}/viewLog.html?buildId=${BuildId}"
 
 # Build info structure
 $buildInfo = @{
@@ -762,8 +893,7 @@ if (-not (Test-Path $artifactsDir)) {
 
 # Write file
 $buildInfo | ConvertTo-Json -Depth 5 | Out-File -FilePath $BuildInfoFile -Encoding UTF8
-
-Write-Host "Generated build information file at: $BuildInfoFile"
+Write-Host "Generated build information file at: ${BuildInfoFile}"
 Write-Host "Contents:"
 Get-Content $BuildInfoFile | Write-Host
 
@@ -783,7 +913,7 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Host "✅ Successfully created build information for $PackageId:$BuildNumber"]]></param>
+Write-Host "✅ Successfully created build information for ${PackageId}:${BuildNumber}"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
