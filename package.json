@@ -1,6 +1,5 @@
 {
-  "name": "vite_react_shadcn_ts",
-  "private": true,
+  "name": "portfolio",
   "version": "2.1.14.61555",
   "type": "module",
   "scripts": {
@@ -9,8 +8,8 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prepare": "husky",
-    "precommit": "dotnet run --project build --target Compile",
+    "prepare": "",
+    "precommit": "",
     "cspell": "cspell ."
   },
   "dependencies": {

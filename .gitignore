@@ -1,6 +1,11 @@
 # Dependencies
 node_modules
 
+cosign.key
+*.key
+!cosign.pub
+
+
 # OS
 .DS_Store
 
