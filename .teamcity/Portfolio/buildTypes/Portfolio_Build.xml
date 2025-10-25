@@ -538,12 +538,40 @@ kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMB
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[$checkoutDir = "%teamcity.build.checkoutDir%"
+          <param name="jetbrains_powershell_script_code"><![CDATA[# TeamCity variables
+$checkoutDir = "%teamcity.build.checkoutDir%"
+$buildNumber = "%build.number%"
 $distFolder = Join-Path -Path $checkoutDir -ChildPath "dist"
-$packageFile = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish\Portfolio-%build.number%.tar"
+$artifactsDir = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish"
 
-Write-Host "Packaging dist folder into $packageFile..."
-tar -czf $packageFile -C $distFolder .]]></param>
+# Fail fast
+$ErrorActionPreference = "Stop"
+
+# Ensure artifacts folder exists
+if (-not (Test-Path $artifactsDir)) {
+    New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
+}
+
+# Navigate to dist directory
+Push-Location $distFolder
+try {
+    # Run npm pack
+    Write-Host "==> Packing npm package from $distFolder..."
+    $tgzFile = npm pack --silent
+    Write-Host "Package created: $tgzFile"
+    
+    # Rename to include build number
+    $finalPackageName = "Portfolio-$buildNumber.tgz"
+    $dest = Join-Path -Path $artifactsDir -ChildPath $finalPackageName
+    
+    # Move and rename .tgz to artifacts folder
+    Move-Item $tgzFile $dest -Force
+    
+    Write-Host "✅ Package moved to artifacts folder: $dest"
+}
+finally {
+    Pop-Location
+}]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
