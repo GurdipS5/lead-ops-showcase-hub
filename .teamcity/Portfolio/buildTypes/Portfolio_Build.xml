@@ -538,7 +538,11 @@ kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMB
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# TeamCity variables
+          <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
+# TeamCity Build Step - npm pack
+# ==============================
+
+# TeamCity variables
 $checkoutDir = "%teamcity.build.checkoutDir%"
 $buildNumber = "%build.number%"
 $distFolder = Join-Path -Path $checkoutDir -ChildPath "dist"
@@ -547,31 +551,100 @@ $artifactsDir = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish"
 # Fail fast
 $ErrorActionPreference = "Stop"
 
-# Ensure artifacts folder exists
-if (-not (Test-Path $artifactsDir)) {
-    New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
+Write-Host "=========================================="
+Write-Host "📦 npm pack - Build $buildNumber"
+Write-Host "=========================================="
+Write-Host "Checkout Dir: $checkoutDir"
+Write-Host "Source Dir:   $distFolder"
+Write-Host "Artifacts:    $artifactsDir"
+Write-Host ""
+
+# ==============================
+# Validate source directory exists
+# ==============================
+if (-not (Test-Path $distFolder)) {
+    Write-Host "##teamcity[message text='dist folder not found: $distFolder' status='ERROR']"
+    Write-Error "❌ dist folder not found: $distFolder"
+    exit 1
 }
 
-# Navigate to dist directory
+# ==============================
+# Ensure artifacts folder exists
+# ==============================
+Write-Host "📁 Ensuring artifacts directory exists..."
+if (-not (Test-Path $artifactsDir)) {
+    New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
+    Write-Host "✅ Artifacts directory created"
+} else {
+    Write-Host "✅ Artifacts directory exists"
+}
+
+# ==============================
+# Navigate to dist directory and pack
+# ==============================
+Write-Host ""
+Write-Host "==> Packing npm package from $distFolder..."
+Write-Host "##teamcity[progressMessage 'Packing npm package...']"
+
 Push-Location $distFolder
 try {
     # Run npm pack
-    Write-Host "==> Packing npm package from $distFolder..."
-    $tgzFile = npm pack --silent
-    Write-Host "Package created: $tgzFile"
+    npm pack --silent
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "##teamcity[message text='npm pack failed with exit code $LASTEXITCODE' status='ERROR']"
+        Write-Error "❌ npm pack failed with exit code $LASTEXITCODE"
+        exit $LASTEXITCODE
+    }
+    
+    # Find the created .tgz file (npm pack creates it in the current directory)
+    $tgzFile = Get-ChildItem -Path . -Filter "*.tgz" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    
+    if (-not $tgzFile) {
+        Write-Host "##teamcity[message text='No .tgz file found after npm pack' status='ERROR']"
+        Write-Error "❌ No .tgz file found after npm pack"
+        exit 1
+    }
+    
+    Write-Host "Package created: $($tgzFile.Name)"
+    Write-Host "##teamcity[message text='npm pack created: $($tgzFile.Name)' status='NORMAL']"
     
     # Rename to include build number
     $finalPackageName = "Portfolio-$buildNumber.tgz"
     $dest = Join-Path -Path $artifactsDir -ChildPath $finalPackageName
     
     # Move and rename .tgz to artifacts folder
-    Move-Item $tgzFile $dest -Force
+    Move-Item $tgzFile.FullName $dest -Force
     
     Write-Host "✅ Package moved to artifacts folder: $dest"
+    Write-Host "##teamcity[message text='Package ready: $finalPackageName' status='NORMAL']"
+    
+    # Publish artifact path for TeamCity
+    Write-Host "##teamcity[publishArtifacts '$dest']"
+    
+    # Set TeamCity parameter with package path
+    Write-Host "##teamcity[setParameter name='npm.package.path' value='$dest']"
+    Write-Host "##teamcity[setParameter name='npm.package.name' value='$finalPackageName']"
+    
+}
+catch {
+    Write-Host "##teamcity[message text='npm pack failed: $($_.Exception.Message)' status='ERROR']"
+    Write-Error "❌ npm pack failed: $($_.Exception.Message)"
+    exit 1
 }
 finally {
     Pop-Location
-}]]></param>
+}
+
+# ==============================
+# Summary
+# ==============================
+Write-Host ""
+Write-Host "##teamcity[progressMessage 'npm pack completed successfully']"
+Write-Host "🎉 npm pack completed successfully!"
+Write-Host "   Package: $finalPackageName"
+Write-Host "   Location: $artifactsDir"
+Write-Host ""]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
