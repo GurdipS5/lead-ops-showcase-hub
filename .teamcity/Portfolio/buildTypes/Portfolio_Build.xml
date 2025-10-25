@@ -583,14 +583,14 @@ finally {
           <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
 # Define paths and variables
 # ==============================
-$packageFile = Join-Path  -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\publish\Portfolio-$($env:BUILD_NUMBER).tar"
+$packageFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\publish\Portfolio-$($env:BUILD_NUMBER).tgz"
 $provenanceFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\provenance.json"
 $attestationFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\attestation\attestation.sig"
-$signatureFile =  Join-Path -Path "%teamcity.build.checkoutDir%"  -ChildPath "\artifacts\publish\portfolio.sig"
-$cosignKeyFile = Join-Path %teamcity.build.checkoutDir% "cosign.key"
+$signatureFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\publish\portfolio.sig"
+$cosignKeyFile = Join-Path "%teamcity.build.checkoutDir%" "cosign.key"
 
-# Cloudsmith repo address (e.g. "gurdip/portfolio")
-$cloudsmithRepo = "gurdipdevops/portfolio"
+# Cloudsmith npm registry
+$npmRegistry = if ($env:NPM_REGISTRY) { $env:NPM_REGISTRY } else { "https://npm.cloudsmith.io/gurdipdevops/portfolio/" }
 
 # Create required directories if missing
 New-Item -ItemType Directory -Force -Path (Split-Path $provenanceFile) | Out-Null
@@ -599,7 +599,7 @@ New-Item -ItemType Directory -Force -Path (Split-Path $attestationFile) | Out-Nu
 # ==============================
 # Write COSIGN_KEY to file
 # ==============================
-if (-not "%env.COSIGN_KEY%") {
+if (-not $env:COSIGN_KEY) {
     Write-Error "❌ COSIGN_KEY environment variable not found. Make sure it's defined in TeamCity."
     exit 1
 }
@@ -620,7 +620,7 @@ Write-Host "🔒 SHA256 hash: $hash"
 # ==============================
 # Get git commit and remote info
 # ==============================
-Push-Location $env:BUILD_CHECKOUTDIR
+Push-Location "%teamcity.build.checkoutDir%"
 $gitCommit = git rev-parse HEAD
 $gitRemote = git config --get remote.origin.url
 Pop-Location
@@ -696,32 +696,30 @@ Set-Content -Path $attestationFile -Value $signature
 Write-Host "✅ Attestation created: $attestationFile"
 
 # ==============================
-# Push to Cloudsmith (OCI)
+# Publish to Cloudsmith npm registry
 # ==============================
-Write-Host "📤 Pushing to Cloudsmith as OCI package..."
-$tag = "%build.number%"
+Write-Host "📦 Publishing to Cloudsmith npm registry: $npmRegistry"
 
-Write-Host "docker.cloudsmith.io/${cloudsmithRepo}/portfolio:${tag}"
+# Check for authentication token
+$npmToken = if ($env:NPM_TOKEN) { $env:NPM_TOKEN } else { $env:CLOUDSMITH_API_KEY }
 
-# Push the main package
-& oras push "docker.cloudsmith.io/${cloudsmithRepo}/portfolio:${tag}" $packagefile --disable-path-validation
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ Cloudsmith push failed for package with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
-}
-Write-Host "✅ Package pushed: $tag"
-
-# Push the signature
-
-& oras attach --artifact-type "application/vnd.cloudsmith.attachment.v1" "docker.cloudsmith.io/gurdipdevops/portfolio/portfolio:%build.number%" $signatureFile --disable-path-validation
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ Cloudsmith push failed for signature with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
+if (-not $npmToken) {
+    Write-Error "❌ NPM_TOKEN or CLOUDSMITH_API_KEY not found. Cannot publish to npm."
+    exit 1
 }
 
-Write-Host "✅ Signature pushed: $tag-sig"
+# Configure npm authentication for Cloudsmith
+& npm config set "//npm.cloudsmith.io/gurdipdevops/portfolio/:_authToken" $npmToken
+
+# Publish the tarball to npm registry
+& npm publish $packageFile --registry $npmRegistry
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "❌ npm publish failed with exit code $LASTEXITCODE"
+    exit $LASTEXITCODE
+}
+
+Write-Host "✅ Package published to npm registry"
 
 # ==============================
 # Summary
@@ -732,7 +730,8 @@ Write-Host "   Package:        $packageFile"
 Write-Host "   Signature:      $signatureFile"
 Write-Host "   Provenance:     $provenanceFile"
 Write-Host "   Attestation:    $attestationFile"
-Write-Host "   Cloudsmith Tag: $tag"]]></param>
+Write-Host "   npm Registry:   $npmRegistry"
+Write-Host "   Build Number:   %build.number%"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
