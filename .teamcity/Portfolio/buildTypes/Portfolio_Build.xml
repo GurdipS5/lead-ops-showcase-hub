@@ -862,7 +862,7 @@ $TeamCityUrl   = "$env:TEAMCITY_SERVER_URL"
 # Octopus configuration (set as TeamCity environment parameters)
 $OctoServer    = "$env:OCTOPUS_SERVER"       # e.g. https://octopus.mycompany.com
 $OctoApiKey    = "$env:OCTOPUS_KEY"
-$ProjectName   = "$env:OCTOPUS_PROJECT_NAME" # optional, for logging
+$ProjectName   = "$env:OctopusProjectName" # optional, for logging
 $PackageId     = "$env:PACKAGE_ID"           # e.g. "MyApp"
 
 # Validate required vars
@@ -901,6 +901,7 @@ Get-Content $BuildInfoFile | Write-Host
 
 # Call Octo CLI to push build info
 Write-Host "Pushing build information to Octopus Deploy..."
+
 & octo build-information create `
     --server $OctoServer `
     --apiKey $OctoApiKey `
