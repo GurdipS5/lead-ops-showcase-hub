@@ -541,12 +541,13 @@ kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMB
           <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
 # TeamCity Build Step - npm pack
 # ==============================
-
 # TeamCity variables
 $checkoutDir = "%teamcity.build.checkoutDir%"
 $buildNumber = "%build.number%"
 $distFolder = Join-Path -Path $checkoutDir -ChildPath "dist"
 $artifactsDir = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish"
+$rootPackageJson = Join-Path -Path $checkoutDir -ChildPath "package.json"
+$distPackageJson = Join-Path -Path $distFolder -ChildPath "package.json"
 
 # Fail fast
 $ErrorActionPreference = "Stop"
@@ -569,8 +570,31 @@ if (-not (Test-Path $distFolder)) {
 }
 
 # ==============================
+# Validate root package.json exists
+# ==============================
+if (-not (Test-Path $rootPackageJson)) {
+    Write-Host "##teamcity[message text='package.json not found in root: $rootPackageJson' status='ERROR']"
+    Write-Error "❌ package.json not found in root: $rootPackageJson"
+    exit 1
+}
+
+# ==============================
+# Copy package.json to dist if needed
+# ==============================
+$packageJsonCopied = $false
+if (-not (Test-Path $distPackageJson)) {
+    Write-Host "📄 Copying package.json from root to dist folder..."
+    Copy-Item -Path $rootPackageJson -Destination $distPackageJson -Force
+    $packageJsonCopied = $true
+    Write-Host "✅ package.json copied to dist"
+} else {
+    Write-Host "✅ package.json already exists in dist"
+}
+
+# ==============================
 # Ensure artifacts folder exists
 # ==============================
+Write-Host ""
 Write-Host "📁 Ensuring artifacts directory exists..."
 if (-not (Test-Path $artifactsDir)) {
     New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
@@ -588,8 +612,8 @@ Write-Host "##teamcity[progressMessage 'Packing npm package...']"
 
 Push-Location $distFolder
 try {
-    # Run npm pack
-    npm pack --silent
+    # Run npm pack using npm.cmd
+    & npm.cmd pack --silent
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "##teamcity[message text='npm pack failed with exit code $LASTEXITCODE' status='ERROR']"
@@ -634,6 +658,14 @@ catch {
 }
 finally {
     Pop-Location
+    
+    # Clean up copied package.json if we created it
+    if ($packageJsonCopied -and (Test-Path $distPackageJson)) {
+        Write-Host ""
+        Write-Host "🧹 Cleaning up copied package.json..."
+        Remove-Item -Path $distPackageJson -Force
+        Write-Host "✅ Temporary package.json removed"
+    }
 }
 
 # ==============================
