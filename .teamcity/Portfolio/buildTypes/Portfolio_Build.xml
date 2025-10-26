@@ -858,7 +858,7 @@ $PackageId    = "Portfolio"
 
 # Path for the build info JSON file in the checkout directory
 $CheckoutDir   = "%teamcity.build.checkoutDir%"
-$BuildInfoFile = Join-Path $CheckoutDir "buildinfo.json"
+$BuildInfoFile = Join-Path $CheckoutDir "buildinfo.octopus"
 
 # Create a simple build info file for Octopus
 $BuildInfo = @{
@@ -880,19 +880,8 @@ $arguments = @(
     "--apiKey", $OctoApiKey,
     "--package-id", $PackageId,
     "--version", $BuildNumber,
-    "--file", $BuildInfoFile,
-    "--overwrite-mode", "OverwriteExisting",
-    "--verbose"
+    "--file", $BuildInfoFile
 )
-
-# Optionally include changelog
-$ChangeLogFile = Join-Path $CheckoutDir "CHANGELOG.md"
-if (Test-Path $ChangeLogFile) {
-    Write-Host "📖 Using release notes from $ChangeLogFile"
-    $arguments += @("--releaseNotesFile", $ChangeLogFile)
-} else {
-    Write-Warning "⚠️ CHANGELOG.md not found, proceeding without release notes."
-}
 
 # Execute the Octopus CLI command
 Write-Host "🚀 Uploading build information to Octopus Deploy..."
