@@ -901,7 +901,7 @@ Get-Content $BuildInfoFile | Write-Host
 
 # Call Octo CLI to push build info
 Write-Host "Pushing build information to Octopus Deploy..."
-& octo build-information create `
+& octo build-information `
     --server $OctoServer `
     --apiKey $OctoApiKey `
     --package-id $PackageId `
