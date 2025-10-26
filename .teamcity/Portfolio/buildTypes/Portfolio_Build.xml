@@ -856,6 +856,7 @@ $RepoUrl      = "%env.BUILD_VCS_URL%"
 $TeamCityUrl  = "%teamcity.url%"
 $PackageId    = "Portfolio"
 $OctoApiKey   = "%env.OCTOPUS_KEY%"
+$OctoServer   = "%env.OCTOPUS_SERVER%"
 
 # Path for the build info JSON file in the checkout directory
 $CheckoutDir   = "%teamcity.build.checkoutDir%"
