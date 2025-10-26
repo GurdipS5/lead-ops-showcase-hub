@@ -847,21 +847,46 @@ Write-Host "   Build Number:   %build.number%"]]></param>
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# Build Octopus CLI arguments
+          <param name="jetbrains_powershell_script_code"><![CDATA[# TeamCity build info variables
+$BuildNumber  = "%build.number%"
+$BuildId      = "%teamcity.build.id%"
+$BuildBranch  = "%vcsroot.branch%"
+$CommitSha    = "%build.vcs.number%"
+$RepoUrl      = "%env.BUILD_VCS_URL%"
+$TeamCityUrl  = "%teamcity.url%"
+$PackageId    = "Portfolio"
+
+# Path for the build info JSON file in the checkout directory
+$CheckoutDir   = "%teamcity.build.checkoutDir%"
+$BuildInfoFile = Join-Path $CheckoutDir "buildinfo.json"
+
+# Create a simple build info file for Octopus
+$BuildInfo = @{
+    BuildNumber = $BuildNumber
+    BuildId     = $BuildId
+    Branch      = $BuildBranch
+    Commit      = $CommitSha
+    Repository  = $RepoUrl
+    TeamCityUrl = $TeamCityUrl
+} | ConvertTo-Json -Depth 5
+
+$BuildInfo | Set-Content -Path $BuildInfoFile -Encoding UTF8
+Write-Host "✅ Build info written to $BuildInfoFile"
+
+# Prepare Octopus CLI arguments
 $arguments = @(
-    "create-release",
+    "build-information", "upload",
     "--server", $OctoServer,
     "--apiKey", $OctoApiKey,
-    "--project", $ProjectName,
+    "--package-id", $PackageId,
     "--version", $BuildNumber,
-    "--package", "$PackageId:$BuildNumber",
-    "--build-information", "$PackageId:$BuildNumber",
-    "--progress",
+    "--file", $BuildInfoFile,
+    "--overwrite-mode", "OverwriteExisting",
     "--verbose"
 )
 
 # Optionally include changelog
-$ChangeLogFile = Join-Path "%teamcity.build.checkoutDir%" "CHANGELOG.md"
+$ChangeLogFile = Join-Path $CheckoutDir "CHANGELOG.md"
 if (Test-Path $ChangeLogFile) {
     Write-Host "📖 Using release notes from $ChangeLogFile"
     $arguments += @("--releaseNotesFile", $ChangeLogFile)
@@ -870,6 +895,7 @@ if (Test-Path $ChangeLogFile) {
 }
 
 # Execute the Octopus CLI command
+Write-Host "🚀 Uploading build information to Octopus Deploy..."
 & octo @arguments]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
