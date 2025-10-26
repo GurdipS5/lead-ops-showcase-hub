@@ -892,6 +892,43 @@ Write-Host "🚀 Uploading build information to Octopus Deploy..."
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
+      <runner id="Create_Octopus_Deplo" name="Create Octopus Deploy Release" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# TeamCity build info variables
+$BuildNumber  = "%build.number%"
+$BuildBranch  = "%vcsroot.branch%"
+$CommitSha    = "%build.vcs.number%"
+$PackageId    = "Portfolio"
+$OctoApiKey   = "%env.OCTOPUS_KEY%"
+$OctoServer   = "%env.OCTOPUS_SERVER%"
+$ProjectName  = "Portfolio"  # Your Octopus project name
+
+# Create the release
+$createReleaseArgs = @(
+    "create-release",
+    "--server=$OctoServer",
+    "--apiKey=$OctoApiKey",
+    "--project=$ProjectName",
+    "--version=$BuildNumber",
+    "--packageVersion=$BuildNumber",
+    "--releaseNotes=Build: $BuildNumber | Branch: $BuildBranch | Commit: $CommitSha"
+)
+
+Write-Host "📦 Creating release $BuildNumber in Octopus Deploy..."
+& octo @createReleaseArgs
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to create release"
+    exit $LASTEXITCODE
+}
+
+Write-Host "✅ Release $BuildNumber created successfully!"]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+        </parameters>
+      </runner>
     </build-runners>
     <vcs-settings>
       <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
