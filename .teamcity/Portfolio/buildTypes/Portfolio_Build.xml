@@ -856,8 +856,8 @@ $BuildNumber   = "%env.BUILD_NUMBER%"
 $BuildId       = "%teamcity.build.id%"
 $BuildBranch   = "%vcsroot.branch%"
 $CommitSha     = "%build.vcs.number%"
-$RepoUrl       = "%build.
-$TeamCityUrl   = "$env:TEAMCITY_SERVER_URL"
+$RepoUrl       = "%build.vcs.url"
+$TeamCityUrl   = "%teamcity.url"
 
 # Octopus configuration (set as TeamCity environment parameters)
 $OctoServer    = "$env:OCTOPUS_SERVER"       # e.g. https://octopus.mycompany.com
