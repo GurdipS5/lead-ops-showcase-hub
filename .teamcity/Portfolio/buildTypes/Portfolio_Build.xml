@@ -843,78 +843,34 @@ Write-Host "   Build Number:   %build.number%"]]></param>
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
-      <runner id="Create_Octopus_Build_Infomration" name="Create Octopus Build Infomration" type="jetbrains_powershell">
+      <runner id="Create_Octopus_Build_Infomration" name="Create Octopus Build Information" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
-# Create Build Information in Octopus (TeamCity)
-# ==============================
-Write-Host "Starting Octopus Build Information creation..."
+          <param name="jetbrains_powershell_script_code"><![CDATA[# Build Octopus CLI arguments
+$arguments = @(
+    "create-release",
+    "--server", $OctoServer,
+    "--apiKey", $OctoApiKey,
+    "--project", $ProjectName,
+    "--version", $BuildNumber,
+    "--package", "$PackageId:$BuildNumber",
+    "--build-information", "$PackageId:$BuildNumber",
+    "--progress",
+    "--verbose"
+)
 
-# TeamCity predefined variables
-$BuildNumber   = "%build.number%"
-$BuildId       = "%teamcity.build.id%"
-$BuildBranch   = "%vcsroot.branch%"
-$CommitSha     = "%build.vcs.number%"
-$RepoUrl       = "%env.BUILD_VCS_URL%"
-$TeamCityUrl   = "%teamcity.url%"
-
-# Octopus configuration (set as TeamCity environment parameters)
-$OctoServer    = "%env.OCTOPUS_SERVER%"       # e.g. https://octopus.mycompany.com
-$OctoApiKey    = "%env:OCTOPUS_KEY%"
-$ProjectName   = "%env.OCTOPUS_PROJECT_NAME"   # optional, for logging
-$PackageId     = "Portfolio"          # e.g. "MyApp"
-
-# Validate required vars
-if (-not $OctoServer -or -not $OctoApiKey -or -not $PackageId -or -not $BuildNumber) {
-    Write-Error "Missing required variables. Ensure OCTOPUS_SERVER, OCTOPUS_API_KEY, PACKAGE_ID, and BUILD_NUMBER are defined as TeamCity environment parameters."
-    exit 1
+# Optionally include changelog
+$ChangeLogFile = Join-Path "%teamcity.build.checkoutDir%" "CHANGELOG.md"
+if (Test-Path $ChangeLogFile) {
+    Write-Host "📖 Using release notes from $ChangeLogFile"
+    $arguments += @("--releaseNotesFile", $ChangeLogFile)
+} else {
+    Write-Warning "⚠️ CHANGELOG.md not found, proceeding without release notes."
 }
 
-# Construct Build Information JSON file
-$BuildInfoFile = Join-Path "%teamcity.build.checkoutDir%" "artifacts\octopus-buildinfo.json"
-$BuildUrl = "${TeamCityUrl}/viewLog.html?buildId=${BuildId}"
-
-# Build info structure
-$buildInfo = @{
-    BuildEnvironment = "TeamCity"
-    BuildNumber      = $BuildNumber
-    BuildUrl         = $BuildUrl
-    Branch           = $BuildBranch
-    VcsCommitNumber  = $CommitSha
-    VcsType          = "Git"
-    VcsRoot          = $RepoUrl
-}
-
-# Ensure artifacts directory exists
-$artifactsDir = Split-Path $BuildInfoFile
-if (-not (Test-Path $artifactsDir)) {
-    New-Item -ItemType Directory -Path $artifactsDir | Out-Null
-}
-
-# Write file
-$buildInfo | ConvertTo-Json -Depth 5 | Out-File -FilePath $BuildInfoFile -Encoding UTF8
-Write-Host "Generated build information file at: ${BuildInfoFile}"
-Write-Host "Contents:"
-Get-Content $BuildInfoFile | Write-Host
-
-# Call Octo CLI to push build info
-Write-Host "Pushing build information to Octopus Deploy..."
-& octo build-information `
-    --server $OctoServer `
-    --apiKey $OctoApiKey `
-    --package-id $PackageId `
-    --version $BuildNumber `
-    --file $BuildInfoFile `
-    --overwrite-mode OverwriteExisting
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ Failed to create build information in Octopus."
-    exit $LASTEXITCODE
-}
-
-Write-Host "✅ Successfully created build information for ${PackageId}:${BuildNumber}"]]></param>
+# Execute the Octopus CLI command
+& octo @arguments]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
