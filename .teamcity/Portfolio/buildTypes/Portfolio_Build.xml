@@ -907,8 +907,7 @@ Write-Host "Pushing build information to Octopus Deploy..."
     --package-id $PackageId `
     --version $BuildNumber `
     --file $BuildInfoFile `
-    --overwrite-mode OverwriteExisting `
-    --verbose
+    --overwrite-mode OverwriteExisting
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Failed to create build information in Octopus."
