@@ -875,7 +875,7 @@ Write-Host "✅ Build info written to $BuildInfoFile"
 
 # Prepare Octopus CLI arguments
 $arguments = @(
-    "build-information", "upload",
+    "build-information",
     "--server", $OctoServer,
     "--apiKey", $OctoApiKey,
     "--package-id", $PackageId,
