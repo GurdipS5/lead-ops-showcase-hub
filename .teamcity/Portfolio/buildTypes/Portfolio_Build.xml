@@ -851,7 +851,7 @@ Write-Host "   Build Number:   %build.number%"]]></param>
 $BuildNumber  = "%build.number%"
 $BuildId      = "%teamcity.build.id%"
 $BuildBranch  = "%vcsroot.branch%"
-$CommitSha    = "%build.vcs.number%"
+$CommitSha    = "%build.vcs.number%
 $RepoUrl      = "%env.BUILD_VCS_URL%"
 $TeamCityUrl  = "%teamcity.url%"
 $PackageId    = "Portfolio"
@@ -877,11 +877,11 @@ Write-Host "✅ Build info written to $BuildInfoFile"
 # Prepare Octopus CLI arguments
 $arguments = @(
     "build-information",
-    "--server", $OctoServer,
-    "--apiKey", $OctoApiKey,
-    "--package-id", $PackageId,
-    "--version", $BuildNumber,
-    "--file", $BuildInfoFile
+    "--server=$OctoServer",
+    "--apiKey=$OctoApiKey",
+    "--package-id=$PackageId",
+    "--version=$BuildNumber",
+    "--file=$BuildInfoFile"
 )
 
 # Execute the Octopus CLI command
