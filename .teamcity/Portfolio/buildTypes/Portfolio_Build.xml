@@ -14,6 +14,7 @@
     <parameters>
       <param name="QODANA_TOKEN" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/QODANA_TOKEN!/qodana_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="SectionDirctory" value="%system.teamcity.build.checkoutDir%/src/data/sections" />
+      <param name="env.BUILD_VCS_URL" value="%vcsroot.Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain.url%" />
       <param name="env.CLOUDSMITH_API_KEY" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/CLOUDSMITH_API_TOKEN!/cloudsmith_api_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.COSIGN_PASSWORD" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/COSIGN_PASSWORD!/cosign_password' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.DOTNET_CLI_HOME" value="/tmp" />
@@ -23,6 +24,7 @@
       <param name="env.OCTOPUS_PROJECT_NAME" value="Portfolio" />
       <param name="env.SBOMPath" value="%teamcity.build.checkoutDir%/artifacts/cyclonedx/sbom.json" />
       <param name="env.SONAR_TOKEN" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/SONAR_TOKEN!/sonar_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
+      <param name="teamcity.url" value="%teamcity.serverUrl%/viewLog.html?buildId=%teamcity.build.id%" />
     </parameters>
     <build-runners>
       <runner id="Test" name="Test" type="jetbrains_powershell">
@@ -841,79 +843,88 @@ Write-Host "   Build Number:   %build.number%"]]></param>
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
-      <runner id="Create_Octopus_Build_Infomration" name="Create Octopus Build Infomration" type="jetbrains_powershell">
+      <runner id="Create_Octopus_Build_Infomration" name="Create Octopus Build Information" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
-# Create Build Information in Octopus (TeamCity)
-# ==============================
-Write-Host "Starting Octopus Build Information creation..."
+          <param name="jetbrains_powershell_script_code"><![CDATA[# TeamCity build info variables
+$BuildNumber  = "%build.number%"
+$BuildId      = "%teamcity.build.id%"
+$BuildBranch  = "%vcsroot.branch%"
+$CommitSha    = "%build.vcs.number%"
+$RepoUrl      = "%env.BUILD_VCS_URL%"
+$TeamCityUrl  = "%teamcity.url%"
+$PackageId    = "Portfolio"
+$OctoApiKey   = "%env.OCTOPUS_KEY%"
+$OctoServer   = "%env.OCTOPUS_SERVER%"
 
-# TeamCity predefined variables
-$BuildNumber   = "${env:BUILD_NUMBER}"
-$BuildId       = "${env:BUILD_ID}"
-$BuildBranch   = "${env:BUILD_VCS_BRANCH}"
-$CommitSha     = "${env:BUILD_VCS_NUMBER}"
-$RepoUrl       = "${env:BUILD_VCS_URL}"
-$TeamCityUrl   = "${env:TEAMCITY_SERVER_URL}"
+# Path for the build info JSON file in the checkout directory
+$CheckoutDir   = "%teamcity.build.checkoutDir%"
+$BuildInfoFile = Join-Path $CheckoutDir "buildinfo.octopus"
 
-# Octopus configuration (set as TeamCity environment parameters)
-$OctoServer    = "${env:OCTOPUS_SERVER}"       # e.g. https://octopus.mycompany.com
-$OctoApiKey    = "${env:OCTOPUS_KEY}"
-$ProjectName   = "${env:OctopusProjectName}"   # optional, for logging
-$PackageId     = "${env:PACKAGE_ID}"           # e.g. "MyApp"
+# Create a simple build info file for Octopus
+$BuildInfo = @{
+    BuildNumber = $BuildNumber
+    BuildId     = $BuildId
+    Branch      = $BuildBranch
+    Commit      = $CommitSha
+    Repository  = $RepoUrl
+    TeamCityUrl = $TeamCityUrl
+} | ConvertTo-Json -Depth 5
 
-# Validate required vars
-if (-not $OctoServer -or -not $OctoApiKey -or -not $PackageId -or -not $BuildNumber) {
-    Write-Error "Missing required variables. Ensure OCTOPUS_SERVER, OCTOPUS_API_KEY, PACKAGE_ID, and BUILD_NUMBER are defined as TeamCity environment parameters."
-    exit 1
-}
+$BuildInfo | Set-Content -Path $BuildInfoFile -Encoding UTF8
+Write-Host "✅ Build info written to $BuildInfoFile"
 
-# Construct Build Information JSON file
-$BuildInfoFile = Join-Path ${env:BUILD_CHECKOUTDIR} "artifacts\octopus-buildinfo.json"
-$BuildUrl = "${TeamCityUrl}/viewLog.html?buildId=${BuildId}"
+# Prepare Octopus CLI arguments
+$arguments = @(
+    "build-information",
+    "--server=$OctoServer",
+    "--apiKey=$OctoApiKey",
+    "--package-id=$PackageId",
+    "--version=$BuildNumber",
+    "--file=$BuildInfoFile"
+)
 
-# Build info structure
-$buildInfo = @{
-    BuildEnvironment = "TeamCity"
-    BuildNumber      = $BuildNumber
-    BuildUrl         = $BuildUrl
-    Branch           = $BuildBranch
-    VcsCommitNumber  = $CommitSha
-    VcsType          = "Git"
-    VcsRoot          = $RepoUrl
-}
+# Execute the Octopus CLI command
+Write-Host "🚀 Uploading build information to Octopus Deploy..."
+& octo @arguments]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+        </parameters>
+      </runner>
+      <runner id="Create_Octopus_Deplo" name="Create Octopus Deploy Release" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# TeamCity build info variables
+$BuildNumber  = "%build.number%"
+$BuildBranch  = "%vcsroot.branch%"
+$CommitSha    = "%build.vcs.number%"
+$PackageId    = "Portfolio"
+$OctoApiKey   = "%env.OCTOPUS_KEY%"
+$OctoServer   = "%env.OCTOPUS_SERVER%"
+$ProjectName  = "Portfolio"  # Your Octopus project name
 
-# Ensure artifacts directory exists
-$artifactsDir = Split-Path $BuildInfoFile
-if (-not (Test-Path $artifactsDir)) {
-    New-Item -ItemType Directory -Path $artifactsDir | Out-Null
-}
+# Create the release
+$createReleaseArgs = @(
+    "create-release",
+    "--server=$OctoServer",
+    "--apiKey=$OctoApiKey",
+    "--project=$ProjectName",
+    "--version=$BuildNumber",
+    "--packageVersion=$BuildNumber",
+    "--releaseNotes=Build: $BuildNumber | Branch: $BuildBranch | Commit: $CommitSha"
+)
 
-# Write file
-$buildInfo | ConvertTo-Json -Depth 5 | Out-File -FilePath $BuildInfoFile -Encoding UTF8
-Write-Host "Generated build information file at: ${BuildInfoFile}"
-Write-Host "Contents:"
-Get-Content $BuildInfoFile | Write-Host
-
-# Call Octo CLI to push build info
-Write-Host "Pushing build information to Octopus Deploy..."
-& octo build-information create `
-    --server $OctoServer `
-    --apiKey $OctoApiKey `
-    --package-id $PackageId `
-    --version $BuildNumber `
-    --file $BuildInfoFile `
-    --overwrite-mode OverwriteExisting `
-    --verbose
+Write-Host "📦 Creating release $BuildNumber in Octopus Deploy..."
+& octo @createReleaseArgs
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ Failed to create build information in Octopus."
+    Write-Error "Failed to create release"
     exit $LASTEXITCODE
 }
 
-Write-Host "✅ Successfully created build information for ${PackageId}:${BuildNumber}"]]></param>
+Write-Host "✅ Release $BuildNumber created successfully!"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
