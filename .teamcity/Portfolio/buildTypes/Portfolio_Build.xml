@@ -548,6 +548,7 @@ $checkoutDir = "%teamcity.build.checkoutDir%"
 $buildNumber = "%build.number%"
 $artifactsDir = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish"
 $rootPackageJson = Join-Path -Path $checkoutDir -ChildPath "package.json"
+$distDir = Join-Path -Path $checkoutDir -ChildPath "dist"
 
 # Fail fast
 $ErrorActionPreference = "Stop"
@@ -557,6 +558,7 @@ Write-Host "📦 npm pack - Build $buildNumber"
 Write-Host "=========================================="
 Write-Host "Checkout Dir: $checkoutDir"
 Write-Host "Artifacts:    $artifactsDir"
+Write-Host "Dist Dir:     $distDir"
 Write-Host ""
 
 # ==============================
@@ -579,6 +581,22 @@ if (-not (Test-Path $artifactsDir)) {
 } else {
     Write-Host "✅ Artifacts directory exists"
 }
+
+# ==============================
+# Copy package.json to dist folder
+# ==============================
+Write-Host ""
+Write-Host "📋 Copying package.json to dist folder..."
+if (-not (Test-Path $distDir)) {
+    New-Item -ItemType Directory -Path $distDir -Force | Out-Null
+    Write-Host "✅ Dist directory created"
+} else {
+    Write-Host "✅ Dist directory exists"
+}
+
+$distPackageJson = Join-Path -Path $distDir -ChildPath "package.json"
+Copy-Item -Path $rootPackageJson -Destination $distPackageJson -Force
+Write-Host "✅ package.json copied to: $distPackageJson"
 
 # ==============================
 # Navigate to root directory and pack
