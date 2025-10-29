@@ -587,7 +587,6 @@ Write-Host ""
 Write-Host "==> Packing npm package from $checkoutDir..."
 Write-Host "##teamcity[progressMessage 'Packing npm package...']"
 
-Push-Location $checkoutDir
 try {
     # Run npm pack using npm.cmd
     & npm.cmd pack --silent
