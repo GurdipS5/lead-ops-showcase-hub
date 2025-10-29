@@ -544,11 +544,9 @@ kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMB
 # TeamCity Build Step - npm pack
 # ==============================
 # TeamCity variables
-$checkoutDir = "%teamcity.build.checkoutDir%"
 $buildNumber = "%build.number%"
-$artifactsDir = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish"
-$rootPackageJson = Join-Path -Path $checkoutDir -ChildPath "package.json"
-$distDir = Join-Path -Path $checkoutDir -ChildPath "dist"
+$currentDir = Get-Location
+$artifactsDir = Join-Path -Path $currentDir -ChildPath "artifacts\publish"
 
 # Fail fast
 $ErrorActionPreference = "Stop"
@@ -556,24 +554,13 @@ $ErrorActionPreference = "Stop"
 Write-Host "=========================================="
 Write-Host "📦 npm pack - Build $buildNumber"
 Write-Host "=========================================="
-Write-Host "Checkout Dir: $checkoutDir"
-Write-Host "Artifacts:    $artifactsDir"
-Write-Host "Dist Dir:     $distDir"
+Write-Host "Working Dir: $currentDir"
+Write-Host "Artifacts:   $artifactsDir"
 Write-Host ""
-
-# ==============================
-# Validate root package.json exists
-# ==============================
-if (-not (Test-Path $rootPackageJson)) {
-    Write-Host "##teamcity[message text='package.json not found in root: $rootPackageJson' status='ERROR']"
-    Write-Error "❌ package.json not found in root: $rootPackageJson"
-    exit 1
-}
 
 # ==============================
 # Ensure artifacts folder exists
 # ==============================
-Write-Host ""
 Write-Host "📁 Ensuring artifacts directory exists..."
 if (-not (Test-Path $artifactsDir)) {
     New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
@@ -583,30 +570,14 @@ if (-not (Test-Path $artifactsDir)) {
 }
 
 # ==============================
-# Copy package.json to dist folder
+# Run npm pack
 # ==============================
 Write-Host ""
-Write-Host "📋 Copying package.json to dist folder..."
-if (-not (Test-Path $distDir)) {
-    New-Item -ItemType Directory -Path $distDir -Force | Out-Null
-    Write-Host "✅ Dist directory created"
-} else {
-    Write-Host "✅ Dist directory exists"
-}
-
-$distPackageJson = Join-Path -Path $distDir -ChildPath "package.json"
-Copy-Item -Path $rootPackageJson -Destination $distPackageJson -Force
-Write-Host "✅ package.json copied to: $distPackageJson"
-
-# ==============================
-# Navigate to root directory and pack
-# ==============================
-Write-Host ""
-Write-Host "==> Packing npm package from $checkoutDir..."
+Write-Host "==> Packing npm package from current directory..."
 Write-Host "##teamcity[progressMessage 'Packing npm package...']"
 
 try {
-    # Run npm pack using npm.cmd
+    # Run npm pack
     & npm.cmd pack --silent
     
     if ($LASTEXITCODE -ne 0) {
@@ -615,7 +586,7 @@ try {
         exit $LASTEXITCODE
     }
     
-    # Find the created .tgz file (npm pack creates it in the current directory)
+    # Find the created .tgz file
     $tgzFile = Get-ChildItem -Path . -Filter "*.tgz" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     
     if (-not $tgzFile) {
@@ -650,9 +621,6 @@ catch {
     Write-Error "❌ npm pack failed: $($_.Exception.Message)"
     exit 1
 }
-finally {
-    Pop-Location
-}
 
 # ==============================
 # Summary
@@ -664,6 +632,7 @@ Write-Host "   Package: $finalPackageName"
 Write-Host "   Location: $artifactsDir"
 Write-Host ""]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.build.workingDir" value="dist" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
