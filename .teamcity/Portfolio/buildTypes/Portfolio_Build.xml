@@ -388,7 +388,7 @@ if ($LASTEXITCODE -eq 0) {
       </runner>
       <runner id="Scan_with_Qodana" name="Scan with Qodana" type="Qodana">
         <parameters>
-          <param name="arguments-entry-point-docker" value="--ide=QDJS" />
+          <param name="arguments-entry-point-docker" value="--ide QDJS" />
           <param name="cli" value="v2025.1.1" />
           <param name="code-inspection-xml-config" value="Default" />
           <param name="linterVersion" value="latest" />
