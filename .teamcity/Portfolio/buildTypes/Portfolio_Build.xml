@@ -557,20 +557,30 @@ kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMB
 $buildNumber = "%build.number%"
 $currentDir = Get-Location
 $artifactsDir = Join-Path -Path $currentDir -ChildPath "artifacts\publish"
-
+$distDir = Join-Path -Path $currentDir -ChildPath "dist"
 # Fail fast
 $ErrorActionPreference = "Stop"
-
 Write-Host "=========================================="
 Write-Host "📦 npm pack - Build $buildNumber"
 Write-Host "=========================================="
 Write-Host "Working Dir: $currentDir"
+Write-Host "Dist Dir:    $distDir"
 Write-Host "Artifacts:   $artifactsDir"
 Write-Host ""
-
+# ==============================
+# Verify dist folder exists
+# ==============================
+Write-Host "📁 Verifying dist directory exists..."
+if (-not (Test-Path $distDir)) {
+    Write-Host "##teamcity[message text='dist directory not found at $distDir' status='ERROR']"
+    Write-Error "❌ dist directory not found at $distDir"
+    exit 1
+}
+Write-Host "✅ dist directory found"
 # ==============================
 # Ensure artifacts folder exists
 # ==============================
+Write-Host ""
 Write-Host "📁 Ensuring artifacts directory exists..."
 if (-not (Test-Path $artifactsDir)) {
     New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
@@ -578,17 +588,15 @@ if (-not (Test-Path $artifactsDir)) {
 } else {
     Write-Host "✅ Artifacts directory exists"
 }
-
 # ==============================
 # Run npm pack
 # ==============================
 Write-Host ""
-Write-Host "==> Packing npm package from current directory..."
-Write-Host "##teamcity[progressMessage 'Packing npm package...']"
-
+Write-Host "==> Packing npm package from dist directory..."
+Write-Host "##teamcity[progressMessage 'Packing npm package from dist...']"
 try {
-    # Run npm pack
-    & npm.cmd pack --silent
+    # Run npm pack on the dist folder
+    & npm.cmd pack $distDir --silent
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "##teamcity[message text='npm pack failed with exit code $LASTEXITCODE' status='ERROR']"
@@ -631,7 +639,6 @@ catch {
     Write-Error "❌ npm pack failed: $($_.Exception.Message)"
     exit 1
 }
-
 # ==============================
 # Summary
 # ==============================
@@ -642,7 +649,6 @@ Write-Host "   Package: $finalPackageName"
 Write-Host "   Location: $artifactsDir"
 Write-Host ""]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.build.workingDir" value="dist" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
