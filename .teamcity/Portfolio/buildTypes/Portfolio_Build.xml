@@ -382,7 +382,6 @@ if ($LASTEXITCODE -eq 0) {
           <param name="code-inspection-xml-config" value="Default" />
           <param name="linterVersion" value="latest" />
           <param name="namesAndTags" value="public-image-qodana-js" />
-          <param name="report-as-test" value="true" />
           <param name="secure:cloud-token" value="zxx1af0235e338982e6" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
