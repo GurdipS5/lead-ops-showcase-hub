@@ -985,104 +985,433 @@ catch {
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
-# TeamCity Build Step - npm pack
-# ==============================
-# TeamCity variables
-$buildNumber = "%build.number%"
-$currentDir = Get-Location
-$artifactsDir = Join-Path -Path $currentDir -ChildPath "artifacts\publish"
-$distDir = Join-Path -Path $currentDir -ChildPath "dist"
-# Fail fast
+          <param name="jetbrains_powershell_script_code"><![CDATA[# ===========================
+# Configuration Variables
+# ===========================
+
+# TeamCity Parameters
+$COSIGN_PRIVATE_KEY = $env:COSIGN_KEY  # TeamCity secure parameter
+$COSIGN_PASSWORD = $env:COSIGN_PASSWORD        # TeamCity secure parameter (if key is encrypted)
+$CLOUDSMITH_API_KEY = $env:CLOUDSMITH_API_KEY  # TeamCity secure parameter
+
+# Cloudsmith Configuration
+$CLOUDSMITH_ORG = "gurdipdevops"
+$CLOUDSMITH_REPO = "portfolio"
+$CLOUDSMITH_RAW_REPO = "portfolio-raw"  # Repository for cosign artifacts zip
+
+# Package Configuration
+$PACKAGE_PATH = "."  # Path to your package.json directory
+$PACKAGE_JSON = Join-Path $PACKAGE_PATH "package.json"
+
+# Cosign Configuration
+$COSIGN_VERSION = "v2.2.3"
+$COSIGN_URL = "https://github.com/sigstore/cosign/releases/download/$COSIGN_VERSION/cosign-windows-amd64.exe"
+
+# ===========================
+# Error Handling
+# ===========================
 $ErrorActionPreference = "Stop"
-Write-Host "=========================================="
-Write-Host "📦 npm pack - Build $buildNumber"
-Write-Host "=========================================="
-Write-Host "Working Dir: $currentDir"
-Write-Host "Dist Dir:    $distDir"
-Write-Host "Artifacts:   $artifactsDir"
-Write-Host ""
-# ==============================
-# Verify dist folder exists
-# ==============================
-Write-Host "📁 Verifying dist directory exists..."
-if (-not (Test-Path $distDir)) {
-    Write-Host "##teamcity[message text='dist directory not found at $distDir' status='ERROR']"
-    Write-Error "❌ dist directory not found at $distDir"
-    exit 1
+
+# ===========================
+# Functions
+# ===========================
+
+function Write-Step {
+    param([string]$Message)
+    Write-Host "`n##teamcity[progressMessage '$Message']"
+    Write-Host "===> $Message" -ForegroundColor Cyan
 }
-Write-Host "✅ dist directory found"
-# ==============================
-# Ensure artifacts folder exists
-# ==============================
-Write-Host ""
-Write-Host "📁 Ensuring artifacts directory exists..."
-if (-not (Test-Path $artifactsDir)) {
-    New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
-    Write-Host "✅ Artifacts directory created"
-} else {
-    Write-Host "✅ Artifacts directory exists"
+
+function Write-Success {
+    param([string]$Message)
+    Write-Host "✓ $Message" -ForegroundColor Green
 }
-# ==============================
-# Run npm pack
-# ==============================
-Write-Host ""
-Write-Host "==> Packing npm package from dist directory..."
-Write-Host "##teamcity[progressMessage 'Packing npm package from dist...']"
+
+function Write-Error {
+    param([string]$Message)
+    Write-Host "✗ $Message" -ForegroundColor Red
+}
+
+function Install-Cosign {
+    Write-Step "Installing Cosign"
+    
+    $cosignPath = Join-Path $env:TEMP "cosign.exe"
+    
+    if (Test-Path $cosignPath) {
+        Write-Success "Cosign already downloaded"
+        return $cosignPath
+    }
+    
+    try {
+        Invoke-WebRequest -Uri $COSIGN_URL -OutFile $cosignPath
+        Write-Success "Cosign downloaded successfully"
+        return $cosignPath
+    }
+    catch {
+        Write-Error "Failed to download Cosign: $_"
+        throw
+    }
+}
+
+function Get-PackageInfo {
+    Write-Step "Reading package information"
+    
+    if (-not (Test-Path $PACKAGE_JSON)) {
+        throw "package.json not found at $PACKAGE_JSON"
+    }
+    
+    $packageData = Get-Content $PACKAGE_JSON -Raw | ConvertFrom-Json
+    $packageName = $packageData.name
+    $packageVersion = $packageData.version
+    
+    Write-Host "Package: $packageName"
+    Write-Host "Version: $packageVersion"
+    
+    return @{
+        Name = $packageName
+        Version = $packageVersion
+        FullName = "$packageName-$packageVersion"
+    }
+}
+
+function Find-PackageTarball {
+    param(
+        [string]$PackageName,
+        [string]$PackageVersion
+    )
+    
+    Write-Step "Looking for existing package tarball"
+    
+    # Expected tarball name format
+    $tarballPattern = "$($PackageName.Replace('@','').Replace('/','-'))-$PackageVersion.tgz"
+    
+    # Search in current directory and package path
+    $searchPaths = @($PACKAGE_PATH, ".")
+    
+    foreach ($searchPath in $searchPaths) {
+        $tarball = Get-ChildItem -Path $searchPath -Filter $tarballPattern -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($tarball) {
+            Write-Success "Found package tarball: $($tarball.FullName)"
+            return $tarball.FullName
+        }
+    }
+    
+    # If not found with exact name, try to find any .tgz file
+    $anyTarball = Get-ChildItem -Path $PACKAGE_PATH -Filter "*.tgz" -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($anyTarball) {
+        Write-Host "Warning: Using tarball $($anyTarball.Name) - verify this is correct"
+        return $anyTarball.FullName
+    }
+    
+    throw "Package tarball not found. Expected: $tarballPattern"
+}
+
+function Create-Provenance {
+    param(
+        [string]$PackageTarball,
+        [string]$PackageName,
+        [string]$PackageVersion
+    )
+    
+    Write-Step "Creating provenance file"
+    
+    $buildUrl = $env:BUILD_URL
+    $buildId = $env:BUILD_ID
+    $vcsRevision = $env:BUILD_VCS_NUMBER
+    $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    
+    $provenance = @{
+        "_type" = "https://in-toto.io/Statement/v0.1"
+        "subject" = @(
+            @{
+                "name" = $PackageName
+                "digest" = @{
+                    "sha256" = (Get-FileHash -Path $PackageTarball -Algorithm SHA256).Hash.ToLower()
+                }
+            }
+        )
+        "predicateType" = "https://slsa.dev/provenance/v0.2"
+        "predicate" = @{
+            "builder" = @{
+                "id" = "TeamCity"
+            }
+            "buildType" = "teamcity-build"
+            "invocation" = @{
+                "configSource" = @{
+                    "uri" = $vcsRevision
+                    "digest" = @{
+                        "sha1" = $vcsRevision
+                    }
+                }
+            }
+            "metadata" = @{
+                "buildInvocationId" = $buildId
+                "buildStartedOn" = $timestamp
+                "completeness" = @{
+                    "parameters" = $true
+                    "environment" = $false
+                    "materials" = $true
+                }
+            }
+            "materials" = @(
+                @{
+                    "uri" = "pkg:npm/$PackageName@$PackageVersion"
+                }
+            )
+        }
+    } | ConvertTo-Json -Depth 10
+    
+    $provenanceFile = "$PackageTarball.provenance.json"
+    $provenance | Out-File -FilePath $provenanceFile -Encoding utf8
+    
+    Write-Success "Provenance file created: $provenanceFile"
+    return $provenanceFile
+}
+
+function Sign-WithCosign {
+    param(
+        [string]$CosignPath,
+        [string]$FilePath
+    )
+    
+    Write-Step "Signing $FilePath with Cosign"
+    
+    # Save private key to temporary file
+    $keyFile = Join-Path $env:TEMP "cosign.key"
+    $COSIGN_PRIVATE_KEY | Out-File -FilePath $keyFile -Encoding utf8 -NoNewline
+    
+    try {
+        # Set environment variable for password if provided
+        if ($COSIGN_PASSWORD) {
+            $env:COSIGN_PASSWORD = $COSIGN_PASSWORD
+        }
+        
+        # Sign the file
+        & $CosignPath sign-blob --key $keyFile --output-signature "$FilePath.sig" --output-certificate "$FilePath.pem" $FilePath
+        
+        if ($LASTEXITCODE -ne 0) {
+            throw "Cosign signing failed with exit code $LASTEXITCODE"
+        }
+        
+        Write-Success "File signed successfully"
+        Write-Host "  - Signature: $FilePath.sig"
+        Write-Host "  - Certificate: $FilePath.pem"
+    }
+    finally {
+        # Clean up key file
+        if (Test-Path $keyFile) {
+            Remove-Item $keyFile -Force
+        }
+        # Clean up environment variable
+        if ($env:COSIGN_PASSWORD) {
+            Remove-Item Env:\COSIGN_PASSWORD
+        }
+    }
+}
+
+function Create-Attestation {
+    param(
+        [string]$CosignPath,
+        [string]$ProvenanceFile,
+        [string]$PackageTarball
+    )
+    
+    Write-Step "Creating attestation"
+    
+    # Save private key to temporary file
+    $keyFile = Join-Path $env:TEMP "cosign.key"
+    $COSIGN_PRIVATE_KEY | Out-File -FilePath $keyFile -Encoding utf8 -NoNewline
+    
+    try {
+        if ($COSIGN_PASSWORD) {
+            $env:COSIGN_PASSWORD = $COSIGN_PASSWORD
+        }
+        
+        # Create attestation
+        & $CosignPath attest --key $keyFile --predicate $ProvenanceFile --type slsaprovenance $PackageTarball
+        
+        if ($LASTEXITCODE -ne 0) {
+            throw "Cosign attestation failed with exit code $LASTEXITCODE"
+        }
+        
+        Write-Success "Attestation created successfully"
+    }
+    finally {
+        if (Test-Path $keyFile) {
+            Remove-Item $keyFile -Force
+        }
+        if ($env:COSIGN_PASSWORD) {
+            Remove-Item Env:\COSIGN_PASSWORD
+        }
+    }
+}
+
+function Create-ArtifactsZip {
+    param(
+        [string]$PackageTarball,
+        [string]$PackageName,
+        [string]$PackageVersion
+    )
+    
+    Write-Step "Creating cosign artifacts zip"
+    
+    $sigFile = "$PackageTarball.sig"
+    $pemFile = "$PackageTarball.pem"
+    $provenanceFile = "$PackageTarball.provenance.json"
+    
+    $zipFileName = "$($PackageName.Replace('@','').Replace('/','-'))-$PackageVersion-cosign-artifacts.zip"
+    $zipPath = Join-Path $PACKAGE_PATH $zipFileName
+    
+    # Remove existing zip if present
+    if (Test-Path $zipPath) {
+        Remove-Item $zipPath -Force
+    }
+    
+    # Create zip with all cosign artifacts
+    $filesToZip = @()
+    
+    if (Test-Path $sigFile) {
+        $filesToZip += $sigFile
+    } else {
+        Write-Host "Warning: Signature file not found: $sigFile"
+    }
+    
+    if (Test-Path $pemFile) {
+        $filesToZip += $pemFile
+    } else {
+        Write-Host "Warning: Certificate file not found: $pemFile"
+    }
+    
+    if (Test-Path $provenanceFile) {
+        $filesToZip += $provenanceFile
+    } else {
+        Write-Host "Warning: Provenance file not found: $provenanceFile"
+    }
+    
+    if ($filesToZip.Count -eq 0) {
+        throw "No cosign artifacts found to zip"
+    }
+    
+    Compress-Archive -Path $filesToZip -DestinationPath $zipPath -Force
+    
+    Write-Success "Artifacts zip created: $zipPath"
+    Write-Host "  Contents:"
+    foreach ($file in $filesToZip) {
+        Write-Host "    - $(Split-Path $file -Leaf)"
+    }
+    
+    return $zipPath
+}
+
+function Upload-ToCloudsmith {
+    param(
+        [string]$PackageTarball,
+        [string]$ArtifactsZip,
+        [string]$PackageName,
+        [string]$PackageVersion
+    )
+    
+    Write-Step "Uploading to Cloudsmith"
+    
+    # Install cloudsmith-cli if not available
+    if (-not (Get-Command cloudsmith -ErrorAction SilentlyContinue)) {
+        Write-Host "Installing cloudsmith-cli..."
+        pip install --upgrade cloudsmith-cli --break-system-packages
+    }
+    
+    # Upload package
+    $env:CLOUDSMITH_API_KEY = $CLOUDSMITH_API_KEY
+    
+    try {
+        # Upload npm package
+        Write-Host "Uploading npm package..."
+        cloudsmith push npm "$CLOUDSMITH_ORG/$CLOUDSMITH_REPO" $PackageTarball
+        
+        if ($LASTEXITCODE -ne 0) {
+            throw "Cloudsmith npm package upload failed with exit code $LASTEXITCODE"
+        }
+        
+        Write-Success "NPM package uploaded to Cloudsmith successfully"
+        
+        # Upload cosign artifacts zip as raw package
+        if (Test-Path $ArtifactsZip) {
+            Write-Host "Uploading cosign artifacts zip..."
+            cloudsmith push raw "$CLOUDSMITH_ORG/$CLOUDSMITH_RAW_REPO" $ArtifactsZip --name "$($PackageName.Replace('@','').Replace('/','-'))-cosign-artifacts" --version $PackageVersion --summary "Cosign signatures, certificates, and provenance for $PackageName@$PackageVersion"
+            
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "Warning: Failed to upload cosign artifacts zip (exit code $LASTEXITCODE)"
+            } else {
+                Write-Success "Cosign artifacts zip uploaded successfully"
+            }
+        }
+        
+        Write-Success "All artifacts uploaded"
+    }
+    finally {
+        Remove-Item Env:\CLOUDSMITH_API_KEY -ErrorAction SilentlyContinue
+    }
+}
+
+# ===========================
+# Main Execution
+# ===========================
+
 try {
-    # Run npm pack on the dist folder
-    & npm.cmd pack $distDir --silent
+    Write-Host "======================================"
+    Write-Host "NPM Package Signing and Publishing"
+    Write-Host "======================================`n"
     
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "##teamcity[message text='npm pack failed with exit code $LASTEXITCODE' status='ERROR']"
-        Write-Error "❌ npm pack failed with exit code $LASTEXITCODE"
-        exit $LASTEXITCODE
+    # Validate required environment variables
+    if (-not $COSIGN_PRIVATE_KEY) {
+        throw "COSIGN_PRIVATE_KEY environment variable is not set"
     }
     
-    # Find the created .tgz file
-    $tgzFile = Get-ChildItem -Path . -Filter "*.tgz" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-    
-    if (-not $tgzFile) {
-        Write-Host "##teamcity[message text='No .tgz file found after npm pack' status='ERROR']"
-        Write-Error "❌ No .tgz file found after npm pack"
-        exit 1
+    if (-not $CLOUDSMITH_API_KEY) {
+        throw "CLOUDSMITH_API_KEY environment variable is not set"
     }
     
-    Write-Host "Package created: $($tgzFile.Name)"
-    Write-Host "##teamcity[message text='npm pack created: $($tgzFile.Name)' status='NORMAL']"
+    # Install Cosign
+    $cosignPath = Install-Cosign
     
-    # Rename to include build number
-    $finalPackageName = "Portfolio-$buildNumber.tgz"
-    $dest = Join-Path -Path $artifactsDir -ChildPath $finalPackageName
+    # Get package information
+    $packageInfo = Get-PackageInfo
     
-    # Move and rename .tgz to artifacts folder
-    Move-Item $tgzFile.FullName $dest -Force
+    # Find existing package tarball
+    $packageTarball = Find-PackageTarball -PackageName $packageInfo.Name -PackageVersion $packageInfo.Version
     
-    Write-Host "✅ Package moved to artifacts folder: $dest"
-    Write-Host "##teamcity[message text='Package ready: $finalPackageName' status='NORMAL']"
+    Write-Success "Using package tarball: $packageTarball"
     
-    # Publish artifact path for TeamCity
-    Write-Host "##teamcity[publishArtifacts '$dest']"
+    # Create provenance
+    $provenanceFile = Create-Provenance -PackageTarball $packageTarball -PackageName $packageInfo.Name -PackageVersion $packageInfo.Version
     
-    # Set TeamCity parameter with package path
-    Write-Host "##teamcity[setParameter name='npm.package.path' value='$dest']"
-    Write-Host "##teamcity[setParameter name='npm.package.name' value='$finalPackageName']"
+    # Sign package with Cosign
+    Sign-WithCosign -CosignPath $cosignPath -FilePath $packageTarball
     
+    # Sign provenance file
+    Sign-WithCosign -CosignPath $cosignPath -FilePath $provenanceFile
+    
+    # Create attestation
+    Create-Attestation -CosignPath $cosignPath -ProvenanceFile $provenanceFile -PackageTarball $packageTarball
+    
+    # Create zip of all cosign artifacts
+    $artifactsZip = Create-ArtifactsZip -PackageTarball $packageTarball -PackageName $packageInfo.Name -PackageVersion $packageInfo.Version
+    
+    # Upload to Cloudsmith
+    Upload-ToCloudsmith -PackageTarball $packageTarball -ArtifactsZip $artifactsZip -PackageName $packageInfo.Name -PackageVersion $packageInfo.Version
+    
+    Write-Host "`n======================================"
+    Write-Success "Build completed successfully!"
+    Write-Host "======================================`n"
+    
+    exit 0
 }
 catch {
-    Write-Host "##teamcity[message text='npm pack failed: $($_.Exception.Message)' status='ERROR']"
-    Write-Error "❌ npm pack failed: $($_.Exception.Message)"
+    Write-Host "`n======================================"
+    Write-Error "Build failed: $_"
+    Write-Host "======================================`n"
+    Write-Host $_.ScriptStackTrace
     exit 1
-}
-# ==============================
-# Summary
-# ==============================
-Write-Host ""
-Write-Host "##teamcity[progressMessage 'npm pack completed successfully']"
-Write-Host "🎉 npm pack completed successfully!"
-Write-Host "   Package: $finalPackageName"
-Write-Host "   Location: $artifactsDir"
-Write-Host ""]]></param>
+}]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
