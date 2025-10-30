@@ -257,7 +257,7 @@ function Update-JsonVersion {
     try {
         $content = Get-Content $FilePath -Raw
         $pattern = '("version"\s*:\s*)"[^"]*"'
-        $replacement = "`$1`"$Version`""
+        $replacement = `$1`"$Version`""
         
         if ($content -match $pattern) {
             $newContent = $content -replace $pattern, $replacement
@@ -276,9 +276,10 @@ function Update-JsonVersion {
     }
 }
 
-# Update both files
+# Update all files
 $packageJsonUpdated = Update-JsonVersion -FilePath "package.json" -Version $Version
 $packageLockUpdated = Update-JsonVersion -FilePath "package-lock.json" -Version $Version
+$distPackageJsonUpdated = Update-JsonVersion -FilePath "dist/package.json" -Version $Version
 
 # Summary
 Write-Host "`n========================================" -ForegroundColor Cyan
@@ -287,10 +288,11 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Version: $Version" -ForegroundColor Yellow
 Write-Host "package.json: $(if($packageJsonUpdated){'✓ Updated'}else{'✗ Failed'})" -ForegroundColor $(if($packageJsonUpdated){'Green'}else{'Red'})
 Write-Host "package-lock.json: $(if($packageLockUpdated){'✓ Updated'}else{'✗ Failed'})" -ForegroundColor $(if($packageLockUpdated){'Green'}else{'Red'})
+Write-Host "dist/package.json: $(if($distPackageJsonUpdated){'✓ Updated'}else{'✗ Failed'})" -ForegroundColor $(if($distPackageJsonUpdated){'Green'}else{'Red'})
 Write-Host "========================================`n" -ForegroundColor Cyan
 
 # Exit with error if any update failed
-if (-not $packageJsonUpdated -or -not $packageLockUpdated) {
+if (-not $packageJsonUpdated -or -not $packageLockUpdated -or -not $distPackageJsonUpdated) {
     Write-Error "One or more package files failed to update"
     exit 1
 }
