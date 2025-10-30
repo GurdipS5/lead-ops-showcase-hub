@@ -9,10 +9,6 @@ cosign.key
 # OS
 .DS_Store
 
-# Build output
-# Ignore everything in dist/
-dist/*
-
 # But keep the folder itself
 !dist/.gitkeep
 
