@@ -257,7 +257,7 @@ function Update-JsonVersion {
     try {
         $content = Get-Content $FilePath -Raw
         $pattern = '("version"\s*:\s*)"[^"]*"'
-        $replacement = "`$1`"$Version`""
+        $replacement = `$1`"$Version`""
         
         if ($content -match $pattern) {
             $newContent = $content -replace $pattern, $replacement
@@ -276,9 +276,10 @@ function Update-JsonVersion {
     }
 }
 
-# Update both files
+# Update all files
 $packageJsonUpdated = Update-JsonVersion -FilePath "package.json" -Version $Version
 $packageLockUpdated = Update-JsonVersion -FilePath "package-lock.json" -Version $Version
+$distPackageJsonUpdated = Update-JsonVersion -FilePath "dist/package.json" -Version $Version
 
 # Summary
 Write-Host "`n========================================" -ForegroundColor Cyan
@@ -287,10 +288,11 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Version: $Version" -ForegroundColor Yellow
 Write-Host "package.json: $(if($packageJsonUpdated){'✓ Updated'}else{'✗ Failed'})" -ForegroundColor $(if($packageJsonUpdated){'Green'}else{'Red'})
 Write-Host "package-lock.json: $(if($packageLockUpdated){'✓ Updated'}else{'✗ Failed'})" -ForegroundColor $(if($packageLockUpdated){'Green'}else{'Red'})
+Write-Host "dist/package.json: $(if($distPackageJsonUpdated){'✓ Updated'}else{'✗ Failed'})" -ForegroundColor $(if($distPackageJsonUpdated){'Green'}else{'Red'})
 Write-Host "========================================`n" -ForegroundColor Cyan
 
 # Exit with error if any update failed
-if (-not $packageJsonUpdated -or -not $packageLockUpdated) {
+if (-not $packageJsonUpdated -or -not $packageLockUpdated -or -not $distPackageJsonUpdated) {
     Write-Error "One or more package files failed to update"
     exit 1
 }
@@ -382,7 +384,6 @@ if ($LASTEXITCODE -eq 0) {
           <param name="code-inspection-xml-config" value="Default" />
           <param name="linterVersion" value="latest" />
           <param name="namesAndTags" value="public-image-qodana-js" />
-          <param name="report-as-test" value="true" />
           <param name="secure:cloud-token" value="zxx1af0235e338982e6" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
@@ -544,10 +545,9 @@ kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMB
 # TeamCity Build Step - npm pack
 # ==============================
 # TeamCity variables
-$checkoutDir = "%teamcity.build.checkoutDir%"
 $buildNumber = "%build.number%"
-$artifactsDir = Join-Path -Path $checkoutDir -ChildPath "artifacts\publish"
-$rootPackageJson = Join-Path -Path $checkoutDir -ChildPath "package.json"
+$currentDir = Get-Location
+$artifactsDir = Join-Path -Path $currentDir -ChildPath "artifacts\publish"
 
 # Fail fast
 $ErrorActionPreference = "Stop"
@@ -555,23 +555,13 @@ $ErrorActionPreference = "Stop"
 Write-Host "=========================================="
 Write-Host "📦 npm pack - Build $buildNumber"
 Write-Host "=========================================="
-Write-Host "Checkout Dir: $checkoutDir"
-Write-Host "Artifacts:    $artifactsDir"
+Write-Host "Working Dir: $currentDir"
+Write-Host "Artifacts:   $artifactsDir"
 Write-Host ""
-
-# ==============================
-# Validate root package.json exists
-# ==============================
-if (-not (Test-Path $rootPackageJson)) {
-    Write-Host "##teamcity[message text='package.json not found in root: $rootPackageJson' status='ERROR']"
-    Write-Error "❌ package.json not found in root: $rootPackageJson"
-    exit 1
-}
 
 # ==============================
 # Ensure artifacts folder exists
 # ==============================
-Write-Host ""
 Write-Host "📁 Ensuring artifacts directory exists..."
 if (-not (Test-Path $artifactsDir)) {
     New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
@@ -581,14 +571,14 @@ if (-not (Test-Path $artifactsDir)) {
 }
 
 # ==============================
-# Navigate to root directory and pack
+# Run npm pack
 # ==============================
 Write-Host ""
-Write-Host "==> Packing npm package from $checkoutDir..."
+Write-Host "==> Packing npm package from current directory..."
 Write-Host "##teamcity[progressMessage 'Packing npm package...']"
 
 try {
-    # Run npm pack using npm.cmd
+    # Run npm pack
     & npm.cmd pack --silent
     
     if ($LASTEXITCODE -ne 0) {
@@ -597,7 +587,7 @@ try {
         exit $LASTEXITCODE
     }
     
-    # Find the created .tgz file (npm pack creates it in the current directory)
+    # Find the created .tgz file
     $tgzFile = Get-ChildItem -Path . -Filter "*.tgz" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     
     if (-not $tgzFile) {
@@ -632,9 +622,6 @@ catch {
     Write-Error "❌ npm pack failed: $($_.Exception.Message)"
     exit 1
 }
-finally {
-    Pop-Location
-}
 
 # ==============================
 # Summary
@@ -646,6 +633,7 @@ Write-Host "   Package: $finalPackageName"
 Write-Host "   Location: $artifactsDir"
 Write-Host ""]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.build.workingDir" value="dist" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
