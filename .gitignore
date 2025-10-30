@@ -10,7 +10,12 @@ cosign.key
 .DS_Store
 
 # Build output
-dist
+# Ignore everything in dist/
+dist/*
+
+# But keep the folder itself
+!dist/.gitkeep
+
 stats.html
 
 # Favicon generation
