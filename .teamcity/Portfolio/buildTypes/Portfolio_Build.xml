@@ -657,157 +657,103 @@ Write-Host ""]]></param>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
           <param name="jetbrains_powershell_script_code"><![CDATA[# ==============================
-# Define paths and variables
+# TeamCity Build Step - npm pack
 # ==============================
-$packageFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\publish\Portfolio-$($env:BUILD_NUMBER).tgz"
-$provenanceFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\provenance.json"
-$attestationFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\attestation\attestation.sig"
-$signatureFile = Join-Path -Path "%teamcity.build.checkoutDir%" -ChildPath "artifacts\publish\portfolio.sig"
-$cosignKeyFile = Join-Path "%teamcity.build.checkoutDir%" "cosign.key"
-
-# Cloudsmith npm registry
-$npmRegistry = if ($env:NPM_REGISTRY) { $env:NPM_REGISTRY } else { "https://npm.cloudsmith.io/gurdipdevops/portfolio/" }
-
-# Create required directories if missing
-New-Item -ItemType Directory -Force -Path (Split-Path $provenanceFile) | Out-Null
-New-Item -ItemType Directory -Force -Path (Split-Path $attestationFile) | Out-Null
-
+# TeamCity variables
+$buildNumber = "%build.number%"
+$currentDir = Get-Location
+$artifactsDir = Join-Path -Path $currentDir -ChildPath "artifacts\publish"
+$distDir = Join-Path -Path $currentDir -ChildPath "dist"
+# Fail fast
+$ErrorActionPreference = "Stop"
+Write-Host "=========================================="
+Write-Host "📦 npm pack - Build $buildNumber"
+Write-Host "=========================================="
+Write-Host "Working Dir: $currentDir"
+Write-Host "Dist Dir:    $distDir"
+Write-Host "Artifacts:   $artifactsDir"
+Write-Host ""
 # ==============================
-# Write COSIGN_KEY to file
+# Verify dist folder exists
 # ==============================
-if (-not $env:COSIGN_KEY) {
-    Write-Error "❌ COSIGN_KEY environment variable not found. Make sure it's defined in TeamCity."
+Write-Host "📁 Verifying dist directory exists..."
+if (-not (Test-Path $distDir)) {
+    Write-Host "##teamcity[message text='dist directory not found at $distDir' status='ERROR']"
+    Write-Error "❌ dist directory not found at $distDir"
     exit 1
 }
-
-# Ensure newline-safe write
-[System.IO.File]::WriteAllText($cosignKeyFile, $env:COSIGN_KEY)
-Write-Host "🔑 Cosign key written to: $cosignKeyFile"
-
+Write-Host "✅ dist directory found"
 # ==============================
-# Calculate SHA256 hash
+# Ensure artifacts folder exists
 # ==============================
-$hashBytes = Get-FileHash -Path $packageFile -Algorithm SHA256
-$hash = $hashBytes.Hash.ToLower()
-
-Write-Host "📦 Package file: $packageFile"
-Write-Host "🔒 SHA256 hash: $hash"
-
+Write-Host ""
+Write-Host "📁 Ensuring artifacts directory exists..."
+if (-not (Test-Path $artifactsDir)) {
+    New-Item -ItemType Directory -Path $artifactsDir -Force | Out-Null
+    Write-Host "✅ Artifacts directory created"
+} else {
+    Write-Host "✅ Artifacts directory exists"
+}
 # ==============================
-# Get git commit and remote info
+# Run npm pack
 # ==============================
-Push-Location "%teamcity.build.checkoutDir%"
-$gitCommit = git rev-parse HEAD
-$gitRemote = git config --get remote.origin.url
-Pop-Location
-
-# ==============================
-# Generate provenance JSON (predicate only)
-# ==============================
-# Escape backslashes for JSON
-$packageFileJson = $packageFile -replace '\\', '\\\\'
-$gitRemoteJson = $gitRemote -replace '\\', '\\\\'
-
-# Only include the predicate content - cosign will wrap it in the in-toto statement
-$provenanceJson = @"
-{
-  "builder": {
-    "id": "teamcity://build/$($env:BUILD_NUMBER)"
-  },
-  "buildType": "teamcity-build",
-  "invocation": {
-    "configSource": {
-      "uri": "$gitRemoteJson",
-      "digest": {
-        "sha1": "$gitCommit"
-      }
+Write-Host ""
+Write-Host "==> Packing npm package from dist directory..."
+Write-Host "##teamcity[progressMessage 'Packing npm package from dist...']"
+try {
+    # Run npm pack on the dist folder
+    & npm.cmd pack $distDir --silent
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "##teamcity[message text='npm pack failed with exit code $LASTEXITCODE' status='ERROR']"
+        Write-Error "❌ npm pack failed with exit code $LASTEXITCODE"
+        exit $LASTEXITCODE
     }
-  },
-  "metadata": {
-    "buildStartedOn": "$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))",
-    "completeness": {
-      "parameters": false,
-      "environment": false,
-      "materials": false
-    },
-    "reproducible": false
-  },
-  "materials": [
-    {
-      "uri": "$gitRemoteJson",
-      "digest": {
-        "sha1": "$gitCommit"
-      }
+    
+    # Find the created .tgz file
+    $tgzFile = Get-ChildItem -Path . -Filter "*.tgz" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    
+    if (-not $tgzFile) {
+        Write-Host "##teamcity[message text='No .tgz file found after npm pack' status='ERROR']"
+        Write-Error "❌ No .tgz file found after npm pack"
+        exit 1
     }
-  ]
+    
+    Write-Host "Package created: $($tgzFile.Name)"
+    Write-Host "##teamcity[message text='npm pack created: $($tgzFile.Name)' status='NORMAL']"
+    
+    # Rename to include build number
+    $finalPackageName = "Portfolio-$buildNumber.tgz"
+    $dest = Join-Path -Path $artifactsDir -ChildPath $finalPackageName
+    
+    # Move and rename .tgz to artifacts folder
+    Move-Item $tgzFile.FullName $dest -Force
+    
+    Write-Host "✅ Package moved to artifacts folder: $dest"
+    Write-Host "##teamcity[message text='Package ready: $finalPackageName' status='NORMAL']"
+    
+    # Publish artifact path for TeamCity
+    Write-Host "##teamcity[publishArtifacts '$dest']"
+    
+    # Set TeamCity parameter with package path
+    Write-Host "##teamcity[setParameter name='npm.package.path' value='$dest']"
+    Write-Host "##teamcity[setParameter name='npm.package.name' value='$finalPackageName']"
+    
 }
-"@
-
-# Write without BOM using .NET method
-$utf8NoBom = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText($provenanceFile, $provenanceJson, $utf8NoBom)
-Write-Host "🧾 Provenance file created: $provenanceFile"
-
-# ==============================
-# Sign the package
-# ==============================
-Write-Host "✍️  Signing package with cosign..."
-& cosign sign-blob --key $cosignKeyFile --output-signature $signatureFile $packageFile --yes
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ cosign sign-blob failed with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
-}
-Write-Host "✅ Package signed: $signatureFile"
-
-# ==============================
-# Create and sign attestation
-# ==============================
-Write-Host "🪪 Creating SLSA attestation..."
-$signature = & cosign attest-blob --predicate $provenanceFile --type slsaprovenance --key $cosignKeyFile --yes $packageFile
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ cosign attest-blob failed with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
-}
-Set-Content -Path $attestationFile -Value $signature
-Write-Host "✅ Attestation created: $attestationFile"
-
-# ==============================
-# Publish to Cloudsmith npm registry
-# ==============================
-Write-Host "📦 Publishing to Cloudsmith npm registry: $npmRegistry"
-
-# Check for authentication token
-$npmToken = if ($env:NPM_TOKEN) { $env:NPM_TOKEN } else { $env:CLOUDSMITH_API_KEY }
-
-if (-not $npmToken) {
-    Write-Error "❌ NPM_TOKEN or CLOUDSMITH_API_KEY not found. Cannot publish to npm."
+catch {
+    Write-Host "##teamcity[message text='npm pack failed: $($_.Exception.Message)' status='ERROR']"
+    Write-Error "❌ npm pack failed: $($_.Exception.Message)"
     exit 1
 }
-
-# Configure npm authentication for Cloudsmith
-& npm config set "//npm.cloudsmith.io/gurdipdevops/portfolio/:_authToken" $npmToken
-
-# Publish the tarball to npm registry
-& npm publish $packageFile --registry $npmRegistry
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "❌ npm publish failed with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
-}
-
-Write-Host "✅ Package published to npm registry"
-
 # ==============================
 # Summary
 # ==============================
 Write-Host ""
-Write-Host "🎉 All steps completed successfully!"
-Write-Host "   Package:        $packageFile"
-Write-Host "   Signature:      $signatureFile"
-Write-Host "   Provenance:     $provenanceFile"
-Write-Host "   Attestation:    $attestationFile"
-Write-Host "   npm Registry:   $npmRegistry"
-Write-Host "   Build Number:   %build.number%"]]></param>
+Write-Host "##teamcity[progressMessage 'npm pack completed successfully']"
+Write-Host "🎉 npm pack completed successfully!"
+Write-Host "   Package: $finalPackageName"
+Write-Host "   Location: $artifactsDir"
+Write-Host ""]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
