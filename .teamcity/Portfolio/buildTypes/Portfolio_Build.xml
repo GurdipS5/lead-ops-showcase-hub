@@ -1174,92 +1174,6 @@ catch {
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
-      <runner id="Create_Octopus_Build_Infomration" name="Create Octopus Build Information" type="jetbrains_powershell">
-        <parameters>
-          <param name="jetbrains_powershell_execution" value="PS1" />
-          <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# TeamCity build info variables
-$BuildNumber  = "%build.number%"
-$BuildId      = "%teamcity.build.id%"
-$BuildBranch  = "%vcsroot.branch%"
-$CommitSha    = "%build.vcs.number%"
-$RepoUrl      = "%env.BUILD_VCS_URL%"
-$TeamCityUrl  = "%teamcity.url%"
-$PackageId    = "Portfolio"
-$OctoApiKey   = "%env.OCTOPUS_KEY%"
-$OctoServer   = "%env.OCTOPUS_SERVER%"
-
-# Path for the build info JSON file in the checkout directory
-$CheckoutDir   = "%teamcity.build.checkoutDir%"
-$BuildInfoFile = Join-Path $CheckoutDir "buildinfo.octopus"
-
-# Create a simple build info file for Octopus
-$BuildInfo = @{
-    BuildNumber = $BuildNumber
-    BuildId     = $BuildId
-    Branch      = $BuildBranch
-    Commit      = $CommitSha
-    Repository  = $RepoUrl
-    TeamCityUrl = $TeamCityUrl
-} | ConvertTo-Json -Depth 5
-
-$BuildInfo | Set-Content -Path $BuildInfoFile -Encoding UTF8
-Write-Host "✅ Build info written to $BuildInfoFile"
-
-# Prepare Octopus CLI arguments
-$arguments = @(
-    "build-information",
-    "--server=$OctoServer",
-    "--apiKey=$OctoApiKey",
-    "--package-id=$PackageId",
-    "--version=$BuildNumber",
-    "--file=$BuildInfoFile"
-)
-
-# Execute the Octopus CLI command
-Write-Host "🚀 Uploading build information to Octopus Deploy..."
-& octo @arguments]]></param>
-          <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="execute_if_failed" />
-        </parameters>
-      </runner>
-      <runner id="Create_Octopus_Deplo" name="Create Octopus Deploy Release" type="jetbrains_powershell">
-        <parameters>
-          <param name="jetbrains_powershell_execution" value="PS1" />
-          <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# TeamCity build info variables
-$BuildNumber  = "%build.number%"
-$BuildBranch  = "%vcsroot.branch%"
-$CommitSha    = "%build.vcs.number%"
-$PackageId    = "Portfolio"
-$OctoApiKey   = "%env.OCTOPUS_KEY%"
-$OctoServer   = "%env.OCTOPUS_SERVER%"
-$ProjectName  = "Portfolio"  # Your Octopus project name
-
-# Create the release
-$createReleaseArgs = @(
-    "create-release",
-    "--server=$OctoServer",
-    "--apiKey=$OctoApiKey",
-    "--project=$ProjectName",
-    "--version=$BuildNumber",
-    "--packageVersion=$BuildNumber",
-    "--releaseNotes=Build: $BuildNumber | Branch: $BuildBranch | Commit: $CommitSha"
-)
-
-Write-Host "📦 Creating release $BuildNumber in Octopus Deploy..."
-& octo @createReleaseArgs
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to create release"
-    exit $LASTEXITCODE
-}
-
-Write-Host "✅ Release $BuildNumber created successfully!"]]></param>
-          <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="execute_if_failed" />
-        </parameters>
-      </runner>
       <runner id="Cosign_and_Push_Package" name="Cosign and Push Package" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
@@ -1738,6 +1652,92 @@ catch {
     Write-Host $_.ScriptStackTrace
     exit 1
 }]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+        </parameters>
+      </runner>
+      <runner id="Create_Octopus_Build_Infomration" name="Create Octopus Build Information" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# TeamCity build info variables
+$BuildNumber  = "%build.number%"
+$BuildId      = "%teamcity.build.id%"
+$BuildBranch  = "%vcsroot.branch%"
+$CommitSha    = "%build.vcs.number%"
+$RepoUrl      = "%env.BUILD_VCS_URL%"
+$TeamCityUrl  = "%teamcity.url%"
+$PackageId    = "Portfolio"
+$OctoApiKey   = "%env.OCTOPUS_KEY%"
+$OctoServer   = "%env.OCTOPUS_SERVER%"
+
+# Path for the build info JSON file in the checkout directory
+$CheckoutDir   = "%teamcity.build.checkoutDir%"
+$BuildInfoFile = Join-Path $CheckoutDir "buildinfo.octopus"
+
+# Create a simple build info file for Octopus
+$BuildInfo = @{
+    BuildNumber = $BuildNumber
+    BuildId     = $BuildId
+    Branch      = $BuildBranch
+    Commit      = $CommitSha
+    Repository  = $RepoUrl
+    TeamCityUrl = $TeamCityUrl
+} | ConvertTo-Json -Depth 5
+
+$BuildInfo | Set-Content -Path $BuildInfoFile -Encoding UTF8
+Write-Host "✅ Build info written to $BuildInfoFile"
+
+# Prepare Octopus CLI arguments
+$arguments = @(
+    "build-information",
+    "--server=$OctoServer",
+    "--apiKey=$OctoApiKey",
+    "--package-id=$PackageId",
+    "--version=$BuildNumber",
+    "--file=$BuildInfoFile"
+)
+
+# Execute the Octopus CLI command
+Write-Host "🚀 Uploading build information to Octopus Deploy..."
+& octo @arguments]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+        </parameters>
+      </runner>
+      <runner id="Create_Octopus_Deplo" name="Create Octopus Deploy Release" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# TeamCity build info variables
+$BuildNumber  = "%build.number%"
+$BuildBranch  = "%vcsroot.branch%"
+$CommitSha    = "%build.vcs.number%"
+$PackageId    = "Portfolio"
+$OctoApiKey   = "%env.OCTOPUS_KEY%"
+$OctoServer   = "%env.OCTOPUS_SERVER%"
+$ProjectName  = "Portfolio"  # Your Octopus project name
+
+# Create the release
+$createReleaseArgs = @(
+    "create-release",
+    "--server=$OctoServer",
+    "--apiKey=$OctoApiKey",
+    "--project=$ProjectName",
+    "--version=$BuildNumber",
+    "--packageVersion=$BuildNumber",
+    "--releaseNotes=Build: $BuildNumber | Branch: $BuildBranch | Commit: $CommitSha"
+)
+
+Write-Host "📦 Creating release $BuildNumber in Octopus Deploy..."
+& octo @createReleaseArgs
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to create release"
+    exit $LASTEXITCODE
+}
+
+Write-Host "✅ Release $BuildNumber created successfully!"]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
