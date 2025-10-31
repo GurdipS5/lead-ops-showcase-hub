@@ -9,6 +9,7 @@
     </options>
     <disabled-settings>
       <setting-ref ref="Checkin_to_GitHub" />
+      <setting-ref ref="Sign_with_Cosign" />
       <setting-ref ref="sdsdds" />
     </disabled-settings>
     <parameters>
