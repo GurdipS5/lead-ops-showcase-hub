@@ -556,7 +556,7 @@ kosli attest snyk --flow portfolio-flow --trail "Portfolio-trail-%env.BUILD_NUMB
 
 $DIST_FOLDER = "dist"
 $OUTPUT_FOLDER = "artifacts/publish"
-$PACKAGE_NAME = "Portfolio"  # Base package name
+$PACKAGE_NAME = "Portfolio"
 
 # ===========================
 # Error Handling
@@ -625,10 +625,10 @@ try {
         Write-Host "Package version: $version"
         
         # Pack the package
-        $packResult = npm pack 2>&1
+        npm pack
         
         if ($LASTEXITCODE -ne 0) {
-            throw "npm pack failed with exit code $LASTEXITCODE. Output: $packResult"
+            throw "npm pack failed with exit code $LASTEXITCODE"
         }
         
         # Find the created tarball
