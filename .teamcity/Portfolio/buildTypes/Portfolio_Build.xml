@@ -1385,8 +1385,19 @@ function Sign-WithCosign {
     
     # Save private key to temporary file
     $keyFile = Join-Path $env:TEMP "cosign.key"
-    # Write key with proper line endings (PEM files need newlines preserved)
-    $COSIGN_PRIVATE_KEY | Out-File -FilePath $keyFile -Encoding utf8
+    
+    # Clean and write key with proper formatting
+    # Trim whitespace and ensure proper line endings
+    $cleanKey = $COSIGN_PRIVATE_KEY.Trim()
+    
+    # Write key using .NET to avoid PowerShell's BOM and encoding issues
+    [System.IO.File]::WriteAllText($keyFile, $cleanKey, [System.Text.UTF8Encoding]::new($false))
+    
+    # Verify key file was created
+    if (-not (Test-Path $keyFile)) {
+        throw "Failed to create key file at $keyFile"
+    }
+    Write-Host "Key file created: $keyFile ($(( Get-Item $keyFile).Length) bytes)"
     
     try {
         # Set environment variable for password if provided
@@ -1428,8 +1439,13 @@ function Create-Attestation {
     
     # Save private key to temporary file
     $keyFile = Join-Path $env:TEMP "cosign.key"
-    # Write key with proper line endings (PEM files need newlines preserved)
-    $COSIGN_PRIVATE_KEY | Out-File -FilePath $keyFile -Encoding utf8
+    
+    # Clean and write key with proper formatting
+    # Trim whitespace and ensure proper line endings
+    $cleanKey = $COSIGN_PRIVATE_KEY.Trim()
+    
+    # Write key using .NET to avoid PowerShell's BOM and encoding issues
+    [System.IO.File]::WriteAllText($keyFile, $cleanKey, [System.Text.UTF8Encoding]::new($false))
     
     try {
         if ($COSIGN_PASSWORD) {
