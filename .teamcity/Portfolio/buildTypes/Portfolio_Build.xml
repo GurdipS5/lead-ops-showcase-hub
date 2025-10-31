@@ -712,6 +712,7 @@ $CLOUDSMITH_RAW_REPO = "portfolio-raw"  # Repository for cosign artifacts zip
 
 # Package Configuration
 $PACKAGE_PATH = "dist"  # Path to your package.json directory
+$TARBALL_PATH = "artifacts/publish"  # Path to your tarball files
 $PACKAGE_JSON = Join-Path $PACKAGE_PATH "package.json"
 
 # Cosign Configuration
@@ -796,10 +797,16 @@ function Find-PackageTarball {
     # Expected tarball name format
     $tarballPattern = "$($PackageName.Replace('@','').Replace('/','-'))-$PackageVersion.tgz"
     
-    # Search in current directory and package path
-    $searchPaths = @($PACKAGE_PATH, ".")
+    # Search in tarball path first, then package path, then current directory
+    $searchPaths = @($TARBALL_PATH, $PACKAGE_PATH, ".")
     
     foreach ($searchPath in $searchPaths) {
+        # Skip if path doesn't exist
+        if (-not (Test-Path $searchPath)) {
+            Write-Host "Search path does not exist: $searchPath"
+            continue
+        }
+        
         $tarball = Get-ChildItem -Path $searchPath -Filter $tarballPattern -ErrorAction SilentlyContinue | Select-Object -First 1
         if ($tarball) {
             Write-Success "Found package tarball: $($tarball.FullName)"
@@ -807,14 +814,20 @@ function Find-PackageTarball {
         }
     }
     
-    # If not found with exact name, try to find any .tgz file
-    $anyTarball = Get-ChildItem -Path $PACKAGE_PATH -Filter "*.tgz" -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($anyTarball) {
-        Write-Host "Warning: Using tarball $($anyTarball.Name) - verify this is correct"
-        return $anyTarball.FullName
+    # If not found with exact name, try to find any .tgz file in tarball path first
+    foreach ($searchPath in $searchPaths) {
+        if (-not (Test-Path $searchPath)) {
+            continue
+        }
+        
+        $anyTarball = Get-ChildItem -Path $searchPath -Filter "*.tgz" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($anyTarball) {
+            Write-Host "Warning: Using tarball $($anyTarball.Name) from $searchPath - verify this is correct"
+            return $anyTarball.FullName
+        }
     }
     
-    throw "Package tarball not found. Expected: $tarballPattern"
+    throw "Package tarball not found. Expected: $tarballPattern in paths: $($searchPaths -join ', ')"
 }
 
 function Create-Provenance {
@@ -971,7 +984,13 @@ function Create-ArtifactsZip {
     $provenanceFile = "$PackageTarball.provenance.json"
     
     $zipFileName = "$($PackageName.Replace('@','').Replace('/','-'))-$PackageVersion-cosign-artifacts.zip"
-    $zipPath = Join-Path $PACKAGE_PATH $zipFileName
+    
+    # Save zip to tarball path if it exists, otherwise use package path
+    if (Test-Path $TARBALL_PATH) {
+        $zipPath = Join-Path $TARBALL_PATH $zipFileName
+    } else {
+        $zipPath = Join-Path $PACKAGE_PATH $zipFileName
+    }
     
     # Remove existing zip if present
     if (Test-Path $zipPath) {
