@@ -1228,18 +1228,28 @@ function Write-Error {
 }
 
 function Install-Cosign {
-    Write-Step "Installing Cosign"
+    Write-Step "Checking for Cosign"
     
+    # First, check if cosign is already available in PATH
+    $existingCosign = Get-Command cosign -ErrorAction SilentlyContinue
+    if ($existingCosign) {
+        Write-Success "Using existing Cosign installation: $($existingCosign.Source)"
+        return $existingCosign.Source
+    }
+    
+    # If not in PATH, check if we've already downloaded it to TEMP
     $cosignPath = Join-Path $env:TEMP "cosign.exe"
     
     if (Test-Path $cosignPath) {
-        Write-Success "Cosign already downloaded"
+        Write-Success "Using previously downloaded Cosign from TEMP"
         return $cosignPath
     }
     
+    # Download cosign if not found
+    Write-Host "Cosign not found, downloading version $COSIGN_VERSION..."
     try {
         Invoke-WebRequest -Uri $COSIGN_URL -OutFile $cosignPath
-        Write-Success "Cosign downloaded successfully"
+        Write-Success "Cosign downloaded successfully to $cosignPath"
         return $cosignPath
     }
     catch {
@@ -1405,8 +1415,8 @@ function Sign-WithCosign {
             $env:COSIGN_PASSWORD = $COSIGN_PASSWORD
         }
         
-        # Sign the file
-        & $CosignPath sign-blob --key $keyFile --output-signature "$FilePath.sig" --output-certificate "$FilePath.pem" $FilePath
+        # Sign the file (--yes auto-accepts transparency log upload prompt for automated builds)
+        & $CosignPath sign-blob --yes --key $keyFile --output-signature "$FilePath.sig" --output-certificate "$FilePath.pem" $FilePath
         
         if ($LASTEXITCODE -ne 0) {
             throw "Cosign signing failed with exit code $LASTEXITCODE"
@@ -1452,8 +1462,8 @@ function Create-Attestation {
             $env:COSIGN_PASSWORD = $COSIGN_PASSWORD
         }
         
-        # Create attestation
-        & $CosignPath attest --key $keyFile --predicate $ProvenanceFile --type slsaprovenance $PackageTarball
+        # Create attestation (--yes auto-accepts transparency log upload prompt for automated builds)
+        & $CosignPath attest --yes --key $keyFile --predicate $ProvenanceFile --type slsaprovenance $PackageTarball
         
         if ($LASTEXITCODE -ne 0) {
             throw "Cosign attestation failed with exit code $LASTEXITCODE"
