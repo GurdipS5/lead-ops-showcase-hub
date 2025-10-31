@@ -701,9 +701,9 @@ catch {
 # ===========================
 
 # TeamCity Parameters
-$COSIGN_PRIVATE_KEY = "%COSIGN_KEY%"  # TeamCity secure parameter
-$COSIGN_PASSWORD  "%COSIGN_PASSWORD%"        # TeamCity secure parameter (if key is encrypted)
-$CLOUDSMITH_API_KEY = "%CLOUDSMITH_API_KEY%"  # TeamCity secure parameter
+$COSIGN_PRIVATE_KEY = "%env.COSIGN_KEY%"  # TeamCity secure parameter
+$COSIGN_PASSWORD  "%env.COSIGN_PASSWORD%"        # TeamCity secure parameter (if key is encrypted)
+$CLOUDSMITH_API_KEY = "%env.CLOUDSMITH_API_KEY%"  # TeamCity secure parameter
 
 # Cloudsmith Configuration
 $CLOUDSMITH_ORG = "gurdipdevops"
