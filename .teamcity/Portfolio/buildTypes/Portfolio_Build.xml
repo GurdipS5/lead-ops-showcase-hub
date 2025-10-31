@@ -711,7 +711,7 @@ $CLOUDSMITH_REPO = "portfolio"
 $CLOUDSMITH_RAW_REPO = "portfolio-raw"  # Repository for cosign artifacts zip
 
 # Package Configuration
-$PACKAGE_PATH = "."  # Path to your package.json directory
+$PACKAGE_PATH = "dist"  # Path to your package.json directory
 $PACKAGE_JSON = Join-Path $PACKAGE_PATH "package.json"
 
 # Cosign Configuration
