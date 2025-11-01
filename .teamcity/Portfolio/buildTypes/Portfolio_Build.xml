@@ -1631,8 +1631,9 @@ try {
     # Sign provenance file
     Sign-WithCosign -CosignPath $cosignPath -FilePath $provenanceFile
     
-    # Create attestation
-    Create-Attestation -CosignPath $cosignPath -ProvenanceFile $provenanceFile -PackageTarball $packageTarball
+    # Note: Skipping attestation - the 'attest' command is designed for container images, not npm packages
+    # We're already signing both the tarball and provenance file which provides the necessary signatures
+    # Create-Attestation -CosignPath $cosignPath -ProvenanceFile $provenanceFile -PackageTarball $packageTarball
     
     # Create zip of all cosign artifacts
     $artifactsZip = Create-ArtifactsZip -PackageTarball $packageTarball -PackageName $packageInfo.Name -PackageVersion $packageInfo.Version
