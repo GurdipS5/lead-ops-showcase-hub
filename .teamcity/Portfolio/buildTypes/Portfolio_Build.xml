@@ -28,15 +28,6 @@
       <param name="teamcity.url" value="%teamcity.serverUrl%/viewLog.html?buildId=%teamcity.build.id%" />
     </parameters>
     <build-runners>
-      <runner id="Test" name="Execute Fraim" type="jetbrains_powershell">
-        <parameters>
-          <param name="jetbrains_powershell_execution" value="PS1" />
-          <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code" value="fraim --debug run code --location . --confidence 6 --chunk-size 400" />
-          <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
-        </parameters>
-      </runner>
       <runner id="Create_artifact_dirs" name="Create artifact dirs" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
@@ -133,6 +124,15 @@ $Artifacts = $result
 return $result]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
+        </parameters>
+      </runner>
+      <runner id="Test" name="Execute Fraim" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code" value="fraim --debug run code --location . --confidence 6 --chunk-size 400" />
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="default" />
         </parameters>
       </runner>
       <runner id="simpleRunner_1" name="NPM Install" type="simpleRunner">
