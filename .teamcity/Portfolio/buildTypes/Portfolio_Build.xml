@@ -83,7 +83,8 @@ $relativePaths = @(
     'artifacts\gitguardian',
     'artifacts\snyk',
     'artifacts\publish',
-    'artifacts\sonar'
+    'artifacts\sonar',
+    'artifacts/semgrep'
 )
 
 $result = foreach ($rel in $relativePaths) {
