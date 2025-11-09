@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-type xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" uuid="10d32fae-1802-4bd4-83f1-d8e593924d06" xsi:noNamespaceSchemaLocation="https://www.jetbrains.com/teamcity/schemas/2025.3/project-config.xsd">
+  <name>SemgrepSCAScan</name>
+  <description />
+  <settings>
+    <vcs-settings>
+      <vcs-entry-ref root-id="Portfolio_HttpsGithubComGurdipSCodeDevopsGurdipPortfolioRefsHeadsMain" />
+    </vcs-settings>
+    <build-triggers>
+      <build-trigger id="TRIGGER_5" type="vcsTrigger">
+        <parameters>
+          <param name="branchFilter" value="+:*" />
+          <param name="enableQueueOptimization" value="true" />
+          <param name="quietPeriodMode" value="DO_NOT_USE" />
+        </parameters>
+      </build-trigger>
+    </build-triggers>
+    <build-extensions>
+      <extension id="perfmon" type="perfmon">
+        <parameters>
+          <param name="teamcity.perfmon.feature.enabled" value="true" />
+        </parameters>
+      </extension>
+    </build-extensions>
+  </settings>
+</build-type>
+
