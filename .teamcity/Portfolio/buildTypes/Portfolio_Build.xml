@@ -351,6 +351,45 @@ exit 0]]></param>
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
+      <runner id="ExecuteSemgrep" name="Execute Semgrep" type="jetbrains_powershell">
+        <parameters>
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[# Semgrep CI Scan Script
+# Executes Semgrep scan and saves SARIF results to /artifacts/semgrep
+
+# Set variables
+$artifactsPath = "/artifacts/semgrep"
+$sarifOutputFile = "$artifactsPath/semgrep-results.sarif"
+
+# Create the semgrep directory only if it doesn't exist
+if (-not (Test-Path -Path $artifactsPath)) {
+    Write-Host "Creating output directory: $artifactsPath" -ForegroundColor Cyan
+    New-Item -ItemType Directory -Path $artifactsPath | Out-Null
+} else {
+    Write-Host "Output directory already exists: $artifactsPath" -ForegroundColor Gray
+}
+
+# Run Semgrep CI scan with SARIF output
+Write-Host "Running Semgrep CI scan..." -ForegroundColor Cyan
+try {
+    semgrep ci --sarif --output $sarifOutputFile
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✓ Semgrep scan completed successfully!" -ForegroundColor Green
+        Write-Host "Results saved to: $sarifOutputFile" -ForegroundColor Green
+    } else {
+        Write-Host "⚠ Semgrep scan completed with findings (exit code: $LASTEXITCODE)" -ForegroundColor Yellow
+        Write-Host "Results saved to: $sarifOutputFile" -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "✗ Error running Semgrep scan: $_" -ForegroundColor Red
+    exit 1
+}]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
+        </parameters>
+      </runner>
       <runner id="Run_CycloneDX" name="Run CycloneDX" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
@@ -1732,45 +1771,6 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "✅ Release $BuildNumber created successfully!"]]></param>
-          <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="execute_if_failed" />
-        </parameters>
-      </runner>
-      <runner id="ExecuteSemgrep" name="Execute Semgrep" type="jetbrains_powershell">
-        <parameters>
-          <param name="jetbrains_powershell_execution" value="PS1" />
-          <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# Semgrep CI Scan Script
-# Executes Semgrep scan and saves SARIF results to /artifacts/semgrep
-
-# Set variables
-$artifactsPath = "/artifacts/semgrep"
-$sarifOutputFile = "$artifactsPath/semgrep-results.sarif"
-
-# Create the semgrep directory only if it doesn't exist
-if (-not (Test-Path -Path $artifactsPath)) {
-    Write-Host "Creating output directory: $artifactsPath" -ForegroundColor Cyan
-    New-Item -ItemType Directory -Path $artifactsPath | Out-Null
-} else {
-    Write-Host "Output directory already exists: $artifactsPath" -ForegroundColor Gray
-}
-
-# Run Semgrep CI scan with SARIF output
-Write-Host "Running Semgrep CI scan..." -ForegroundColor Cyan
-try {
-    semgrep ci --sarif --output $sarifOutputFile
-    
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "✓ Semgrep scan completed successfully!" -ForegroundColor Green
-        Write-Host "Results saved to: $sarifOutputFile" -ForegroundColor Green
-    } else {
-        Write-Host "⚠ Semgrep scan completed with findings (exit code: $LASTEXITCODE)" -ForegroundColor Yellow
-        Write-Host "Results saved to: $sarifOutputFile" -ForegroundColor Yellow
-    }
-} catch {
-    Write-Host "✗ Error running Semgrep scan: $_" -ForegroundColor Red
-    exit 1
-}]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
