@@ -1818,6 +1818,16 @@ fraim run risk_flagger --location . --diff --base main --head HEAD \
           <param name="teamcity.perfmon.feature.enabled" value="true" />
         </parameters>
       </extension>
+      <extension id="BUILD_EXT_2" type="pullRequests">
+        <parameters>
+          <param name="authenticationType" value="token" />
+          <param name="filterAuthorRole" value="MEMBER" />
+          <param name="filterTargetBranch" value="main" />
+          <param name="providerType" value="github" />
+          <param name="secure:accessToken" value="zxx92e31830d4146af088134d6e4bdf4676a9a097887ccd503932e956cd1e9bea9d" />
+          <param name="vcsRootId" value="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
+        </parameters>
+      </extension>
     </build-extensions>
   </settings>
 </build-type>
