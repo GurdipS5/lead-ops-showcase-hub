@@ -1783,11 +1783,10 @@ Write-Host "✅ Release $BuildNumber created successfully!"]]></param>
 $repo = "$env:teamcity_pullRequest_repository"
 $prUrl = "https://github.com/$repo/pull/$prNumber"
 Write-Host "PR URL: $prUrl"
-%teamcity.build
 
 # Automated PR analysis with team notification
 fraim run risk_flagger --location . --diff --base main --head HEAD \
-  --pr-url https://github.com/owner/repo/pull/123 \
+  --pr-url $prUrl \
   --approver security-team \
   --custom-risk-list-json '{"Example Rule": "Flag this rule on every diff, it is an example to show how the workflow works."}' \
   --custom-risk-list-action replace]]></param>
