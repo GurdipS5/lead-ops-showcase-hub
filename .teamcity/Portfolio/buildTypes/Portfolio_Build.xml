@@ -24,7 +24,7 @@
       <param name="env.KOSLI_KEY" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/KOSLI_API_KEY!/kosli_api_key' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.OCTOPUS_PROJECT_NAME" value="Portfolio" />
       <param name="env.SBOMPath" value="%teamcity.build.checkoutDir%/artifacts/cyclonedx/sbom.json" />
-      <param name="env.SONAR_TOKEN" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kv/data/SONAR_TOKEN!/sonar_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
+      <param name="env.SONAR_TOKEN" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kvv2/data/SONAR_TOKEN!/sonar_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="teamcity.url" value="%teamcity.serverUrl%/viewLog.html?buildId=%teamcity.build.id%" />
     </parameters>
     <build-runners>
