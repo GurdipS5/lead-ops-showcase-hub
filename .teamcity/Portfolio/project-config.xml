@@ -5,7 +5,6 @@
     <param name="env.ANTHROPIC_API_KEY" value="" spec="remote remoteType='hashicorp-vault' teamcity_hashicorp_vault_vaultQuery='kvv2/data/ANTHROPIC_API_KEY!/anthropic_api_key' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
     <param name="env.COSIGN_KEY" value="" spec="remote remoteType='hashicorp-vault' teamcity_hashicorp_vault_vaultQuery='kvv2/data/COSIGN_KEY!/cosign_key' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
     <param name="env.DTRACK_API_KEY" value="" spec="remote remoteType='hashicorp-vault' teamcity_hashicorp_vault_vaultQuery='kvv2/data/DTRACK_API_KEY!/a' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
-    <param name="env.HARBOR_ROBOT" value="" spec="remote remoteType='hashicorp-vault' teamcity_hashicorp_vault_vaultQuery='kv/data/HARBOR_ROBOT!/harbor_robot' display='hidden' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
     <param name="env.OCTOPUS_KEY" value="" spec="remote remoteType='hashicorp-vault' teamcity_hashicorp_vault_vaultQuery='kvv2/data/OCTOPUS_KEY!/octopus_key' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
     <param name="env.OctopusProjectName" value="Portfolio" />
     <param name="env.OctopusServerUrl" value="http://octopusd.gssira.com" />
