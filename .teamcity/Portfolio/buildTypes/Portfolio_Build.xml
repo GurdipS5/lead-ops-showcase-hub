@@ -1823,7 +1823,7 @@ fraim run risk_flagger --location . --diff --base main --head HEAD \
           <param name="filterAuthorRole" value="MEMBER" />
           <param name="filterTargetBranch" value="main" />
           <param name="providerType" value="github" />
-          <param name="secure:accessToken" value="zxx92e31830d4146af088134d6e4bdf4676a9a097887ccd503932e956cd1e9bea9d" />
+          <param name="secure:accessToken" value="zxxe48fdb69960388d34d28335b0ad79b3d7e6e6a67deacd0e47f0e9d649c1b5263b30c44649228a8e8775d03cbe80d301b" />
           <param name="vcsRootId" value="Portfolio_HttpsGithubComGurdipS5leadOpsShowcaseHubRefsHeadsMain" />
         </parameters>
       </extension>
