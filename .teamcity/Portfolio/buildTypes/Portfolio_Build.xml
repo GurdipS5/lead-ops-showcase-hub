@@ -19,7 +19,6 @@
       <param name="env.CLOUDSMITH_API_KEY" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kvv2/data/CLOUDSMITH_API_TOKEN!/cloudsmith_api_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.COSIGN_PASSWORD" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kvv2/data/COSIGN_PASSWORD!/cosign_password' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.DOTNET_CLI_HOME" value="/tmp" />
-      <param name="env.GITGUARDIAN_API_KEY" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kvvv2/data/GITGUARDIAN_TOKEN!/gitguardian_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.GitGuardianDir" value="%teamcity.build.checkoutDir%/artifacts/gitguardian/" />
       <param name="env.KOSLI_KEY" value="" spec="remote remoteType='hashicorp-vault' buildTypeId='Portfolio_Build' teamcity_hashicorp_vault_vaultQuery='kvv2/data/KOSLI_API_KEY!/kosli_api_key' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
       <param name="env.OCTOPUS_PROJECT_NAME" value="Portfolio" />
