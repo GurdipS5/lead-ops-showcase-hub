@@ -132,7 +132,7 @@ return $result]]></param>
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[C:\Users\Administrator\pipx\venvs\fraim\Scripts\fraim.exe --debug run code --location . --confidence 6 --chunk-size 400 --output /artifacts/fraim/code-results.sarif
+          <param name="jetbrains_powershell_script_code"><![CDATA[C:\Users\Administrator\pipx\venvs\fraim\Scripts\fraim.exe --debug run code --location . --confidence 6 --chunk-size 400 --format text
 C:\Users\Administrator\pipx\venvs\fraim\Scripts\fraim.exe run risk_flagger --location . --diff `
 --custom-risk-list-json '{
   "SQL Injection": "Unsanitized user input being used directly in SQL queries",
