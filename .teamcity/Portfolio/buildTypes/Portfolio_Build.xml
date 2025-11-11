@@ -84,6 +84,7 @@ $relativePaths = @(
     'artifacts\snyk',
     'artifacts\publish',
     'artifacts\sonar',
+    'artifacts/fraim',
     'artifacts/semgrep'
 )
 
