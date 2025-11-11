@@ -10,7 +10,6 @@
     <param name="env.OctopusServerUrl" value="http://octopusd.gssira.com" />
     <param name="env.SNYK_TOKEN" value="" spec="remote remoteType='hashicorp-vault' teamcity_hashicorp_vault_vaultQuery='kvv2/data/SNYK_TOKEN!/snyk_token' display='normal' teamcity_hashicorp_vault_namespace='PortfolioSecrets' projectId='Portfolio'" />
     <param name="env.blah" value="sdffd" spec="text display='hidden' description='ffdfd' validationMode='any'" />
-    <param name="env.dsdsdsdsd" value="dsdsdss" spec="remote remoteType='hashicorp-vault' teamcity_hashicorp_vault_vaultQuery='kv/data/OCTOPUS_KEY!/octopus_key' display='hidden' teamcity_hashicorp_vault_namespace='PortfolioSecrets' description='dsdsds' label='dsdss' projectId='Portfolio'" />
   </parameters>
   <project-extensions>
     <extension id="PROJECT_EXT_4" type="versionedSettings">
