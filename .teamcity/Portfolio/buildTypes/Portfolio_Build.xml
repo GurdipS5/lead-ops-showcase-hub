@@ -132,7 +132,7 @@ return $result]]></param>
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code" value="C:\Users\Administrator\pipx\venvs\fraim\Scripts\fraim.exe --debug run code --location . --confidence 6 --chunk-size 400 --show-logs false" />
+          <param name="jetbrains_powershell_script_code" value="C:\Users\Administrator\pipx\venvs\fraim\Scripts\fraim.exe  --show-logs false run code --location . --confidence 6 --chunk-size 400" />
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
