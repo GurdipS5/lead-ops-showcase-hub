@@ -132,20 +132,7 @@ return $result]]></param>
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[C:\Users\Administrator\pipx\venvs\fraim\Scripts\fraim.exe --debug run code --location . --confidence 6 --chunk-size 400 --format text
-C:\Users\Administrator\pipx\venvs\fraim\Scripts\fraim.exe run risk_flagger --location . --diff `
---custom-risk-list-json '{
-  "SQL Injection": "Unsanitized user input being used directly in SQL queries",
-  "XSS Vulnerability": "User-controlled data rendered without proper encoding or sanitization",
-  "Authentication Bypass": "Missing or weak authentication checks on protected endpoints",
-  "CSRF Protection Missing": "State-changing operations without CSRF token validation",
-  "Insecure Direct Object Reference": "User-controlled IDs accessing resources without authorization checks",
-  "Sensitive Data Exposure": "Passwords, API keys, or tokens stored in plaintext or logged",
-  "Broken Access Control": "Missing authorization checks allowing unauthorized access to resources",
-  "Security Misconfiguration": "Default credentials, unnecessary services, or overly permissive settings",
-  "Insecure Deserialization": "Untrusted data being deserialized without validation",
-  "Path Traversal": "File paths constructed from user input without proper sanitization"
-}' --output /artifacts/fraim/risk-flagger-results.sarif]]></param>
+          <param name="jetbrains_powershell_script_code" value="C:\Users\Administrator\pipx\venvs\fraim\Scripts\fraim.exe --debug run code --location . --confidence 6 --chunk-size 400 --format text" />
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
