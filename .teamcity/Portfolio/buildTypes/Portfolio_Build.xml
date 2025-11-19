@@ -1616,7 +1616,14 @@ function Upload-ToCloudsmith {
         if (Test-Path $ArtifactsZip) {
             Write-Host "Uploading cosign artifacts zip..."
             $artifactsName = "$($PackageName.Replace('@','').Replace('/','-'))-cosign-artifacts"
-            py -3.11 -m cloudsmith_cli push raw "$CLOUDSMITH_ORG/$CLOUDSMITH_RAW_REPO" $ArtifactsZip --name $artifactsName --summary "Cosign signatures, certificates, and provenance for $PackageName@$PackageVersion"
+
+            $python = "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\python.exe"
+
+            & $python -m cloudsmith_cli push raw `
+                "$env:CLOUDSMITH_ORG/$env:CLOUDSMITH_RAW_REPO" `
+                $ArtifactsZip `
+                --name $artifactsName `
+                --summary "Cosign signatures, certificates, and provenance for $PackageName@$PackageVersion"
             
             if ($LASTEXITCODE -ne 0) {
                 Write-Host "Warning: Failed to upload cosign artifacts zip (exit code $LASTEXITCODE)"
