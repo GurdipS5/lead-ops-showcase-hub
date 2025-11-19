@@ -1626,7 +1626,7 @@ function Upload-ToCloudsmith {
             Write-Host "Uploading cosign artifacts zip..."
             $artifactsName = "$($PackageName.Replace('@','').Replace('/','-'))-cosign-artifacts"
 
-            $python = "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\python.exe"
+            $python = "C:\Program Files\Python311\python.exe"
 
             & $python -m cloudsmith_cli push raw `
                 "$env:CLOUDSMITH_ORG/$env:CLOUDSMITH_RAW_REPO" `
