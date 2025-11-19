@@ -1690,7 +1690,7 @@ catch {
     Write-Host "`n======================================"
     Write-Error "Build failed: $_"
     Write-Host "======================================`n"
-    Write-Host $_.ScriptStackTrace
+    Write-Host $_
     exit 1
 }]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
