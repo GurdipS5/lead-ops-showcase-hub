@@ -428,8 +428,7 @@ if ($LASTEXITCODE -eq 0) {
 $repo = "$env:teamcity_pullRequest_repository"
 $prUrl = "https://github.com/$repo/pull/$prNumber"
 Write-Host "PR URL: $prUrl"
-$env:SEMGREP_API_KEY = "%env.ANTHROPIC_API_KEY%%"
-
+$env:SEMGREP_API_KEY = $env:ANTHROPIC_API_KEY
 
 # Automated PR analysis with team notification
 fraim run risk_flagger --location . --diff --base main --head HEAD   `
