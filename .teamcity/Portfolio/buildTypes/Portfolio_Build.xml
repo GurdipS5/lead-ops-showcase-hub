@@ -438,7 +438,7 @@ fraim run risk_flagger --location . --diff --base main --head HEAD \
   --custom-risk-list-json '{"Example Rule": "Flag this rule on every diff, it is an example to show how the workflow works."}' \
   --custom-risk-list-action replace]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
-          <param name="teamcity.step.mode" value="default" />
+          <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
       <runner id="Scan_with_Qodana" name="Scan with Qodana" type="Qodana">
