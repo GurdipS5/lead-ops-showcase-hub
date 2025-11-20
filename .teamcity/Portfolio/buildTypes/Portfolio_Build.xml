@@ -1794,7 +1794,7 @@ Write-Host "✅ Release $BuildNumber created successfully!"]]></param>
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
-      <runner id="jetbrains_powershell" name="" type="jetbrains_powershell">
+      <runner id="jetbrains_powershell" name="Execute Fraim (1)" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
