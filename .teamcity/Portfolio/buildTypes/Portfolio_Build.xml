@@ -1632,7 +1632,7 @@ function Upload-ToCloudsmith {
                 "$($CLOUDSMITH_ORG)/$($CLOUDSMITH_REPO)" `
                 $ArtifactsZip `
                 --name $artifactsName `
-                --summary "Cosign signatures, certificates, and provenance for $PackageName@$PackageVersion" '
+                --summary "Cosign signatures, certificates, and provenance for $PackageName@$PackageVersion" `
                 --version $buildNumber
             
             if ($LASTEXITCODE -ne 0) {
