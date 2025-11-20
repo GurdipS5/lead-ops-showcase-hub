@@ -383,6 +383,8 @@ if (-not (Test-Path -Path $artifactsPath)) {
 # Run Semgrep CI scan with SARIF output
 Write-Host "Running Semgrep CI scan..." -ForegroundColor Cyan
 try {
+	$env:SEMGREP_APP_TOKEN = "%env.SEMGREP_APP_TOKEN%"
+	semgrep login
     semgrep ci --sarif --output $sarifOutputFile
     
     if ($LASTEXITCODE -eq 0) {
