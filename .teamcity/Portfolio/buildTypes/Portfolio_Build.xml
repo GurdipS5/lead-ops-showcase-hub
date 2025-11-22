@@ -273,42 +273,56 @@ exit 0]]></param>
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
       </runner>
-      <runner id="Set_changelog" name="Set changelog" type="jetbrains_powershell">
+      <runner id="Set_changelog" name="Update Changelog" type="jetbrains_powershell">
         <parameters>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
-          <param name="jetbrains_powershell_script_code"><![CDATA[# Check if major or minor version (add your IsMajorOrMinorVersion logic)
-    if ($version -match '^v?\d+\.\d+\.0$') {
-        $changelogArgs = @(
-            "--latest-version", $version,
-            "--commit-limit", "false",
-            "--unreleased",
-            "--template", "compact",
-            "--commit-url", "false",
-            "--issue-url", "false",
-            "--merge-url", "false",
-            "--compare-url", "false",
-            "--breaking-pattern", "BREAKING CHANGE:",
-            "--tag-prefix", "v",
-            "--type-to-emoji", "feat=✨",
-            "--type-to-emoji", "fix=🐛",
-            "--type-to-emoji", "perf=⚡",
-            "--type-to-emoji", "refactor=♻️",
-            "--type-to-emoji", "style=💄",
-            "--type-to-emoji", "docs=📚",
-            "--type-to-emoji", "test=🧪",
-            "--type-to-emoji", "build=🏗️",
-            "--type-to-emoji", "ci=👷",
-            "--type-to-emoji", "chore=🔧",
-            "--type-to-emoji", "revert=⏪",
-            "--type-to-emoji", "security=🔒"
-        )
-        
-        & auto-changelog $changelogArgs
-        Write-Host "Updated changelog for version $version with emojis"
-    } else {
-        Write-Host "Skipping changelog update for patch version $version"
-    }]]></param>
+          <param name="jetbrains_powershell_script_code"><![CDATA[$ErrorActionPreference = "Stop"
+
+$branch = "%teamcity.build.branch%"
+$buildNumber = "%build.number%"
+$isPR = $branch -match "pull|PR-"
+
+if ($branch -eq "main" -or $branch -eq "master") {
+    # Main branch: Generate full changelog and release notes
+    Write-Host "=== Generating changelog for main branch ==="
+    
+    # Use TeamCity's build.number which was set in Step 2
+    $newVersion = $buildNumber
+    
+    # Generate full changelog with new version tag
+    Write-Host "Generating full changelog for version: $newVersion"
+    git-cliff --tag $newVersion --output CHANGELOG.md
+    
+    # Generate changelog for this release only
+    Write-Host "Generating release-specific changelog..."
+    git-cliff --latest --output CHANGELOG_RELEASE.md
+    
+    Write-Host "`nChangelog generated successfully"
+    Write-Host "`n=== Release Changelog ==="
+    Get-Content CHANGELOG_RELEASE.md | Write-Host
+    
+} elseif ($isPR) {
+    # PR branch: Generate unreleased changes changelog
+    Write-Host "=== Generating changelog for Pull Request ==="
+    
+    $baseBranch = "%teamcity.pullRequest.target.branch%"
+    if ([string]::IsNullOrWhiteSpace($baseBranch)) {
+        $baseBranch = "main"
+    }
+    
+    Write-Host "Base branch: $baseBranch"
+    
+    # Generate changelog for unreleased changes (PR changes)
+    git-cliff --unreleased --output PR_CHANGELOG.md
+    
+    # Display changelog in build log
+    Write-Host "`n=== Changes in this PR ==="
+    Get-Content PR_CHANGELOG.md | Write-Host
+    
+} else {
+    Write-Host "Branch '$branch' is neither main nor a PR - skipping changelog generation"
+}]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
