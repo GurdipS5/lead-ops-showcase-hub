@@ -143,9 +143,11 @@ return $result]]></param>
           <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
-      <runner id="Set_Version" name="Set Version" type="simpleRunner">
+      <runner id="Set_Version" name="Set Version" type="jetbrains_powershell">
         <parameters>
-          <param name="script.content"><![CDATA[$ErrorActionPreference = "Stop"
+          <param name="jetbrains_powershell_execution" value="PS1" />
+          <param name="jetbrains_powershell_noprofile" value="true" />
+          <param name="jetbrains_powershell_script_code"><![CDATA[$ErrorActionPreference = "Stop"
 
 $branch = "%teamcity.build.branch%"
 
@@ -169,7 +171,7 @@ if ($branch -eq "main" -or $branch -eq "master") {
         $major = [int]$versionParts[0]
         $minor = [int]$versionParts[1]
         $patch = [int]$versionParts[2] + 1
-        $newVersion = "$major.$minor.$patch"
+        $newVersion = "v$major.$minor.$patch"
     }
     
     Write-Host "Next version: $newVersion"
@@ -179,8 +181,8 @@ if ($branch -eq "main" -or $branch -eq "master") {
     
     $newVersion | Out-File -FilePath "VERSION.txt" -Encoding UTF8 -NoNewline
 }]]></param>
+          <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
-          <param name="use.custom.script" value="true" />
         </parameters>
       </runner>
       <runner id="CSpell" name="CSpell" type="simpleRunner">
