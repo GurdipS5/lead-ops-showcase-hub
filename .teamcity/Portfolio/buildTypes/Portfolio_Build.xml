@@ -424,7 +424,7 @@ Write-Host "PR URL: $prUrl"
 $env:SEMGREP_API_KEY = $env:ANTHROPIC_API_KEY
 
 # Automated PR analysis with team notification
-fraim run risk_flagger --location . --diff --base main --head HEAD   `
+"C:\Program Files\Python313\Scripts\fraim.exe" run risk_flagger --location . --diff --base main --head HEAD   `
   --pr-url $prUrl  `
   --approver security-team  `
   --custom-risk-list-json '{"Example Rule": "Flag this rule on every diff, it is an example to show how the workflow works."}'  `
