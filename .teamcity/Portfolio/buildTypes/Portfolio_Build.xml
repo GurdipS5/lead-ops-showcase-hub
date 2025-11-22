@@ -145,8 +145,40 @@ return $result]]></param>
       </runner>
       <runner id="Set_Version" name="Set Version" type="simpleRunner">
         <parameters>
-          <param name="script.content"><![CDATA[git fetch --deepen=1000 || git fetch --unshallow
-npx nbgv cloud]]></param>
+          <param name="script.content"><![CDATA[$ErrorActionPreference = "Stop"
+
+$branch = "%teamcity.build.branch%"
+
+# For main branch builds
+if ($branch -eq "main" -or $branch -eq "master") {
+    Write-Host "Determining next version using git-cliff..."
+    
+    # Use git-cliff to determine the next version based on conventional commits
+    $newVersion = git-cliff --bumped-version 2>$null
+    
+    if ([string]::IsNullOrWhiteSpace($newVersion)) {
+        Write-Host "No new version detected, using patch bump"
+        
+        $latestTag = git describe --tags --abbrev=0 2>$null
+        if ([string]::IsNullOrWhiteSpace($latestTag)) {
+            $latestTag = "v0.0.0"
+        }
+        
+        # Bump patch version
+        $versionParts = $latestTag -replace '^v', '' -split '\.'
+        $major = [int]$versionParts[0]
+        $minor = [int]$versionParts[1]
+        $patch = [int]$versionParts[2] + 1
+        $newVersion = "$major.$minor.$patch"
+    }
+    
+    Write-Host "Next version: $newVersion"
+    
+    # Set TeamCity's standard build.number parameter
+    Write-Host "##teamcity[buildNumber '$newVersion']"
+    
+    $newVersion | Out-File -FilePath "VERSION.txt" -Encoding UTF8 -NoNewline
+}]]></param>
           <param name="teamcity.step.mode" value="default" />
           <param name="use.custom.script" value="true" />
         </parameters>
