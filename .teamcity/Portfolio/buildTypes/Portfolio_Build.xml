@@ -157,6 +157,7 @@ if ($branch -eq "main" -or $branch -eq "master") {
     
     # Use git-cliff to determine the next version based on conventional commits
     $newVersion = git-cliff --bumped-version 2>$null
+    Write-Host $newVersion
     
     if ([string]::IsNullOrWhiteSpace($newVersion)) {
         Write-Host "No new version detected, using patch bump"
