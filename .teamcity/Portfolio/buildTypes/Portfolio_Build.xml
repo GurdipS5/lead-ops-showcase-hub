@@ -148,26 +148,29 @@ return $result]]></param>
           <param name="jetbrains_powershell_execution" value="PS1" />
           <param name="jetbrains_powershell_noprofile" value="true" />
           <param name="jetbrains_powershell_script_code"><![CDATA[$ErrorActionPreference = "Stop"
-
 $branch = "%teamcity.build.branch%"
+$buildCounter = "%build.counter%"
+
+# Get the base version from the latest tag
+function Get-BaseVersion {
+    $latestTag = git describe --tags --abbrev=0 2>$null
+    if ([string]::IsNullOrWhiteSpace($latestTag)) {
+        return "v0.0.0"
+    }
+    return $latestTag
+}
 
 # For main branch builds
 if ($branch -eq "main" -or $branch -eq "master") {
     Write-Host "Determining next version using git-cliff..."
     
-    # Use git-cliff to determine the next version based on conventional commits
     $newVersion = git-cliff --bumped-version 2>$null
     Write-Host $newVersion
     
     if ([string]::IsNullOrWhiteSpace($newVersion)) {
         Write-Host "No new version detected, using patch bump"
         
-        $latestTag = git describe --tags --abbrev=0 2>$null
-        if ([string]::IsNullOrWhiteSpace($latestTag)) {
-            $latestTag = "v0.0.0"
-        }
-        
-        # Bump patch version
+        $latestTag = Get-BaseVersion
         $versionParts = $latestTag -replace '^v', '' -split '\.'
         $major = [int]$versionParts[0]
         $minor = [int]$versionParts[1]
@@ -176,12 +179,52 @@ if ($branch -eq "main" -or $branch -eq "master") {
     }
     
     Write-Host "Next version: $newVersion"
+}
+# For PR builds
+elseif ($branch -match '^(refs/)?pull/(\d+)' -or $branch -match '^pr[/-](\d+)' -or $branch -match '^\d+/merge$') {
+    Write-Host "PR build detected for branch: $branch"
     
-    # Set TeamCity's standard build.number parameter
-    Write-Host "##teamcity[buildNumber '$newVersion']"
+    # Extract PR number from various formats
+    if ($branch -match '(\d+)') {
+        $prNumber = $matches[1]
+    } else {
+        $prNumber = "unknown"
+    }
     
-    $newVersion | Out-File -FilePath "VERSION.txt" -Encoding UTF8 -NoNewline
-}]]></param>
+    $baseVersion = Get-BaseVersion
+    $versionParts = $baseVersion -replace '^v', '' -split '\.'
+    $major = [int]$versionParts[0]
+    $minor = [int]$versionParts[1]
+    $patch = [int]$versionParts[2]
+    
+    # Create prerelease version: v1.2.3-pr.123.456 (PR number + build counter)
+    $newVersion = "v$major.$minor.$patch-pr.$prNumber.$buildCounter"
+    
+    Write-Host "PR version: $newVersion"
+}
+# For feature/other branches
+else {
+    Write-Host "Feature branch build: $branch"
+    
+    $baseVersion = Get-BaseVersion
+    $versionParts = $baseVersion -replace '^v', '' -split '\.'
+    $major = [int]$versionParts[0]
+    $minor = [int]$versionParts[1]
+    $patch = [int]$versionParts[2]
+    
+    # Sanitize branch name for version string
+    $safeBranch = $branch -replace '[^a-zA-Z0-9]', '-' -replace '-+', '-' -replace '^-|-$', ''
+    $safeBranch = $safeBranch.Substring(0, [Math]::Min(20, $safeBranch.Length))
+    
+    $newVersion = "v$major.$minor.$patch-$safeBranch.$buildCounter"
+    
+    Write-Host "Branch version: $newVersion"
+}
+
+# Set TeamCity's standard build.number parameter
+Write-Host "##teamcity[buildNumber '$newVersion']"
+
+$newVersion | Out-File -FilePath "VERSION.txt" -Encoding UTF8 -NoNewline]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
         </parameters>
