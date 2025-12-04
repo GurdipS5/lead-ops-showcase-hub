@@ -153,19 +153,21 @@ $buildCounter = "%build.counter%"
 
 # Get the base version from the latest tag
 function Get-BaseVersion {
-    $latestTag = git describe --tags --abbrev=0 2>$null
+    # Use cmd /c to avoid PowerShell treating stderr as error
+    $latestTag = cmd /c "git describe --tags --abbrev=0 2>nul"
+    
     if ([string]::IsNullOrWhiteSpace($latestTag)) {
+        Write-Host "No tags found, using v0.0.0"
         return "v0.0.0"
     }
-    return $latestTag
+    return $latestTag.Trim()
 }
 
 # For main branch builds
 if ($branch -eq "main" -or $branch -eq "master") {
     Write-Host "Determining next version using git-cliff..."
     
-    $newVersion = git-cliff --bumped-version 2>$null
-    Write-Host $newVersion
+    $newVersion = cmd /c "git-cliff --bumped-version 2>nul"
     
     if ([string]::IsNullOrWhiteSpace($newVersion)) {
         Write-Host "No new version detected, using patch bump"
@@ -184,7 +186,6 @@ if ($branch -eq "main" -or $branch -eq "master") {
 elseif ($branch -match '^(refs/)?pull/(\d+)' -or $branch -match '^pr[/-](\d+)' -or $branch -match '^\d+/merge$') {
     Write-Host "PR build detected for branch: $branch"
     
-    # Extract PR number from various formats
     if ($branch -match '(\d+)') {
         $prNumber = $matches[1]
     } else {
@@ -197,7 +198,6 @@ elseif ($branch -match '^(refs/)?pull/(\d+)' -or $branch -match '^pr[/-](\d+)' -
     $minor = [int]$versionParts[1]
     $patch = [int]$versionParts[2]
     
-    # Create prerelease version: v1.2.3-pr.123.456 (PR number + build counter)
     $newVersion = "v$major.$minor.$patch-pr.$prNumber.$buildCounter"
     
     Write-Host "PR version: $newVersion"
@@ -212,7 +212,6 @@ else {
     $minor = [int]$versionParts[1]
     $patch = [int]$versionParts[2]
     
-    # Sanitize branch name for version string
     $safeBranch = $branch -replace '[^a-zA-Z0-9]', '-' -replace '-+', '-' -replace '^-|-$', ''
     $safeBranch = $safeBranch.Substring(0, [Math]::Min(20, $safeBranch.Length))
     
@@ -221,9 +220,7 @@ else {
     Write-Host "Branch version: $newVersion"
 }
 
-# Set TeamCity's standard build.number parameter
 Write-Host "##teamcity[buildNumber '$newVersion']"
-
 $newVersion | Out-File -FilePath "VERSION.txt" -Encoding UTF8 -NoNewline]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="default" />
