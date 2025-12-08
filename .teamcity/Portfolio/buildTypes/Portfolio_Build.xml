@@ -464,13 +464,13 @@ $prUrl = "https://github.com/$repo/pull/$prNumber"
 Write-Host "PR URL: $prUrl"
 
 # Read custom rules from file
-$customRules = Get-Content -Path "fraim_rules.json" -Raw
+$customRules = (Get-Content -Path "fraim-rules.json" -Raw) -replace "`r`n", "" -replace "`n", ""
 
 # Automated PR analysis with team notification
 & "C:\Program Files\Python313\Scripts\fraim.exe" run risk_flagger --location . --diff --base main --head HEAD `
   --pr-url $prUrl `
   --approver security-team `
-  --custom-risk-list-json $customRules `
+  --custom-risk-list-json "$customRules" `
   --custom-risk-list-action replace]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
