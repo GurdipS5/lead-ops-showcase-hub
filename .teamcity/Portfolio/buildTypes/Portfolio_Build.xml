@@ -471,7 +471,7 @@ $customRules = (Get-Content -Path "fraim_rules.json" -Raw) -replace "`r`n", "" -
   --pr-url $prUrl `
   --approver security-team `
   --custom-risk-list-filepath fraim_rules.json `
-  --custom- risk-list-action replace]]></param>
+  --custom-risk-list-action replace]]></param>
           <param name="jetbrains_powershell_script_mode" value="CODE" />
           <param name="teamcity.step.mode" value="execute_if_failed" />
         </parameters>
