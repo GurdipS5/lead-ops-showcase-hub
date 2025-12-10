@@ -569,7 +569,7 @@ if (-not (Test-Path $env:GitGuardianDir)) {
 }
 
 # Run the scan, prettify JSON, and save to SARIF file
-ggshield secret scan commit-range HEAD~1 --format sarif |
+ggshield secret scan commit-range HEAD --format sarif |
     ConvertFrom-Json |
     ConvertTo-Json -Depth 10 |
     Tee-Object -FilePath "$env:GitGuardianDir\results.sarif"]]></param>
